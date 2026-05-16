@@ -1,200 +1,151 @@
-\section{Fourier Neural Operator for Thermoelastic Wave Prediction}
+\section{Two-Dimensional Fourier Neural Operator for Thermoelastic Field Prediction}
 
-\subsection{Motivation for Using Fourier Neural Operator}
+\subsection{Model Formulation}
 
-The previous chapters established the physical and geological basis of thermoelastic wave propagation in rocks. In this section, the focus shifts from the physical formulation of the problem to the machine learning method used to approximate its solution. The Fourier Neural Operator, abbreviated as FNO, is considered as a data-driven operator-learning model for predicting the evolution of thermoelastic fields from simulation data.
+In the present work, the Fourier Neural Operator is used as a supervised learning model for predicting thermoelastic field evolution from simulation-generated data. The model is formulated as a two-dimensional Fourier Neural Operator, which means that the spectral transformations are applied over a two-dimensional spatial grid. The physical state at each grid point is represented by several channels, while the spatial structure of the data is described by two coordinates.
 
-The main reason for using FNO in this project is that the target variables are not isolated scalar outputs, but spatially distributed physical fields. At each time step, the state of the medium may be represented by several channels, such as temperature, displacement components, velocity components, stress components, strain components, and material parameters. Therefore, the model must learn a mapping between field-valued quantities.
+Let the computational domain be denoted by
+\[
+D \subset \mathbb{R}^{2}.
+\]
+Each point of the domain is represented as
+\[
+\mathbf{x} = (x,y),
+\]
+where \(x\) and \(y\) are the two spatial coordinates. Although the model operates on a two-dimensional grid, the predicted physical state contains multiple output channels. In the present formulation, the target field is written as
+\[
+\mathbf{s}(\mathbf{x}, t)
+=
+\left[
+T(\mathbf{x}, t),
+u(\mathbf{x}, t),
+v(\mathbf{x}, t),
+w(\mathbf{x}, t)
+\right],
+\]
+where \(T(\mathbf{x}, t)\) is the temperature field, and \(u(\mathbf{x}, t)\), \(v(\mathbf{x}, t)\), and \(w(\mathbf{x}, t)\) are displacement-related field components extracted from the simulation data.
 
-Let the spatial domain be denoted by
-\[
-D \subset \mathbb{R}^{d},
-\]
-where \(d\) is the spatial dimension. In a three-dimensional simulation,
-\[
-d = 3.
-\]
-At every point
-\[
-\mathbf{x} \in D,
-\]
-the input field can be represented as
-\[
-a(\mathbf{x}) \in \mathbb{R}^{d_a},
-\]
-where \(d_a\) is the number of input channels. The output field is written as
-\[
-u(\mathbf{x}) \in \mathbb{R}^{d_u},
-\]
-where \(d_u\) is the number of predicted output channels.
-
-The aim of FNO is to approximate a solution operator
-\[
-\mathcal{G}^{\dagger}: \mathcal{A} \rightarrow \mathcal{U},
-\]
-where \(\mathcal{A}\) is the input function space and \(\mathcal{U}\) is the output function space. The learned approximation is written as
+The purpose of the model is to learn a mapping from known input fields to future output fields. This mapping is represented as an operator
 \[
 \mathcal{G}_{\theta}: \mathcal{A} \rightarrow \mathcal{U},
 \]
-where \(\theta\) denotes all trainable parameters of the neural operator. The training objective is to make
+where \(\mathcal{A}\) is the input function space, \(\mathcal{U}\) is the output function space, and \(\theta\) denotes the trainable parameters of the model. The learned operator approximates the relation
 \[
-\mathcal{G}_{\theta}(a) \approx \mathcal{G}^{\dagger}(a).
+\mathcal{G}_{\theta}(a) \approx \mathbf{s},
 \]
+where \(a\) is the input field and \(\mathbf{s}\) is the target thermoelastic state.
 
-In the context of this project, the reference operator
-\[
-\mathcal{G}^{\dagger}
-\]
-is represented by high-fidelity simulation data. The role of FNO is to learn the relationship between input physical conditions and the resulting thermoelastic fields. Once trained, the model can be used to predict the field response for new input configurations within the range covered by the training data.
+\subsection{Temporal Prediction Task}
 
-\subsection{Operator Learning Formulation}
-
-The dataset used for operator learning consists of paired input and output fields:
+For a one-step temporal prediction task, the model can be written as
 \[
-\mathcal{D}
-=
-\left\{
-\left(
-a_j,
-u_j
-\right)
-\right\}_{j=1}^{N_s},
-\]
-where \(N_s\) is the number of training samples. Each input \(a_j\) represents the known state or parameter configuration of the system, while \(u_j\) represents the corresponding target field obtained from simulation.
-
-For a time-dependent prediction problem, the input may contain one or several previous time states. If the physical state at time \(t_n\) is denoted by
-\[
-u(\mathbf{x}, t_n),
-\]
-then a one-step prediction task can be written as
-\[
-\mathcal{G}_{\theta}:
-u(\mathbf{x}, t_n)
-\mapsto
-u(\mathbf{x}, t_{n+1}).
-\]
-The predicted field is
-\[
-\hat{u}(\mathbf{x}, t_{n+1})
+\hat{\mathbf{s}}(\mathbf{x}, t_{n+1})
 =
 \mathcal{G}_{\theta}
 \left(
-u(\mathbf{x}, t_n)
-\right).
+\mathbf{s}(\mathbf{x}, t_n)
+\right),
 \]
+where \(\mathbf{s}(\mathbf{x}, t_n)\) is the known state at time \(t_n\), and \(\hat{\mathbf{s}}(\mathbf{x}, t_{n+1})\) is the predicted state at the next time step.
 
-If several previous states are used as input, the mapping becomes
+If several previous time steps are used as input, the mapping becomes
 \[
-\mathcal{G}_{\theta}:
-\left[
-u(\mathbf{x}, t_{n-m+1}),
-u(\mathbf{x}, t_{n-m+2}),
+\hat{\mathbf{s}}(\mathbf{x}, t_{n+1})
+=
+\mathcal{G}_{\theta}
+\left(
+\mathbf{s}(\mathbf{x}, t_{n-m+1}),
+\mathbf{s}(\mathbf{x}, t_{n-m+2}),
 \ldots,
-u(\mathbf{x}, t_n)
-\right]
-\mapsto
-u(\mathbf{x}, t_{n+1}),
+\mathbf{s}(\mathbf{x}, t_n)
+\right),
 \]
 where \(m\) is the number of input time steps.
 
-In a multi-channel formulation, the state field can be written as
+In the present implementation, the target output is represented as
 \[
-u(\mathbf{x}, t)
+\hat{\mathbf{s}}(\mathbf{x}, t)
 =
 \left[
-u_1(\mathbf{x}, t),
-u_2(\mathbf{x}, t),
-\ldots,
-u_C(\mathbf{x}, t)
-\right],
+\hat{T}(\mathbf{x}, t),
+\hat{u}(\mathbf{x}, t),
+\hat{v}(\mathbf{x}, t),
+\hat{w}(\mathbf{x}, t)
+\right].
 \]
-where \(C\) is the number of physical channels. For the thermoelastic prediction task, these channels may correspond to temperature, displacement, velocity, stress, strain, or other quantities extracted from the numerical simulation.
+Thus, the model predicts four physical channels at every grid point of the two-dimensional computational domain.
 
-The learning problem is therefore not formulated as the prediction of a single value. Instead, the model learns a field-to-field mapping:
+\subsection{Input and Output Tensor Representation}
+
+The input tensor for a two-dimensional FNO has the form
 \[
-\mathcal{G}_{\theta}:
-\mathbb{R}^{N \times C_{in}}
-\rightarrow
-\mathbb{R}^{N \times C_{out}},
+\mathbf{A}
+\in
+\mathbb{R}^{B \times N_x \times N_y \times C_{in}},
 \]
-where \(N\) is the number of spatial points, \(C_{in}\) is the number of input channels, and \(C_{out}\) is the number of output channels.
-
-\subsection{Fourier Representation of Field Data}
-
-The defining feature of FNO is that part of the computation is performed in the Fourier domain. A spatial field can be represented not only by its values at grid points, but also by its frequency components. For a continuous function \(v(\mathbf{x})\), the Fourier transform is written as
+where \(B\) is the batch size, \(N_x\) and \(N_y\) are the numbers of grid points in the two spatial directions, and \(C_{in}\) is the number of input channels. The corresponding target tensor has the form
 \[
-\mathcal{F}(v)(\boldsymbol{\xi})
+\mathbf{S}
+\in
+\mathbb{R}^{B \times N_x \times N_y \times C_{out}}.
+\]
+For the current task,
+\[
+C_{out}=4,
+\]
+because the model predicts the four fields
+\[
+T, \quad u, \quad v, \quad w.
+\]
+
+If the input contains \(m\) previous time steps and each time step contains \(C\) physical channels, the input tensor can be constructed by concatenating the temporal information along the channel dimension:
+\[
+\mathbf{A}
+\in
+\mathbb{R}^{B \times N_x \times N_y \times (mC)}.
+\]
+This representation allows the model to use information from several previous states without treating time as an additional Fourier dimension.
+
+\subsection{Coordinate Encoding}
+
+In many implementations of FNO, spatial coordinates are appended to the input field. For the two-dimensional case, the coordinate-augmented input is written as
+\[
+\tilde{a}(\mathbf{x})
 =
-\int_{D}
-v(\mathbf{x})
-e^{-2\pi i \mathbf{x} \cdot \boldsymbol{\xi}}
-d\mathbf{x},
+\left[
+a(\mathbf{x}),
+x,
+y
+\right].
 \]
-where \(\boldsymbol{\xi}\) denotes the frequency variable and \(i\) is the imaginary unit.
-
-The inverse Fourier transform reconstructs the field in physical space:
+Since
 \[
-\mathcal{F}^{-1}(\hat{v})(\mathbf{x})
-=
-\int_{\mathbb{R}^{d}}
-\hat{v}(\boldsymbol{\xi})
-e^{2\pi i \mathbf{x} \cdot \boldsymbol{\xi}}
-d\boldsymbol{\xi}.
+\mathbf{x} = (x,y),
 \]
-
-In numerical implementation, the field is available on a finite grid. For a one-dimensional discrete signal
+the augmented input has dimension
 \[
-v_0, v_1, \ldots, v_{N-1},
+\tilde{a}(\mathbf{x}) \in \mathbb{R}^{d_a+2}.
 \]
-the discrete Fourier transform is
-\[
-\hat{v}_k
-=
-\sum_{n=0}^{N-1}
-v_n
-e^{-2\pi i kn/N},
-\]
-and the inverse transform is
-\[
-v_n
-=
-\frac{1}{N}
-\sum_{k=0}^{N-1}
-\hat{v}_k
-e^{2\pi i kn/N}.
-\]
+Coordinate encoding provides the model with explicit information about the location of each grid point. This is useful because the same physical value may have different meaning depending on its position in the domain.
 
-For multidimensional data, the same idea is applied along several spatial dimensions. In a two-dimensional grid, the transform is applied over \(x\)- and \(y\)-directions. In a three-dimensional grid, it is applied over \(x\)-, \(y\)-, and \(z\)-directions. This allows the model to represent spatial patterns through spectral modes.
+\subsection{Architecture of the Two-Dimensional FNO}
 
-In FNO, Fourier coefficients are not used only for analysis. They are transformed by trainable weights. Therefore, the model learns how the spectral representation of the input field should be modified in order to produce the predicted output field.
-
-\subsection{General Architecture of FNO}
-
-The FNO architecture consists of three main parts:
-
-\begin{enumerate}
-    \item lifting layer;
-    \item sequence of Fourier layers;
-    \item projection layer.
-\end{enumerate}
-
-Let the input field be
-\[
-a(\mathbf{x}) \in \mathbb{R}^{d_a}.
-\]
-The lifting layer maps this input to a higher-dimensional latent representation:
+The main computational block of FNO is the Fourier layer. Before applying the Fourier layers, the input is lifted to a higher-dimensional latent representation:
 \[
 v_0(\mathbf{x})
 =
-P(a(\mathbf{x})),
+P
+\left(
+\tilde{a}(\mathbf{x})
+\right),
 \]
-where \(P\) is a learnable pointwise transformation. The lifted representation has the form
+where \(P\) is a learnable pointwise transformation. The lifted field is
 \[
 v_0(\mathbf{x}) \in \mathbb{R}^{d_v},
 \]
 where \(d_v\) is the hidden channel dimension.
 
-After lifting, the model applies \(L\) Fourier layers:
+The model then applies a sequence of Fourier layers:
 \[
 v_0
 \rightarrow
@@ -202,9 +153,9 @@ v_1
 \rightarrow
 \cdots
 \rightarrow
-v_L.
+v_L,
 \]
-Each layer updates the latent field using a spectral transformation and a pointwise transformation. The general form of the update is
+where \(L\) is the number of Fourier layers. Each Fourier layer updates the hidden representation by combining a spectral transformation with a pointwise transformation:
 \[
 v_{l+1}(\mathbf{x})
 =
@@ -217,17 +168,25 @@ W_l v_l(\mathbf{x})
 b_l
 \right),
 \]
-where \(l\) is the layer index, \(\mathcal{K}_l\) is the spectral integral operator, \(W_l\) is a pointwise linear transformation, \(b_l\) is a bias term, and \(\sigma\) is a nonlinear activation function.
+where \(l\) is the layer index, \(\mathcal{K}_l\) is the Fourier-domain operator, \(W_l\) is a pointwise linear transformation, \(b_l\) is a bias term, and \(\sigma\) is a nonlinear activation function.
 
-After the last Fourier layer, the projection layer maps the hidden representation to the required output dimension:
+After the last Fourier layer, the latent representation is projected to the target output channels:
 \[
-\hat{u}(\mathbf{x})
+\hat{\mathbf{s}}(\mathbf{x}, t)
 =
-Q(v_L(\mathbf{x})),
+Q
+\left(
+v_L(\mathbf{x})
+\right),
 \]
-where \(Q\) is a learnable projection network.
+where \(Q\) is a learnable projection network. Since the output contains four channels, the final prediction has the form
+\[
+\hat{\mathbf{s}}(\mathbf{x}, t)
+\in
+\mathbb{R}^{4}.
+\]
 
-The complete FNO mapping can be written as
+The complete FNO mapping can be expressed as
 \[
 \mathcal{G}_{\theta}
 =
@@ -247,11 +206,7 @@ where \(\mathcal{L}_l\) denotes the \(l\)-th Fourier layer.
 
 \subsection{Fourier Layer}
 
-The Fourier layer is the central computational block of FNO. Let
-\[
-v_l(\mathbf{x})
-\]
-be the hidden representation at layer \(l\). The layer first applies the Fourier transform:
+The spectral part of the Fourier layer is computed using the Fourier transform. For a hidden field \(v_l(\mathbf{x})\), the Fourier transform is
 \[
 \hat{v}_l(\boldsymbol{\xi})
 =
@@ -259,10 +214,14 @@ be the hidden representation at layer \(l\). The layer first applies the Fourier
 \left(
 v_l
 \right)
-(\boldsymbol{\xi}).
+(\boldsymbol{\xi}),
+\]
+where \(\boldsymbol{\xi}\) is the frequency variable. In the two-dimensional case,
+\[
+\boldsymbol{\xi} = (\xi_1,\xi_2).
 \]
 
-The transformed representation is then multiplied by trainable complex-valued weights:
+The Fourier coefficients are multiplied by trainable complex-valued weights:
 \[
 \hat{z}_l(\boldsymbol{\xi})
 =
@@ -271,26 +230,34 @@ R_l(\boldsymbol{\xi})
 \]
 where \(R_l(\boldsymbol{\xi})\) is the learned spectral weight tensor.
 
-Only a finite number of Fourier modes is usually retained. Let
+Only a finite number of Fourier modes is retained. For the two-dimensional FNO, the retained set of modes can be written as
 \[
 \mathcal{M}_K
+=
+\left\{
+(k_1,k_2)
+:
+|k_1| \leq K_1,
+|k_2| \leq K_2
+\right\},
 \]
-be the set of retained modes, where \(K\) denotes the number of selected modes. The spectral operation can be written as
+where \(K_1\) and \(K_2\) are the numbers of retained modes in the two spatial directions.
+
+The spectral operation is therefore
 \[
-\hat{z}_l(\boldsymbol{\xi})
+\hat{z}_l(k_1,k_2)
 =
 \begin{cases}
-R_l(\boldsymbol{\xi})\hat{v}_l(\boldsymbol{\xi}),
+R_l(k_1,k_2)\hat{v}_l(k_1,k_2),
 &
-\boldsymbol{\xi} \in \mathcal{M}_K,
+(k_1,k_2) \in \mathcal{M}_K,
 \\
 0,
 &
-\boldsymbol{\xi} \notin \mathcal{M}_K.
+(k_1,k_2) \notin \mathcal{M}_K.
 \end{cases}
 \]
-
-Then the inverse Fourier transform is applied:
+After this multiplication, the inverse Fourier transform is applied:
 \[
 z_l(\mathbf{x})
 =
@@ -301,7 +268,7 @@ z_l(\mathbf{x})
 (\mathbf{x}).
 \]
 
-Finally, the result is combined with the pointwise term:
+The output of the spectral operation is combined with the pointwise term:
 \[
 v_{l+1}(\mathbf{x})
 =
@@ -314,8 +281,7 @@ W_l v_l(\mathbf{x})
 b_l
 \right).
 \]
-
-The full Fourier layer can therefore be written compactly as
+Equivalently, the Fourier layer can be written compactly as
 \[
 v_{l+1}
 =
@@ -332,196 +298,29 @@ b_l
 \right).
 \]
 
-This equation is the core mathematical operation of FNO. The model transforms the field to spectral space, applies learned weights to selected modes, returns to physical space, and then applies a nonlinear activation.
-
-\subsection{Mode Truncation and Spectral Weights}
-
-The number of retained Fourier modes is one of the most important hyperparameters of FNO. If the complete discrete field contains many frequency components, the model usually keeps only the first \(K\) modes in each spatial direction. In a two-dimensional setting, this may be expressed as
-\[
-\mathcal{M}_K
-=
-\left\{
-(k_1, k_2)
-:
-|k_1| \leq K_1,
-|k_2| \leq K_2
-\right\}.
-\]
-For a three-dimensional grid, the retained set can be written as
-\[
-\mathcal{M}_K
-=
-\left\{
-(k_1, k_2, k_3)
-:
-|k_1| \leq K_1,
-|k_2| \leq K_2,
-|k_3| \leq K_3
-\right\}.
-\]
-
-The trainable spectral weights are defined only for these retained modes. For one Fourier layer, the weight tensor may be represented as
+For a two-dimensional Fourier layer, the trainable spectral weights can be represented as
 \[
 R_l
 \in
-\mathbb{C}^{C_{in}^{(l)} \times C_{out}^{(l)} \times K_1 \times K_2}
+\mathbb{C}^{C_{in}^{(l)} \times C_{out}^{(l)} \times K_1 \times K_2},
 \]
-in the two-dimensional case, or as
+where \(C_{in}^{(l)}\) and \(C_{out}^{(l)}\) are the numbers of input and output hidden channels at layer \(l\). This form shows that the Fourier transformation is applied over two spatial dimensions, while the physical quantities are represented as multiple channels.
+
+\subsection{Supervised Training Objective}
+
+The model is trained in a purely supervised manner. This means that the training objective compares the predicted fields with the reference fields obtained from simulation data. The model does not explicitly enforce the governing partial differential equations during optimization.
+
+Let the prediction for sample \(j\) be
 \[
-R_l
-\in
-\mathbb{C}^{C_{in}^{(l)} \times C_{out}^{(l)} \times K_1 \times K_2 \times K_3}
-\]
-in the three-dimensional case. Here, \(C_{in}^{(l)}\) and \(C_{out}^{(l)}\) are the numbers of input and output hidden channels in layer \(l\).
-
-Mode truncation reduces computational cost and controls the spectral capacity of the model. The choice of \(K\) affects how much spatial detail can be represented. In the thermoelastic prediction task, this parameter must be selected carefully because the target fields may contain both smooth components and localized variations.
-
-\subsection{Input Tensor Construction}
-
-In practical training, the physical fields are stored as tensors. For a two-dimensional spatial grid, the input tensor may have the form
-\[
-\mathbf{A}
-\in
-\mathbb{R}^{B \times N_x \times N_y \times C_{in}},
-\]
-where \(B\) is the batch size, \(N_x\) and \(N_y\) are the grid sizes, and \(C_{in}\) is the number of input channels.
-
-For a three-dimensional spatial grid, the input tensor may be written as
-\[
-\mathbf{A}
-\in
-\mathbb{R}^{B \times N_x \times N_y \times N_z \times C_{in}}.
-\]
-
-If several previous time steps are included in the input, the time dimension can either be treated as an additional axis or concatenated into the channel dimension. In the channel-concatenation approach, the input tensor becomes
-\[
-\mathbf{A}
-\in
-\mathbb{R}^{B \times N_x \times N_y \times N_z \times (mC)},
-\]
-where \(m\) is the number of input time steps and \(C\) is the number of physical channels per time step.
-
-The corresponding target tensor is
-\[
-\mathbf{U}
-\in
-\mathbb{R}^{B \times N_x \times N_y \times N_z \times C_{out}}.
-\]
-
-For one-step prediction, \(C_{out}\) is the number of physical channels predicted at the next time step. For multi-step direct prediction, the target may contain several future states:
-\[
-\mathbf{U}
-\in
-\mathbb{R}^{B \times N_x \times N_y \times N_z \times (hC)},
-\]
-where \(h\) is the number of future time steps predicted directly by the model.
-
-\subsection{Coordinate Encoding}
-
-In many FNO implementations, spatial coordinates are appended to the input channels. This gives the model explicit information about the position of each grid point in the computational domain. If the original input is
-\[
-a(\mathbf{x}),
-\]
-then the augmented input can be written as
-\[
-\tilde{a}(\mathbf{x})
+\hat{\mathbf{s}}_j
 =
-\left[
-a(\mathbf{x}),
-x,
-y,
-z
-\right].
+\mathcal{G}_{\theta}(a_j),
 \]
-
-For a three-dimensional problem,
+and let the corresponding reference field be
 \[
-\mathbf{x}
-=
-(x,y,z).
+\mathbf{s}_j.
 \]
-The augmented field therefore becomes
-\[
-\tilde{a}(\mathbf{x})
-\in
-\mathbb{R}^{d_a+3}.
-\]
-
-Coordinate encoding is useful because the same physical channel value may have different meaning depending on its location in the domain. For example, points located near a heat source, boundary, or material interface may have different evolution patterns than points located in the interior. By including coordinates, the model can learn spatially dependent behavior more effectively.
-
-\subsection{Temporal Prediction Strategy}
-
-For time-dependent thermoelastic prediction, FNO can be used in several ways. The first approach is one-step prediction:
-\[
-\hat{u}(\mathbf{x}, t_{n+1})
-=
-\mathcal{G}_{\theta}
-\left(
-u(\mathbf{x}, t_n)
-\right).
-\]
-In this case, the model predicts only the next time step.
-
-For longer prediction horizons, the model can be applied recursively. The first prediction is
-\[
-\hat{u}(\mathbf{x}, t_{n+1})
-=
-\mathcal{G}_{\theta}
-\left(
-u(\mathbf{x}, t_n)
-\right).
-\]
-The second prediction is then obtained by feeding the previous prediction back into the model:
-\[
-\hat{u}(\mathbf{x}, t_{n+2})
-=
-\mathcal{G}_{\theta}
-\left(
-\hat{u}(\mathbf{x}, t_{n+1})
-\right).
-\]
-In general,
-\[
-\hat{u}(\mathbf{x}, t_{n+r})
-=
-\mathcal{G}_{\theta}
-\left(
-\hat{u}(\mathbf{x}, t_{n+r-1})
-\right),
-\]
-where \(r\) is the prediction step.
-
-Another option is direct multi-step prediction:
-\[
-\mathcal{G}_{\theta}
-:
-u(\mathbf{x}, t_n)
-\mapsto
-\left[
-u(\mathbf{x}, t_{n+1}),
-u(\mathbf{x}, t_{n+2}),
-\ldots,
-u(\mathbf{x}, t_{n+h})
-\right].
-\]
-Here, \(h\) is the number of future steps predicted by a single forward pass.
-
-The choice between recursive and direct prediction depends on the dataset structure and the required forecasting horizon. Recursive prediction is flexible, but prediction errors may accumulate over time. Direct prediction avoids recursive feedback during inference, but the output dimension becomes larger.
-
-\subsection{Training Objective}
-
-The FNO model is trained by minimizing the difference between predicted fields and reference simulation fields. Let the prediction for sample \(j\) be
-\[
-\hat{u}_j
-=
-\mathcal{G}_{\theta}(a_j).
-\]
-The corresponding reference field is
-\[
-u_j.
-\]
-
-A common training loss is the mean squared error:
+The mean squared error loss is defined as
 \[
 \mathcal{L}_{MSE}
 =
@@ -530,14 +329,17 @@ A common training loss is the mean squared error:
 \sum_{i=1}^{N}
 \sum_{c=1}^{C}
 \left(
-\hat{u}_{j,i,c}
+\hat{s}_{j,i,c}
 -
-u_{j,i,c}
+s_{j,i,c}
 \right)^2,
 \]
-where \(N_s\) is the number of samples, \(N\) is the number of spatial points, and \(C\) is the number of predicted channels.
+where \(N_s\) is the number of samples, \(N\) is the number of grid points, and \(C\) is the number of output channels. In the current formulation,
+\[
+C=4.
+\]
 
-Another important metric is the relative \(L^2\) error:
+The relative \(L^2\) loss is defined as
 \[
 \mathcal{L}_{rel}
 =
@@ -545,217 +347,73 @@ Another important metric is the relative \(L^2\) error:
 \sum_{j=1}^{N_s}
 \frac{
 \left\|
-\hat{u}_j - u_j
+\hat{\mathbf{s}}_j
+-
+\mathbf{s}_j
 \right\|_2
 }{
 \left\|
-u_j
+\mathbf{s}_j
 \right\|_2
 }.
 \]
 
-For multi-channel prediction, the loss can also be computed channel-wise:
-\[
-\mathcal{L}_{c}
-=
-\frac{
-\left\|
-\hat{u}_{c} - u_{c}
-\right\|_2
-}{
-\left\|
-u_{c}
-\right\|_2
-}.
-\]
-This is useful when different physical channels have different numerical scales.
-
-The total loss may be written as a weighted sum:
+The total loss used for training can be written as
 \[
 \mathcal{L}
 =
-\sum_{c=1}^{C}
-\omega_c
-\mathcal{L}_c,
+\lambda_{MSE}
+\mathcal{L}_{MSE}
++
+\lambda_{rel}
+\mathcal{L}_{rel},
 \]
-where \(\omega_c\) is the weight assigned to channel \(c\). The weights can be used to balance the contribution of temperature, displacement, stress, or other output variables.
+where \(\lambda_{MSE}\) and \(\lambda_{rel}\) are weighting coefficients. If both terms are used with equal importance, then
+\[
+\lambda_{MSE}=1,
+\qquad
+\lambda_{rel}=1.
+\]
+
+No additional physics-informed residual term is included in this formulation. In particular, the loss does not contain a term of the form
+\[
+\mathcal{L}_{PDE}
+=
+\left\|
+\mathcal{N}
+\left(
+\hat{\mathbf{s}}
+\right)
+\right\|_2^2,
+\]
+where \(\mathcal{N}\) would denote a differential operator corresponding to the governing equations. Therefore, the physical information enters the model implicitly through the simulation-generated training data, not through explicit enforcement of the partial differential equations during training.
+
+This distinction is important for the interpretation of the model. The FNO does not solve the governing equations directly at each inference step. Instead, it learns a data-driven approximation of the input-output relation present in the simulation dataset. The learned mapping is expected to be accurate within the range of spatial patterns, material parameters, and temporal evolution represented in the training data.
 
 \subsection{Normalization of Physical Channels}
 
-Normalization is important when training FNO on multi-channel physical data. Different variables may have different magnitudes and units. If the model is trained directly on unnormalized data, channels with larger numerical values may dominate the loss.
-
-For each channel \(c\), standard normalization can be written as
+Because the output channels may have different magnitudes, normalization is applied before training. For each channel \(c\), standard normalization can be written as
 \[
-\tilde{u}_{i,c}
+\tilde{s}_{i,c}
 =
 \frac{
-u_{i,c} - \mu_c
+s_{i,c} - \mu_c
 }{
 \sigma_c
 },
 \]
-where \(\mu_c\) is the mean value of channel \(c\), and \(\sigma_c\) is the standard deviation of channel \(c\).
-
-The inverse transformation is
+where \(\mu_c\) is the mean value of channel \(c\), and \(\sigma_c\) is the standard deviation of channel \(c\). The inverse transformation is
 \[
-u_{i,c}
+s_{i,c}
 =
-\tilde{u}_{i,c}\sigma_c + \mu_c.
+\tilde{s}_{i,c}\sigma_c + \mu_c.
 \]
 
-The same normalization strategy can be applied to input and output fields. During training, the model predicts normalized values. During evaluation and visualization, predictions are transformed back to physical units.
+The normalization parameters are computed using the training set and then reused for validation, testing, and inference. This prevents information from the validation or test sets from influencing the training process.
 
-If min-max normalization is used, the normalized value can be written as
-\[
-\tilde{u}_{i,c}
-=
-\frac{
-u_{i,c} - u_{c}^{min}
-}{
-u_{c}^{max} - u_{c}^{min}
-},
-\]
-where \(u_{c}^{min}\) and \(u_{c}^{max}\) are the minimum and maximum values of channel \(c\) in the training set.
+\subsection{Evaluation Metrics}
 
-The inverse transformation is
-\[
-u_{i,c}
-=
-\tilde{u}_{i,c}
-\left(
-u_{c}^{max} - u_{c}^{min}
-\right)
-+
-u_{c}^{min}.
-\]
-
-The normalization parameters must be computed only from the training set and then reused for validation, testing, and inference. This prevents information leakage from the validation or test data into the training process.
-
-\subsection{Application to Thermoelastic Simulation Data}
-
-In this project, FNO is applied to simulation data representing the evolution of thermoelastic fields. The model does not redefine the physical theory already introduced in previous chapters. Instead, it uses the simulated fields as training data and learns the mapping from known states and parameters to future states.
-
-A general input vector at a spatial point can be written as
-\[
-a(\mathbf{x}, t)
-=
-\left[
-u(\mathbf{x}, t-m+1),
-\ldots,
-u(\mathbf{x}, t),
-p(\mathbf{x}),
-\mathbf{x}
-\right],
-\]
-where \(u(\mathbf{x}, t)\) denotes the physical state at time \(t\), \(p(\mathbf{x})\) denotes material or simulation parameters, and \(\mathbf{x}\) denotes spatial coordinates.
-
-The model output is the predicted future state:
-\[
-\hat{u}(\mathbf{x}, t+\Delta t)
-=
-\mathcal{G}_{\theta}
-\left(
-a(\mathbf{x}, t)
-\right).
-\]
-
-If the output contains several channels, it can be written as
-\[
-\hat{u}(\mathbf{x}, t+\Delta t)
-=
-\left[
-\hat{u}_1(\mathbf{x}, t+\Delta t),
-\hat{u}_2(\mathbf{x}, t+\Delta t),
-\ldots,
-\hat{u}_{C_{out}}(\mathbf{x}, t+\Delta t)
-\right].
-\]
-
-For thermoelastic wave prediction, the channel set may include variables extracted from the simulation, for example
-\[
-\hat{u}(\mathbf{x}, t)
-=
-\left[
-\hat{T},
-\hat{u}_x,
-\hat{u}_y,
-\hat{u}_z,
-\hat{v}_x,
-\hat{v}_y,
-\hat{v}_z,
-\hat{\sigma}_{xx},
-\hat{\sigma}_{yy},
-\hat{\sigma}_{zz},
-\hat{\sigma}_{xy},
-\hat{\sigma}_{yz},
-\hat{\sigma}_{xz}
-\right].
-\]
-
-The exact set of channels depends on the exported simulation data. The important point is that FNO treats the data as a structured field and learns the relationship between all channels jointly.
-
-\subsection{Training and Validation Pipeline}
-
-The training pipeline consists of several stages. First, simulation outputs are converted into arrays or tensors with consistent spatial and temporal indexing. Second, the channels are normalized using statistics computed from the training set. Third, input-target pairs are constructed according to the chosen prediction strategy. Finally, the FNO model is trained using gradient-based optimization.
-
-The dataset is divided into three subsets:
-\[
-\mathcal{D}
-=
-\mathcal{D}_{train}
-\cup
-\mathcal{D}_{val}
-\cup
-\mathcal{D}_{test}.
-\]
-The training set is used to update model parameters. The validation set is used to monitor generalization during training and tune hyperparameters. The test set is used only for final evaluation.
-
-For each batch, the model receives an input tensor
-\[
-\mathbf{A}_{batch}
-\]
-and produces a prediction
-\[
-\hat{\mathbf{U}}_{batch}
-=
-\mathcal{G}_{\theta}
-\left(
-\mathbf{A}_{batch}
-\right).
-\]
-The loss is computed against the reference tensor
-\[
-\mathbf{U}_{batch}.
-\]
-The optimization problem is
-\[
-\theta^{*}
-=
-\arg\min_{\theta}
-\mathcal{L}
-\left(
-\mathcal{G}_{\theta}(\mathbf{A}_{batch}),
-\mathbf{U}_{batch}
-\right).
-\]
-
-The parameters are updated iteratively:
-\[
-\theta_{q+1}
-=
-\theta_q
--
-\eta
-\nabla_{\theta}
-\mathcal{L}(\theta_q),
-\]
-where \(q\) is the optimization step and \(\eta\) is the learning rate.
-
-\subsection{Evaluation of FNO Predictions}
-
-The evaluation of FNO should include both numerical error metrics and field-level analysis. Numerical metrics are needed to quantify the average discrepancy between predicted and reference fields. Field-level analysis is needed because a small average error does not always guarantee that the spatial structure of the prediction is physically meaningful.
-
-The mean squared error is
+The quality of the trained model is evaluated by comparing predicted and reference fields. The mean squared error is
 \[
 MSE
 =
@@ -763,12 +421,11 @@ MSE
 \sum_{i=1}^{N}
 \sum_{c=1}^{C}
 \left(
-\hat{u}_{i,c}
+\hat{s}_{i,c}
 -
-u_{i,c}
+s_{i,c}
 \right)^2.
 \]
-
 The mean absolute error is
 \[
 MAE
@@ -777,41 +434,41 @@ MAE
 \sum_{i=1}^{N}
 \sum_{c=1}^{C}
 \left|
-\hat{u}_{i,c}
+\hat{s}_{i,c}
 -
-u_{i,c}
+s_{i,c}
 \right|.
 \]
-
 The relative error is
 \[
 E_{rel}
 =
 \frac{
 \left\|
-\hat{u} - u
+\hat{\mathbf{s}} - \mathbf{s}
 \right\|_2
 }{
 \left\|
-u
+\mathbf{s}
 \right\|_2
 }.
 \]
 
-For channel-wise evaluation, the error for channel \(c\) is
+For channel-wise evaluation, the relative error of channel \(c\) can be written as
 \[
 E_c
 =
 \frac{
 \left\|
-\hat{u}_{c} - u_{c}
+\hat{s}_{c} - s_{c}
 \right\|_2
 }{
 \left\|
-u_{c}
+s_{c}
 \right\|_2
 }.
 \]
+This metric is useful because the model predicts several physical fields, and each field may have a different scale and different prediction difficulty.
 
 For time-dependent prediction, the error can also be evaluated as a function of the prediction step:
 \[
@@ -819,130 +476,28 @@ E(r)
 =
 \frac{
 \left\|
-\hat{u}(\cdot, t_{n+r})
+\hat{\mathbf{s}}(\cdot, t_{n+r})
 -
-u(\cdot, t_{n+r})
+\mathbf{s}(\cdot, t_{n+r})
 \right\|_2
 }{
 \left\|
-u(\cdot, t_{n+r})
+\mathbf{s}(\cdot, t_{n+r})
 \right\|_2
-}.
+},
 \]
-This metric shows how the prediction quality changes as the forecasting horizon increases.
+where \(r\) is the forecasting step. This expression is especially useful when the model is applied recursively for several future time steps.
 
-Field-level evaluation may include comparison of spatial slices, time sequences, maximum-value regions, and error maps:
-\[
-e(\mathbf{x}, t)
-=
-\left|
-\hat{u}(\mathbf{x}, t)
--
-u(\mathbf{x}, t)
-\right|.
-\]
-For a selected channel \(c\), the local absolute error is
-\[
-e_c(\mathbf{x}, t)
-=
-\left|
-\hat{u}_c(\mathbf{x}, t)
--
-u_c(\mathbf{x}, t)
-\right|.
-\]
+\subsection{Hyperparameters}
 
-These error fields can be visualized to identify where the model performs well and where it produces larger deviations from the reference simulation.
+The most important hyperparameters of the two-dimensional FNO are the number of Fourier layers \(L\), the number of retained modes \(K_1\) and \(K_2\), the hidden channel dimension \(d_v\), the number of input time steps \(m\), the learning rate \(\eta\), and the batch size \(B\). These parameters control the model capacity, computational cost, and stability of training.
 
-\subsection{Hyperparameters of the FNO Model}
-
-The performance of FNO depends on several hyperparameters. The most important are:
-
-\begin{itemize}
-    \item number of Fourier layers \(L\);
-    \item number of retained modes \(K\);
-    \item hidden channel dimension \(d_v\);
-    \item number of input time steps \(m\);
-    \item prediction horizon \(h\);
-    \item learning rate \(\eta\);
-    \item batch size \(B\);
-    \item normalization strategy;
-    \item loss function and channel weights.
-\end{itemize}
-
-The number of Fourier layers controls the depth of the operator approximation. The number of modes controls the spectral capacity of the model. The hidden channel dimension controls how much information can be stored in the latent representation.
-
-If \(K\) is too small, the model may fail to represent detailed spatial structures. If \(K\) is too large, the model becomes more computationally expensive and may require more data for stable training. Similarly, a small hidden dimension may limit model capacity, while an excessively large hidden dimension may increase memory usage and training time.
-
-For a three-dimensional thermoelastic dataset, computational cost is especially important. The input tensor may be large, and the Fourier transform must be applied over multiple spatial dimensions. Therefore, batch size, number of modes, and hidden channel dimension must be selected according to available GPU memory.
-
-\subsection{Limitations in the Present Application}
-
-Although FNO is suitable for field-to-field prediction, several limitations must be considered in the present application. First, the model depends on the quality and coverage of the training dataset. If the training data includes only a narrow range of material parameters, geometries, or thermal loading conditions, the model may not generalize reliably to configurations outside that range.
-
-Second, the standard FNO formulation is most convenient when the data is represented on a structured grid. If the original simulation is produced on an unstructured mesh, the fields may need to be interpolated to a regular grid before training:
-\[
-u_{grid}(\mathbf{x}_i)
-=
-\mathcal{I}
-\left(
-u_{mesh}
-\right)(\mathbf{x}_i),
-\]
-where \(\mathcal{I}\) is an interpolation operator. This preprocessing step must be handled carefully because interpolation can introduce additional numerical error.
-
-Third, boundary effects and localized features may require sufficient spatial resolution and adequate representation in the training data. If such features are underrepresented, the model may produce smoothed or inaccurate predictions in these regions.
-
-Fourth, recursive temporal prediction may accumulate errors. If the model is repeatedly applied to its own previous predictions, the discrepancy can grow with the prediction horizon:
-\[
-\left\|
-\hat{u}(\cdot, t_{n+r})
--
-u(\cdot, t_{n+r})
-\right\|_2
-\]
-may increase as \(r\) becomes larger. Therefore, long-horizon prediction requires careful validation.
-
-These limitations do not invalidate the use of FNO. Rather, they define the conditions under which the model should be trained, evaluated, and interpreted.
+The number of retained modes determines how much spectral information is used by the model. If the number of modes is too small, the model may lose important spatial details. If the number of modes is too large, the model becomes more computationally expensive and may require more training data. The hidden channel dimension controls the amount of information stored in the latent representation, while the number of Fourier layers controls the depth of the operator approximation.
 
 \subsection{Summary}
 
-The Fourier Neural Operator is used in this project as a field-to-field learning model for thermoelastic simulation data. Its purpose is to approximate the mapping from known physical states and parameters to future thermoelastic fields. The model represents data as spatial functions, lifts the input to a latent space, applies several Fourier layers, and projects the result to the desired output channels.
-
-The central operation of FNO is the spectral layer:
+In summary, the FNO used in this project is a two-dimensional field-to-field prediction model. It applies Fourier transformations over the two spatial dimensions \(x\) and \(y\), while the physical state is represented through multiple channels. The model predicts four target fields,
 \[
-v_{l+1}
-=
-\sigma
-\left(
-\mathcal{F}^{-1}
-\left(
-R_l \cdot \mathcal{F}(v_l)
-\right)
-+
-W_l v_l
-+
-b_l
-\right).
+T, \quad u, \quad v, \quad w,
 \]
-This operation allows the model to learn transformations of field data through trainable Fourier-domain weights.
-
-For the present thesis, the main role of FNO is practical and computational: it learns from reference simulation data and predicts thermoelastic field evolution for new inputs within the training distribution. The quality of the model is assessed using numerical metrics, channel-wise errors, temporal prediction errors, and visualization of predicted fields. Therefore, FNO forms the machine learning core of the predictive part of the project, while the physical interpretation remains grounded in the thermoelastic framework established in the previous chapters.
-
-% =========================
-% REFERENCES
-% =========================
-
-\begin{thebibliography}{9}
-
-\bibitem{li2020fno}
-Z. Li, N. Kovachki, K. Azizzadenesheli, B. Liu, K. Bhattacharya, A. Stuart, and A. Anandkumar,
-``Fourier Neural Operator for Parametric Partial Differential Equations,''
-\textit{International Conference on Learning Representations}, 2021.
-
-\bibitem{kovachki2023neuraloperator}
-N. Kovachki, Z. Li, B. Liu, K. Azizzadenesheli, K. Bhattacharya, A. Stuart, and A. Anandkumar,
-``Neural Operator: Learning Maps Between Function Spaces,''
-\textit{Journal of Machine Learning Research}, vol. 24, no. 89, pp. 1--97, 2023.
-
-\end{thebibliography}
+and is trained using supervised loss functions based on mean squared error and relative \(L^2\) error. No explicit PDE residual is included in the training objective. Thus, the model learns the thermoelastic behavior from simulation data rather than by directly enforcing the governing equations during optimization.
