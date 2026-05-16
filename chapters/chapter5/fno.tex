@@ -556,7 +556,7 @@ q_1(v_L(x))
 \]
 For the present task,
 \[
-C_{out}=4,
+C_{out}=3,
 \]
 and therefore
 \[
@@ -565,8 +565,7 @@ and therefore
 \left[
 \hat{T}(x, t),
 \hat{u}(x, t),
-\hat{v}(x, t),
-\hat{w}(x, t)
+\hat{v}(x, t)
 \right].
 \]
 
@@ -574,7 +573,7 @@ Finally, the output is returned to channel-first format:
 \[
 \hat{S}
 \in
-\mathbb{R}^{B \times 4 \times N_x \times N_y}.
+\mathbb{R}^{B \times 3 \times N_x \times N_y}.
 \]
 
 \subsection{Temporal Prediction Task}
@@ -650,7 +649,7 @@ s_{j,i,c}
 \]
 where \(N_s\) is the number of samples, \(N\) is the number of spatial grid points, and \(C\) is the number of output channels. In the present case,
 \[
-C = 4.
+C = 3.
 \]
 
 The relative \(L^2\) loss is defined as
