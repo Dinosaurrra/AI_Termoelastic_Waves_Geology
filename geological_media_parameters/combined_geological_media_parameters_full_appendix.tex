@@ -1,0 +1,31 @@
+% Appendix version. Requires: \usepackage{longtable,array,pdflscape}
+\begin{landscape}
+\scriptsize
+\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{2pt}
+\begin{longtable}{p{0.07\linewidth}p{0.08\linewidth}rrrrrrrrrrrrrp{0.08\linewidth}p{0.12\linewidth}p{0.06\linewidth}p{0.20\linewidth}}
+\caption{Full combined effective geological media parameter table for the thermoelastic prediction framework.}
+\label{tab:combined_geological_media_parameters_full_appendix}\\
+\hline
+Material & Rock group & $\rho$ & $E$ & $\nu$ & $\mu$ & $K$ & $\lambda$ & $\alpha$ & $k$ & $C_p$ & $C$ & $\gamma$ & $V_P$ & $V_S$ & Porosity & Source & Type & Notes \\
+ & & kg m$^{-3}$ & Pa & -- & Pa & Pa & Pa & K$^{-1}$ & W m$^{-1}$ K$^{-1}$ & J kg$^{-1}$ K$^{-1}$ & J m$^{-3}$ K$^{-1}$ & Pa K$^{-1}$ & m s$^{-1}$ & m s$^{-1}$ & \% & & & \\
+\hline
+\endfirsthead
+\hline
+Material & Rock group & $\rho$ & $E$ & $\nu$ & $\mu$ & $K$ & $\lambda$ & $\alpha$ & $k$ & $C_p$ & $C$ & $\gamma$ & $V_P$ & $V_S$ & Porosity & Source & Type & Notes \\
+\hline
+\endhead
+granite & igneous intrusive & 2650 & 7.62758e10 & 0.244953 & 3.06340e10 & 4.98443e10 & 2.94216e10 & 7.9e-6 & 2.50 & 850 & 2.2525e6 & 1.18131e6 & 5850 & 3400 & total 45.5 & 10-rock table; expansion PDF & mixed & Midpoint of source ranges; elastic constants derived from $\rho,V_P,V_S$. \\
+granodiorite & igneous intrusive & 2795 & 8.59124e10 & 0.254607 & 3.42388e10 & 5.83503e10 & 3.55244e10 & N/A & 2.40 & N/A & N/A & N/A & 6100 & 3500 & N/A & 10-rock table & mixed & $C_p$ and $\alpha$ not found; elastic constants derived from $\rho,V_P,V_S$. \\
+basalt & igneous volcanic & 3000 & 1.03963e11 & 0.265682 & 4.10700e10 & 7.39475e10 & 4.65675e10 & N/A & 1.95 & 1300 & 3.9000e6 & N/A & 6550 & 3700 & total 19.0 & 10-rock table & mixed & $\alpha$ not found; elastic constants derived from $\rho,V_P,V_S$. \\
+diabase & igneous hypabyssal & 2975 & 9.82224e10 & 0.273763 & 3.85560e10 & 7.23594e10 & 4.66554e10 & N/A & 2.50 & 850 & 2.52875e6 & N/A & 6450 & 3600 & N/A & 10-rock table & mixed & $\alpha$ not found; elastic constants derived from $\rho,V_P,V_S$. \\
+gabbro & igneous intrusive mafic & 3075 & 1.14274e11 & 0.286785 & 4.44030e10 & 8.93262e10 & 5.97242e10 & N/A & 2.30 & 1000 & 3.0750e6 & N/A & 6950 & 3800 & total 43.5 & 10-rock table & mixed & $\alpha$ not found; elastic constants derived from $\rho,V_P,V_S$. \\
+sandstone & sedimentary siliciclastic & 2725 & 5.57493e10 & 0.259369 & 2.21338e10 & 3.86132e10 & 2.38574e10 & 1.16e-5 & 2.25 & 1000 & 2.7250e6 & 1.34374e6 & 5000 & 2850 & total 31.5; eff. 26.5 & 10-rock table; expansion PDF & mixed & Midpoint of source ranges; elastic constants derived from $\rho,V_P,V_S$. \\
+limestone & sedimentary carbonate & 2675 & 6.14772e10 & 0.276786 & 2.40750e10 & 4.59030e10 & 2.98530e10 & 8.0e-6 & 2.55 & 1050 & 2.80875e6 & 1.10167e6 & 5400 & 3000 & total 31.5; eff. 18.0 & 10-rock table; expansion PDF & mixed & Midpoint of source ranges; elastic constants derived from $\rho,V_P,V_S$. \\
+marble & metamorphic carbonate & 2725 & 8.24091e10 & 0.270399 & 3.24343e10 & 5.98206e10 & 3.81977e10 & 9.8e-6 & 2.80 & 850 & 2.31625e6 & 1.75872e6 & 6150 & 3450 & N/A & 10-rock table; expansion PDF & mixed & Expansion coefficient is midpoint of 5.5--14.1e-6 K$^{-1}$ range. \\
+schist & metamorphic foliated & 2800 & 6.81956e10 & 0.267200 & 2.69080e10 & 4.88227e10 & 3.08840e10 & N/A & 2.75 & 1150 & 3.2200e6 & N/A & 5500 & 3100 & total 26.5; eff. 27.5 & 10-rock table & mixed & $\alpha$ not found; elastic constants derived from $\rho,V_P,V_S$. \\
+quartzite & metamorphic quartz-rich & 2650 & 8.35015e10 & 0.250149 & 3.33966e10 & 5.57008e10 & 3.34364e10 & N/A & 5.10 & 1000 & 2.6500e6 & N/A & 6150 & 3550 & N/A & 10-rock table & mixed & $\alpha$ not found; elastic constants derived from $\rho,V_P,V_S$. \\
+\hline
+\end{longtable}
+\normalsize
+\end{landscape}
