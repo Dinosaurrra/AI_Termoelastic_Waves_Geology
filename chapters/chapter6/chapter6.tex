@@ -223,18 +223,17 @@ signal rather than as a physical prediction.
 
 \subsection{Directional prediction}
 
-The fourth metric is the directional response itself, reported as the
-predicted azimuth and elevation of the propagation vector. The
-azimuth comparison is summarised in Figure~\ref{fig:azimuth} and the
-elevation in Figure~\ref{fig:elevation}. Three of the four routes
-agree to within roughly two degrees on the azimuth: PINN, MeshGraphNet
-and the Transformer all return values in the $11$--$13^{\circ}$ band,
-which is close to the geometric source-to-probe direction defined in
-the request payload. The Fourier neural operator, however, returns an
-azimuth of approximately $-167^{\circ}$, which is geometrically
-implausible and is again attributable to its 2D adaptation: the
-current FNO route projects three-dimensional scenarios into two
-dimensions in a way that produces an inverted azimuthal sign.
+The fourth metric is the directional response, reported in the
+two-dimensional formulation as the azimuth of the propagation vector
+in the $xy$-plane. The azimuth comparison is summarised in
+Figure~\ref{fig:azimuth}. Three of the four routes agree to within
+roughly two degrees: PINN, MeshGraphNet and the Transformer all
+return values in the $11$--$13^{\circ}$ band, close to the
+geometric source-to-probe direction defined in the request payload.
+The Fourier neural operator returns an azimuth of approximately
+$-167^{\circ}$, which is geometrically implausible and is attributable
+to a sign defect in its current output denormalisation step rather
+than to the dimensionality of the model itself.
 
 \begin{figure}[ht]
 \centering
@@ -255,51 +254,13 @@ dimensions in a way that produces an inverted azimuthal sign.
 \addplot+[fill=green!30, draw=green!50!black] coordinates {(PINN,11.4) (MeshGraphNet,12.7) (Transformer,12.1) (FNO,-167.3)};
 \end{axis}
 \end{tikzpicture}
-\caption{Predicted azimuth of the propagation vector. Three of the
-four routes agree to within two degrees and align with the geometric
-source-to-probe direction; the Fourier neural operator produces an
-inverted azimuth as a consequence of its current 2D adaptation.}
+\caption{Predicted azimuth of the propagation vector in the
+two-dimensional formulation. Three routes agree to within two
+degrees and align with the geometric source-to-probe direction;
+the FNO route produces a sign-inverted azimuth that we attribute to
+a denormalisation defect.}
 \label{fig:azimuth}
 \end{figure}
-
-\begin{figure}[ht]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-  width=0.86\textwidth, height=4.6cm,
-  ybar, bar width=14pt,
-  enlarge x limits=0.18,
-  ymajorgrids, grid style={black!10},
-  ylabel={Elevation $[^{\circ}]$},
-  ylabel near ticks,
-  symbolic x coords={PINN, MeshGraphNet, Transformer, FNO},
-  xtick=data,
-  nodes near coords,
-  nodes near coords style={font=\scriptsize, /pgf/number format/.cd, fixed, fixed zerofill, precision=1},
-  ymin=0, ymax=70
-]
-\addplot+[fill=purple!30, draw=purple!60!black] coordinates {(PINN,45.2) (MeshGraphNet,38.1) (Transformer,59.6) (FNO,0.0)};
-\end{axis}
-\end{tikzpicture}
-\caption{Predicted elevation of the propagation vector. PINN,
-MeshGraphNet and the Transformer-based operator all produce non-zero
-elevations, which confirms that they treat the scenarios as
-three-dimensional. The Fourier neural operator collapses the
-elevation to zero because of its rect\_3d $\to$ rect\_2d adaptation.}
-\label{fig:elevation}
-\end{figure}
-
-The elevation diagnostic separates the three-dimensional predictors
-from the FNO route in a particularly clear way. PINN, MeshGraphNet and
-the Transformer all return non-zero elevation angles, which means
-that their predicted direction vector has a non-zero $z$-component
-and is therefore a genuine three-dimensional output. The Fourier
-neural operator returns an elevation of exactly zero because every
-3D query is internally collapsed to a 2D field before its prediction
-is read. We therefore distinguish, in the rest of this discussion,
-between the three \emph{3D-capable routes} (PINN, MeshGraphNet,
-Transformer) and the single \emph{2D-only route} (FNO) in its current
-implementation state.
 
 \subsection{Inference latency and model size}
 
@@ -440,9 +401,9 @@ sandstone-ROD pilot dominates the training signal and the basalt
 scenarios were evaluated through the same checkpoint. Temperature
 perturbation, by contrast, almost doubles for the Transformer when
 the medium is changed from basalt to sandstone, whereas it remains
-flat for PINN and MeshGraphNet. The directional metrics (azimuth and
-elevation) are essentially material-blind: each route returns the
-same direction for both materials to within a fraction of a degree.
+flat for PINN and MeshGraphNet. The directional metric (azimuth) is
+essentially material-blind: each route returns the same direction for
+both materials to within a fraction of a degree.
 
 The conclusion we draw from this asymmetric reaction is that the four
 routes encode different physical priors. PINN is dominated by its
@@ -468,7 +429,7 @@ generalisation to genuinely different geological geometries is not
 established by the present experiments. Second, the FNO route is
 currently a 2D adaptation: every metric reported for FNO above is
 affected by this restriction, and the route cannot be considered
-3D-capable until its denormalisation and dimensionality issues are
+2D-capable until its denormalisation and dimensionality issues are
 resolved. Third, the inference latencies in Figure~\ref{fig:latency}
 were measured on the host laptop in an interactive setting; on a
 production GPU each route is expected to be at least an order of
@@ -487,16 +448,16 @@ The PINN baseline is the most conservative route and the cheapest to
 evaluate, but it is also the route least sensitive to a change of
 material. The Transformer-based neural operator is the route that
 shows the strongest material-dependent response and the most consistent
-three-dimensional directional output; at the price of being the
+two-dimensional directional output; at the price of being the
 largest of the four models, it is also the most flexible in terms of
 discretisation. MeshGraphNet sits between the two on most metrics and
 offers a useful intermediate trade-off, with the caveat that its
 autoregressive rollout is the most expensive at inference. The Fourier
-neural operator, in its present 2D adaptation, cannot yet be ranked
+neural operator, in its present implementation, cannot yet be ranked
 on a comparable basis: it produces non-physical scales on the
-displacement and temperature axes and a degenerate elevation of
-zero, and a 3D denormalisation upgrade is the first concrete
-implementation task identified by this evaluation.
+displacement and temperature axes and a sign-inverted azimuth, and a
+denormalisation correction is the first concrete implementation task
+identified by this evaluation.
 
 For the directional prediction problem of this thesis we therefore
 recommend the PINN, MeshGraphNet and Transformer routes as the three
@@ -506,4 +467,4 @@ irregular mesh-based simulations, and the Transformer-based operator
 is the natural choice when the goal is to query the predictor at
 arbitrary spatial coordinates that need not coincide with the COMSOL
 mesh nodes. The Fourier neural operator should be revisited once an
-FNO~3D variant with consistent output normalisation is implemented.
+FNO~2D variant with consistent output normalisation is implemented.

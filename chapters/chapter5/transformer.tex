@@ -5,10 +5,10 @@
 The coupled thermoelastic system written down in Chapter~2 defines a
 deterministic mapping
 \[
-\mathcal{G}: (a,\,\mathrm{IC},\,\mathrm{BC},\,s) \;\longmapsto\; \big(T(\mathbf{x},t),\,\mathbf{u}(\mathbf{x},t),\,\sigma(\mathbf{x},t)\big),
+\mathcal{G}: (a,\,\mathrm{IC},\,\mathrm{BC},\,s) \;\longmapsto\; \big(T(x,t),\,u(x,t),\,\sigma(x,t)\big),
 \]
 where the input collects the material parameter field
-\(a(\mathbf{x}) = (\rho,\lambda,\mu,\gamma,k,C_p)\), the initial and
+\(a(x) = (\rho,\lambda,\mu,\gamma,k,C_p)\), the initial and
 boundary conditions, and the source description. A neural surrogate
 \(\mathcal{G}_\theta\) with learnable parameters \(\theta\) is intended
 to approximate this mapping at a fraction of the cost of running the
@@ -38,27 +38,27 @@ thesis.
 
 The first step is to encode the physical state of the medium as a
 sequence of \emph{tokens}. For every retained mesh node
-\(\mathbf{x}_i\in\Omega\) we form an input token whose feature vector
+\(x_i\in\Omega\) we form an input token whose feature vector
 combines the local geometry, the initial physical state, and the
 material parameters of the medium:
 \begin{equation}
 a_i =
 \big[\,
-  x_i,\,y_i,\,z_i,\;
+  x_i,\,y_i,\;
   T_i^{(0)},\;
-  u_i^{(0)},\,v_i^{(0)},\,w_i^{(0)},\;
-  \dot u_i^{(0)},\,\dot v_i^{(0)},\,\dot w_i^{(0)},\;
+  u_i^{(0)},\,v_i^{(0)},\;
+  \dot u_i^{(0)},\,\dot v_i^{(0)},\;
   E_i,\,\nu_i,\,\rho_i,\,\alpha_i,\,k_i,\,C_{p,i}
-\,\big]\in\mathbb{R}^{16}.
+\,\big]\in\mathbb{R}^{13}.
 \end{equation}
-The first three entries fix the location at which the token is
-attached, the next seven entries describe the state of the rock at the
+The first two entries fix the location at which the token is
+attached, the next five entries describe the state of the rock at the
 beginning of the simulation interval, and the remaining six entries are
 the static material constants of the medium. A separate set of
 \emph{query tokens} \(\{q_j\}_{j=1}^{N_q}\) is then formed from the
 locations at which the predicted fields are desired:
 \begin{equation}
-q_j = (x_q^{(j)},\,y_q^{(j)},\,z_q^{(j)})\in\mathbb{R}^{3}.
+q_j = (x_q^{(j)},\,y_q^{(j)})\in\mathbb{R}^{2}.
 \end{equation}
 The number of input tokens \(N_{\mathrm{in}}\) and the number of query
 tokens \(N_q\) are independent of each other and may differ between
@@ -84,17 +84,17 @@ construction discretisation-invariant.
   }
 ]
 
-\node[itok] (i1) {\(a_1 = (\mathbf{x}_1,\;T_1^{(0)},\;\mathbf{u}_1^{(0)},\;\dot{\mathbf{u}}_1^{(0)},\;a_1^{\text{mat}})\)};
-\node[itok, below=of i1] (i2) {\(a_2 = (\mathbf{x}_2,\;\ldots)\)};
+\node[itok] (i1) {\(a_1 = (x_1,\;T_1^{(0)},\;u_1^{(0)},\;\dot{u}_1^{(0)},\;a_1^{\text{mat}})\)};
+\node[itok, below=of i1] (i2) {\(a_2 = (x_2,\;\ldots)\)};
 \node[below=2mm of i2] (idots) {\(\vdots\)};
-\node[itok, below=2mm of idots] (iN) {\(a_{N_{\mathrm{in}}} = (\mathbf{x}_{N_{\mathrm{in}}},\;\ldots)\)};
+\node[itok, below=2mm of idots] (iN) {\(a_{N_{\mathrm{in}}} = (x_{N_{\mathrm{in}}},\;\ldots)\)};
 
 \node[draw=black!50, dashed, fit=(i1) (iN), inner sep=4mm, label=above:{\textbf{Input set} (mesh nodes, ground-truth state at \(t=0\))}] (inset) {};
 
-\node[qtok, right=18mm of i1.east] (q1) {\(q_1 = (\mathbf{x}_q^{(1)})\)};
-\node[qtok, below=of q1] (q2) {\(q_2 = (\mathbf{x}_q^{(2)})\)};
+\node[qtok, right=18mm of i1.east] (q1) {\(q_1 = (x_q^{(1)})\)};
+\node[qtok, below=of q1] (q2) {\(q_2 = (x_q^{(2)})\)};
 \node[below=2mm of q2] (qdots) {\(\vdots\)};
-\node[qtok, below=2mm of qdots] (qN) {\(q_{N_q} = (\mathbf{x}_q^{(N_q)})\)};
+\node[qtok, below=2mm of qdots] (qN) {\(q_{N_q} = (x_q^{(N_q)})\)};
 
 \node[draw=black!50, dashed, fit=(q1) (qN), inner sep=4mm, label=above:{\textbf{Query set} (arbitrary points)}] (qset) {};
 
@@ -110,24 +110,24 @@ coordinates and indicate where the predicted fields should be returned.}
 \subsubsection{Scaled dot-product attention}
 
 The basic operation in a Transformer is attention. Given a query
-representation \(\mathbf{Q}\in\mathbb{R}^{N_q\times d_k}\), key and
-value representations \(\mathbf{K}\in\mathbb{R}^{N_{\mathrm{in}}\times d_k}\)
-and \(\mathbf{V}\in\mathbb{R}^{N_{\mathrm{in}}\times d_v}\), the
+representation \(Q\in\mathbb{R}^{N_q\times d_k}\), key and
+value representations \(K\in\mathbb{R}^{N_{\mathrm{in}}\times d_k}\)
+and \(V\in\mathbb{R}^{N_{\mathrm{in}}\times d_v}\), the
 scaled dot-product attention is defined as
 \begin{equation}
-\operatorname{Attention}(\mathbf{Q},\mathbf{K},\mathbf{V}) =
+\operatorname{Attention}(Q,K,V) =
 \operatorname{softmax}\!\left(
-  \frac{\mathbf{Q}\mathbf{K}^{\top}}{\sqrt{d_k}}
-\right)\mathbf{V}.
+  \frac{QK^{\top}}{\sqrt{d_k}}
+\right)V.
 \label{eq:dotproduct}
 \end{equation}
-The matrix \(\mathbf{Q}\mathbf{K}^{\top}\in\mathbb{R}^{N_q\times N_{\mathrm{in}}}\)
+The matrix \(QK^{\top}\in\mathbb{R}^{N_q\times N_{\mathrm{in}}}\)
 contains a similarity score between every query and every input. The
 scaling factor \(\sqrt{d_k}\) prevents the dot products from growing
 with the embedding dimension and keeps the softmax in its informative
 regime. The row-wise softmax converts the scores into a non-negative
 weight matrix whose rows sum to one. Multiplying these weights by
-\(\mathbf{V}\) returns, for each query, a convex combination of input
+\(V\) returns, for each query, a convex combination of input
 values that is selected by the learnt similarity pattern. From the
 operator-learning point of view this operation is a soft, data-driven
 analogue of an integral kernel, in which the kernel itself depends on
@@ -143,18 +143,18 @@ computed:
 \begin{equation}
 \operatorname{head}_i =
 \operatorname{Attention}\!\big(
-  \mathbf{Q}\mathbf{W}^Q_i,\,
-  \mathbf{K}\mathbf{W}^K_i,\,
-  \mathbf{V}\mathbf{W}^V_i
+  QW^Q_i,\,
+  KW^K_i,\,
+  VW^V_i
 \big),
 \end{equation}
 \begin{equation}
-\operatorname{MultiHead}(\mathbf{Q},\mathbf{K},\mathbf{V}) =
-\operatorname{Concat}(\operatorname{head}_1,\dots,\operatorname{head}_h)\,\mathbf{W}^O,
+\operatorname{MultiHead}(Q,K,V) =
+\operatorname{Concat}(\operatorname{head}_1,\dots,\operatorname{head}_h)\,W^O,
 \end{equation}
 where the projection matrices satisfy
-\(\mathbf{W}^Q_i,\mathbf{W}^K_i,\mathbf{W}^V_i\in\mathbb{R}^{d_m\times d_k}\)
-and \(\mathbf{W}^O\in\mathbb{R}^{h d_v\times d_m}\). In the baseline
+\(W^Q_i,W^K_i,W^V_i\in\mathbb{R}^{d_m\times d_k}\)
+and \(W^O\in\mathbb{R}^{h d_v\times d_m}\). In the baseline
 configuration used in this thesis the embedding dimension is
 \(d_m=128\), the number of heads is \(h=4\), and the per-head key and
 value dimensions are \(d_k=d_v=d_m/h=32\). Different heads can in
@@ -166,41 +166,41 @@ coupling in another.
 
 The input tokens \(\{a_i\}\) are first lifted into the embedding space
 by a learnt linear projection
-\(\mathbf{W}_{\mathrm{in}}\in\mathbb{R}^{C_{\mathrm{in}}\times d_m}\),
+\(W_{\mathrm{in}}\in\mathbb{R}^{C_{\mathrm{in}}\times d_m}\),
 yielding initial representations
-\(\mathbf{H}^{(0)}\in\mathbb{R}^{N_{\mathrm{in}}\times d_m}\) with
-\(C_{\mathrm{in}}=16\). They are then refined by a stack of
+\(H^{(0)}\in\mathbb{R}^{N_{\mathrm{in}}\times d_m}\) with
+\(C_{\mathrm{in}}=13\). They are then refined by a stack of
 \(L_{\mathrm{enc}}\) identical encoder blocks. Each block consists of
 multi-head self-attention followed by a position-wise feed-forward
 network, with residual connections and layer normalisation around
 both:
 \begin{equation}
-\mathbf{H}^{(\ell)'} =
+H^{(\ell)'} =
 \operatorname{LayerNorm}\!\big(
-  \mathbf{H}^{(\ell)} +
-  \operatorname{MultiHead}(\mathbf{H}^{(\ell)},\mathbf{H}^{(\ell)},\mathbf{H}^{(\ell)})
+  H^{(\ell)} +
+  \operatorname{MultiHead}(H^{(\ell)},H^{(\ell)},H^{(\ell)})
 \big),
 \end{equation}
 \begin{equation}
-\mathbf{H}^{(\ell+1)} =
+H^{(\ell+1)} =
 \operatorname{LayerNorm}\!\big(
-  \mathbf{H}^{(\ell)'} +
-  \operatorname{FFN}(\mathbf{H}^{(\ell)'})
+  H^{(\ell)'} +
+  \operatorname{FFN}(H^{(\ell)'})
 \big).
 \end{equation}
 The feed-forward sub-block applies the same two-layer perceptron to
 every token independently,
 \begin{equation}
-\operatorname{FFN}(\mathbf{h}) =
-\mathbf{W}_2\,\phi\!\big(\mathbf{W}_1\mathbf{h} + \mathbf{b}_1\big) + \mathbf{b}_2,
+\operatorname{FFN}(h) =
+W_2\,\phi\!\big(W_1h + b_1\big) + b_2,
 \end{equation}
-where \(\mathbf{W}_1\in\mathbb{R}^{d_{\mathrm{ff}}\times d_m}\),
-\(\mathbf{W}_2\in\mathbb{R}^{d_m\times d_{\mathrm{ff}}}\), and the
+where \(W_1\in\mathbb{R}^{d_{\mathrm{ff}}\times d_m}\),
+\(W_2\in\mathbb{R}^{d_m\times d_{\mathrm{ff}}}\), and the
 activation \(\phi\) is taken to be the GELU function. The hidden width
 of the FFN sub-block is \(d_{\mathrm{ff}} = 4\,d_m\), in agreement with
 the original Transformer choice \cite{vaswani2017}. After
 \(L_{\mathrm{enc}}\) such layers the encoder produces a context tensor
-\(\mathbf{H}\in\mathbb{R}^{N_{\mathrm{in}}\times d_m}\) that captures
+\(H\in\mathbb{R}^{N_{\mathrm{in}}\times d_m}\) that captures
 how each input token relates to every other input token through the
 learnt self-attention pattern.
 
@@ -210,39 +210,40 @@ The decoder is the operator-learning component. Its purpose is to
 compute the predicted state at every query location by attending to
 the encoded inputs. The query coordinates are first lifted by a
 separate linear projection
-\(\mathbf{W}_{\mathrm{q}}\in\mathbb{R}^{3\times d_m}\) into a query
-embedding \(\mathbf{Z}^{(0)}\in\mathbb{R}^{N_q\times d_m}\). A stack of
+\(W_{\mathrm{q}}\in\mathbb{R}^{3\times d_m}\) into a query
+embedding \(Z^{(0)}\in\mathbb{R}^{N_q\times d_m}\). A stack of
 \(L_{\mathrm{dec}}\) decoder blocks then refines this representation
 via cross-attention between the query embedding (as queries) and the
 encoder output (as keys and values):
 \begin{equation}
-\mathbf{Z}^{(\ell)'} =
+Z^{(\ell)'} =
 \operatorname{LayerNorm}\!\big(
-  \mathbf{Z}^{(\ell)} +
-  \operatorname{MultiHead}(\mathbf{Z}^{(\ell)},\mathbf{H},\mathbf{H})
+  Z^{(\ell)} +
+  \operatorname{MultiHead}(Z^{(\ell)},H,H)
 \big),
 \end{equation}
 \begin{equation}
-\mathbf{Z}^{(\ell+1)} =
+Z^{(\ell+1)} =
 \operatorname{LayerNorm}\!\big(
-  \mathbf{Z}^{(\ell)'} +
-  \operatorname{FFN}(\mathbf{Z}^{(\ell)'})
+  Z^{(\ell)'} +
+  \operatorname{FFN}(Z^{(\ell)'})
 \big).
 \end{equation}
 After the final decoder layer a linear output head
-\(\mathbf{W}_{\mathrm{out}}\in\mathbb{R}^{d_m\times C_{\mathrm{out}}}\)
+\(W_{\mathrm{out}}\in\mathbb{R}^{d_m\times C_{\mathrm{out}}}\)
 maps every decoded query token to a vector of predicted physical
 quantities:
 \begin{equation}
 \hat{y}_j =
-\big(\hat T_j,\,\hat u_j,\,\hat v_j,\,\hat w_j\big) =
-\mathbf{W}_{\mathrm{out}}\,\mathbf{Z}^{(L_{\mathrm{dec}})}_{j,:}
+\big(\hat T_j,\,\hat u_j,\,\hat v_j\big) =
+W_{\mathrm{out}}\,Z^{(L_{\mathrm{dec}})}_{j,:}
 \in\mathbb{R}^{C_{\mathrm{out}}},
-\qquad C_{\mathrm{out}} = 4.
+\qquad C_{\mathrm{out}} = 3.
 \end{equation}
-Within the framework of Chapter~2 these four channels coincide with
-the primary unknowns of the thermoelastic system: the temperature
-field and the three components of the displacement vector. The other
+Within the framework of Chapter~2 these three channels coincide with
+the primary unknowns of the two-dimensional thermoelastic system: the
+temperature field and the two in-plane components of the displacement
+vector. The other
 quantities of physical interest, in particular the strain and stress
 tensors, can either be derived from the predicted displacement by
 spatial differentiation or be added as additional output channels in
@@ -292,22 +293,22 @@ chosen so that training and inference remain feasible on a CPU.
   arr/.style={-{Latex[length=2mm]}, thick, draw=black!65}
 ]
 
-\node[inp] (in)   {Input tokens \(\{a_i\}\in\mathbb{R}^{16}\)};
-\node[inp, below=of in] (ip) {Input projection \(\mathbb{R}^{16}\!\to\!\mathbb{R}^{d_m}\)};
+\node[inp] (in)   {Input tokens \(\{a_i\}\in\mathbb{R}^{13}\)};
+\node[inp, below=of in] (ip) {Input projection \(\mathbb{R}^{13}\!\to\!\mathbb{R}^{d_m}\)};
 \node[enc, below=of ip] (e1) {Self-attention layer \#1};
 \node[enc, below=of e1] (e2) {Self-attention layer \#2};
 \node[below=2mm of e2] (edots) {\(\vdots\)};
 \node[enc, below=2mm of edots] (eL) {Self-attention layer \(L_{\mathrm{enc}}\)};
 
-\node[qry, right=24mm of in] (q)  {Query tokens \(\{q_j\}\in\mathbb{R}^{3}\)};
-\node[qry, below=of q]   (qp) {Query projection \(\mathbb{R}^{3}\!\to\!\mathbb{R}^{d_m}\)};
+\node[qry, right=24mm of in] (q)  {Query tokens \(\{q_j\}\in\mathbb{R}^{2}\)};
+\node[qry, below=of q]   (qp) {Query projection \(\mathbb{R}^{2}\!\to\!\mathbb{R}^{d_m}\)};
 \node[dec, below=of qp]  (d1) {Cross-attention layer \#1};
 \node[dec, below=of d1]  (d2) {Cross-attention layer \#2};
 \node[below=2mm of d2]   (ddots) {\(\vdots\)};
 \node[dec, below=2mm of ddots] (dL) {Cross-attention layer \(L_{\mathrm{dec}}\)};
 
-\node[outp, below=18mm of $(eL)!0.5!(dL)$] (head) {Linear head \(\mathbb{R}^{d_m}\!\to\!\mathbb{R}^{4}\)};
-\node[outp, below=of head] (yhat) {\(\hat{y}_j = (\hat T_j,\,\hat u_j,\,\hat v_j,\,\hat w_j)\)};
+\node[outp, below=18mm of $(eL)!0.5!(dL)$] (head) {Linear head \(\mathbb{R}^{d_m}\!\to\!\mathbb{R}^{3}\)};
+\node[outp, below=of head] (yhat) {\(\hat{y}_j = (\hat T_j,\,\hat u_j,\,\hat v_j)\)};
 
 \draw[arr] (in) -- (ip);
 \draw[arr] (ip) -- (e1);
@@ -321,7 +322,7 @@ chosen so that training and inference remain feasible on a CPU.
 \draw[arr] (d2) -- (ddots);
 \draw[arr] (ddots) -- (dL);
 
-\draw[arr] (eL.east) -- ++(8mm,0) |- (d1.west) node[pos=0.25, right] {\scriptsize \(\mathbf{K},\,\mathbf{V}\)};
+\draw[arr] (eL.east) -- ++(8mm,0) |- (d1.west) node[pos=0.25, right] {\scriptsize \(K,\,V\)};
 \draw[arr, dashed, draw=black!40] (eL.east) -- ++(8mm,0) |- (dL.west);
 
 \draw[arr] (dL.south) -- ++(0,-4mm) -| (head.north);
@@ -333,7 +334,7 @@ operator. The left column processes the input set with
 \(L_{\mathrm{enc}}\) self-attention layers. The right column lifts the
 query coordinates and applies \(L_{\mathrm{dec}}\) cross-attention
 layers in which the encoded context provides keys and values. A linear
-head maps the decoded query embeddings to the four predicted physical
+head maps the decoded query embeddings to the three predicted physical
 channels at every query location.}
 \label{fig:transformer-arch}
 \end{figure}
@@ -361,10 +362,10 @@ not just its instantaneous value:
 \begin{equation}
 \mathcal{L}_{\mathrm{vel}}(\theta) =
 \frac{1}{N_q}\sum_{j=1}^{N_q}
-\big\|\,\partial_t \hat{\mathbf{u}}_j - \dot{\mathbf{u}}_j^{\mathrm{ref}}\big\|_2^2,
+\big\|\,\partial_t \hat{u}_j - \dot{u}_j^{\mathrm{ref}}\big\|_2^2,
 \label{eq:vel}
 \end{equation}
-where the time derivative \(\partial_t\hat{\mathbf{u}}_j\) is obtained
+where the time derivative \(\partial_t\hat{u}_j\) is obtained
 by automatic differentiation through the model output with respect to
 the query time coordinate. A third term enforces the diffusion side of
 the heat equation derived in Chapter~2,

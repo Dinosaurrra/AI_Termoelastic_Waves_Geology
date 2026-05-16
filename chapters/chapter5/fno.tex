@@ -37,19 +37,19 @@ D \subset \mathbb{R}^{2}.
 \]
 Each point of the domain is described by two coordinates:
 \[
-\mathbf{x} = (x,y).
+x = (x,y).
 \]
 Although the spatial grid is two-dimensional, the physical state at each grid point may contain several channels. In this work, the target field is represented as
 \[
-\mathbf{s}(\mathbf{x}, t)
+s(x, t)
 =
 \left[
-T(\mathbf{x}, t),
-u(\mathbf{x}, t),
-v(\mathbf{x}, t)
+T(x, t),
+u(x, t),
+v(x, t)
 \right],
 \]
-where \(T(\mathbf{x}, t)\) is the temperature field, and \(u(\mathbf{x}, t)\), and \(v(\mathbf{x}, t)\)) are displacement-related field components extracted from the simulation data.
+where \(T(x, t)\) is the temperature field, and \(u(x, t)\), and \(v(x, t)\)) are displacement-related field components extracted from the simulation data.
 
 The model learns an operator
 \[
@@ -57,17 +57,17 @@ The model learns an operator
 \]
 where \(\mathcal{A}\) is the input field space, \(\mathcal{U}\) is the output field space, and \(\theta\) denotes the trainable parameters of the neural network. The learned mapping can be written as
 \[
-\hat{\mathbf{s}}
+\hat{s}
 =
 \mathcal{G}_{\theta}(a),
 \]
-where \(a\) is the input tensor and \(\hat{\mathbf{s}}\) is the predicted thermoelastic field.
+where \(a\) is the input tensor and \(\hat{s}\) is the predicted thermoelastic field.
 
 \subsection{Input and Output Tensor Format}
 
 In the used PyTorch implementation, the input tensor follows the channel-first convention:
 \[
-\mathbf{A}
+A
 \in
 \mathbb{R}^{B \times C_{in} \times N_x \times N_y},
 \]
@@ -75,7 +75,7 @@ where \(B\) is the batch size, \(C_{in}\) is the number of input channels, and \
 
 The output tensor has the form
 \[
-\hat{\mathbf{S}}
+\hat{S}
 \in
 \mathbb{R}^{B \times C_{out} \times N_x \times N_y}.
 \]
@@ -94,7 +94,7 @@ C_{in}=mC.
 \]
 In that case, the input tensor becomes
 \[
-\mathbf{A}
+A
 \in
 \mathbb{R}^{B \times (mC) \times N_x \times N_y}.
 \]
@@ -171,10 +171,10 @@ The implementation supports optional coordinate encoding through the parameter
 \]
 If this option is enabled, the model appends normalized spatial coordinates to the input features. For a two-dimensional grid, this means that the coordinate-augmented input at each grid point is
 \[
-\tilde{a}(\mathbf{x})
+\tilde{a}(x)
 =
 \left[
-a(\mathbf{x}),
+a(x),
 x,
 y
 \right].
@@ -213,11 +213,11 @@ C_{in} + 2.
 \]
 The first lifting transformation is
 \[
-v^{(1)}(\mathbf{x})
+v^{(1)}(x)
 =
 P_1
 \left(
-\tilde{a}(\mathbf{x})
+\tilde{a}(x)
 \right),
 \]
 where
@@ -231,11 +231,11 @@ Here, \(C_{lift}\) corresponds to the parameter \(\texttt{lifting\_channels}\).
 
 If an additional lifting layer is used, the representation is further mapped to the main hidden dimension:
 \[
-v_0(\mathbf{x})
+v_0(x)
 =
 P_2
 \left(
-v^{(1)}(\mathbf{x})
+v^{(1)}(x)
 \right),
 \]
 where
@@ -544,13 +544,13 @@ q_2:
 
 Thus, the predicted field at each spatial point is
 \[
-\hat{\mathbf{s}}(\mathbf{x}, t)
+\hat{s}(x, t)
 =
 q_2
 \left(
 \sigma
 \left(
-q_1(v_L(\mathbf{x}))
+q_1(v_L(x))
 \right)
 \right).
 \]
@@ -560,19 +560,19 @@ C_{out}=4,
 \]
 and therefore
 \[
-\hat{\mathbf{s}}(\mathbf{x}, t)
+\hat{s}(x, t)
 =
 \left[
-\hat{T}(\mathbf{x}, t),
-\hat{u}(\mathbf{x}, t),
-\hat{v}(\mathbf{x}, t),
-\hat{w}(\mathbf{x}, t)
+\hat{T}(x, t),
+\hat{u}(x, t),
+\hat{v}(x, t),
+\hat{w}(x, t)
 \right].
 \]
 
 Finally, the output is returned to channel-first format:
 \[
-\hat{\mathbf{S}}
+\hat{S}
 \in
 \mathbb{R}^{B \times 4 \times N_x \times N_y}.
 \]
@@ -581,42 +581,42 @@ Finally, the output is returned to channel-first format:
 
 The model can be used for one-step temporal prediction. If the known state at time \(t_n\) is
 \[
-\mathbf{s}(\mathbf{x}, t_n),
+s(x, t_n),
 \]
 then the model predicts the next state:
 \[
-\hat{\mathbf{s}}(\mathbf{x}, t_{n+1})
+\hat{s}(x, t_{n+1})
 =
 \mathcal{G}_{\theta}
 \left(
-\mathbf{s}(\mathbf{x}, t_n)
+s(x, t_n)
 \right).
 \]
 
 If several previous time steps are used, the input can be written as
 \[
-a(\mathbf{x}, t_n)
+a(x, t_n)
 =
 \left[
-\mathbf{s}(\mathbf{x}, t_{n-m+1}),
-\mathbf{s}(\mathbf{x}, t_{n-m+2}),
+s(x, t_{n-m+1}),
+s(x, t_{n-m+2}),
 \ldots,
-\mathbf{s}(\mathbf{x}, t_n)
+s(x, t_n)
 \right],
 \]
 where \(m\) is the number of input time steps. The model then predicts
 \[
-\hat{\mathbf{s}}(\mathbf{x}, t_{n+1})
+\hat{s}(x, t_{n+1})
 =
 \mathcal{G}_{\theta}
 \left(
-a(\mathbf{x}, t_n)
+a(x, t_n)
 \right).
 \]
 
 In tensor form, the temporal information is included by increasing the channel dimension:
 \[
-\mathbf{A}
+A
 \in
 \mathbb{R}^{B \times (mC) \times N_x \times N_y}.
 \]
@@ -625,13 +625,13 @@ In tensor form, the temporal information is included by increasing the channel d
 
 The model is trained in a supervised manner by comparing the predicted thermoelastic fields with reference fields obtained from simulation data. Let the prediction for sample \(j\) be
 \[
-\hat{\mathbf{s}}_j
+\hat{s}_j
 =
 \mathcal{G}_{\theta}(a_j),
 \]
 and let the corresponding reference field be
 \[
-\mathbf{s}_j.
+s_j.
 \]
 
 The mean squared error loss is defined as
@@ -661,13 +661,13 @@ The relative \(L^2\) loss is defined as
 \sum_{j=1}^{N_s}
 \frac{
 \left\|
-\hat{\mathbf{s}}_j
+\hat{s}_j
 -
-\mathbf{s}_j
+s_j
 \right\|_2
 }{
 \left\|
-\mathbf{s}_j
+s_j
 \right\|_2
 }.
 \]
@@ -743,13 +743,13 @@ E_{rel}
 =
 \frac{
 \left\|
-\hat{\mathbf{s}}
+\hat{s}
 -
-\mathbf{s}
+s
 \right\|_2
 }{
 \left\|
-\mathbf{s}
+s
 \right\|_2
 }.
 \]

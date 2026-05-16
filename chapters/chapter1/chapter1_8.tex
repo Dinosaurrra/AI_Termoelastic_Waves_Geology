@@ -18,7 +18,7 @@ If a rock is heated but its expansion is fully constrained, thermal strain induc
 \begin{equation}
 \sigma_{\mathrm{th}} = -E\alpha\Delta T,
 \end{equation}
-where \(\sigma_{\mathrm{th}}\) is the thermal stress and \(E\) is Young's modulus. The negative sign reflects the sign convention in which tensile stress is positive and compressive stress is negative. Under this convention, heating \((\Delta T > 0)\) produces compressive stress because the rock tries to expand but cannot. Conversely, cooling \((\Delta T < 0)\) may produce tensile stress if contraction is restrained. This simple relation shows that thermal stress is proportional to the temperature change and to the stiffness of the material. It should be understood as an illustrative one-dimensional case; real geological media are three-dimensional, heterogeneous, and often only partially constrained \cite{boley1960,jaeger2007}.
+where \(\sigma_{\mathrm{th}}\) is the thermal stress and \(E\) is Young's modulus. The negative sign reflects the sign convention in which tensile stress is positive and compressive stress is negative. Under this convention, heating \((\Delta T > 0)\) produces compressive stress because the rock tries to expand but cannot. Conversely, cooling \((\Delta T < 0)\) may produce tensile stress if contraction is restrained. This simple relation shows that thermal stress is proportional to the temperature change and to the stiffness of the material. It should be understood as an illustrative one-dimensional case; real geological media are two-dimensional, heterogeneous, and often only partially constrained \cite{boley1960,jaeger2007}.
 
 In geological media, constraints on thermal expansion are common. At the scale of individual grains, each mineral grain is surrounded by neighboring grains and cement, so its expansion is resisted by contact forces. At larger scales, bedding, foliation, or stratification may mechanically restrict thermal deformation because adjacent layers can have different stiffness, temperature, or thermal expansion behavior. In situ stresses from overburden and tectonic loading also pre-stress the rock before any additional thermal disturbance occurs. As a result, thermal stress may develop whenever subsurface rocks are heated or cooled under restricted conditions \cite{jaeger2007,turcotte2014}.
 
@@ -46,15 +46,15 @@ This relation shows that thermal stress depends not only on the magnitude of the
 
 The same relation can be written in compact tensor form as
 \begin{equation}
-\boldsymbol{\sigma}
+\sigma
 =
-\lambda\,\mathrm{tr}(\boldsymbol{\varepsilon})\mathbf{I}
+\lambda\,\mathrm{tr}(\varepsilon)I
 +
-2\mu\boldsymbol{\varepsilon}
+2\mu\varepsilon
 -
-3K\alpha\theta\mathbf{I}.
+3K\alpha\theta I.
 \end{equation}
-In this expression, \(\boldsymbol{\sigma}\) is the stress tensor, \(\boldsymbol{\varepsilon}\) is the strain tensor, \(\mathrm{tr}(\boldsymbol{\varepsilon})\) is the trace of the strain tensor and represents volumetric strain, and \(\mathbf{I}\) is the identity tensor. The term \(3K\alpha\theta\mathbf{I}\) represents the isotropic thermal part of the stress response. This form makes clear that, in linear isotropic thermoelasticity, stress contains both a mechanical contribution from strain and a thermal contribution from temperature change \cite{boley1960,nowacki1986}.
+In this expression, \(\sigma\) is the stress tensor, \(\varepsilon\) is the strain tensor, \(\mathrm{tr}(\varepsilon)\) is the trace of the strain tensor and represents volumetric strain, and \(I\) is the identity tensor. The term \(3K\alpha\theta I\) represents the isotropic thermal part of the stress response. This form makes clear that, in linear isotropic thermoelasticity, stress contains both a mechanical contribution from strain and a thermal contribution from temperature change \cite{boley1960,nowacki1986}.
 
 These classical relations are simplified descriptions of real geological media. Natural rocks may contain pores, fractures, bedding, foliation, mineral fabrics, weathered zones, and fluids, all of which disturb the local distribution of stress and strain. Thermal stress may concentrate near crack tips, grain boundaries, cement contacts, or interfaces between minerals with contrasting expansion behavior. Layered or fractured rock masses may also respond differently depending on the direction of heating, the orientation of discontinuities, and the pre-existing stress field. Therefore, the isotropic thermoelastic equations provide a necessary theoretical foundation, but their geological interpretation must account for heterogeneity, anisotropy, and scale \cite{jaeger2007,mavko2009,turcotte2014}.
 

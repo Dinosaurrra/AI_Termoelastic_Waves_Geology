@@ -2,14 +2,14 @@
 
 The input variables are selected from the physical fields, material parameters, and directional quantities defined in Chapter 2. They describe the geological material, the thermal-mechanical state, and the source--probe geometry. A compact input vector may be written conceptually as
 \begin{equation}
-\mathbf{X}
+X
 =
 \left[
 m,\rho,E,\nu,\mu,K,\lambda,\alpha,k,C_p,C,\gamma,
-T,\theta,\mathbf{x}_s,\mathbf{x}_p,\hat{\mathbf{d}},t
+T,\theta,x_s,x_p,\hat{d},t
 \right],
 \end{equation}
-where \(m\) denotes the material type, \(\rho\) is density, \(E\), \(\nu\), \(\mu\), \(K\), and \(\lambda\) are elastic parameters, \(\alpha\), \(k\), \(C_p\), \(C\), and \(\gamma\) are thermal and thermoelastic parameters, \(T\) and \(\theta\) describe the thermal state, \(\mathbf{x}_s\) and \(\mathbf{x}_p\) are the source and probe locations, \(\hat{\mathbf{d}}\) is the unit propagation direction, and \(t\) denotes time or an observation setting.
+where \(m\) denotes the material type, \(\rho\) is density, \(E\), \(\nu\), \(\mu\), \(K\), and \(\lambda\) are elastic parameters, \(\alpha\), \(k\), \(C_p\), \(C\), and \(\gamma\) are thermal and thermoelastic parameters, \(T\) and \(\theta\) describe the thermal state, \(x_s\) and \(x_p\) are the source and probe locations, \(\hat{d}\) is the unit propagation direction, and \(t\) denotes time or an observation setting.
 
 The material type identifies the geological medium being considered. In this thesis, representative media such as sandstone, basalt, granite, and limestone are interpreted through effective material parameters. The material label itself is useful for organizing the comparison, while the numerical parameters provide the physical quantities used in the formulation. This distinction is important because two samples with the same lithological name may still differ in density, stiffness, porosity, thermal conductivity, or heat capacity.
 
@@ -17,23 +17,23 @@ The elastic parameters describe the mechanical response of the medium. Density c
 
 The thermal parameters describe heat transfer, heat storage, and thermal-mechanical coupling. The temperature field \(T\) and perturbation \(\theta\) represent the thermal state of the medium. Thermal conductivity \(k\) controls the rate of heat conduction, while \(C_p\) and \(C=\rho C_p\) describe heat storage. The coefficient of thermal expansion \(\alpha\) determines how temperature change produces thermal strain, and the coupling coefficient \(\gamma=3K\alpha\) connects temperature perturbation with thermal stress in the thermoelastic constitutive relation.
 
-The geometric part of the input describes direction. The source point \(\mathbf{x}_s\) and probe point \(\mathbf{x}_p\) determine the propagation vector
+The geometric part of the input describes direction. The source point \(x_s\) and probe point \(x_p\) determine the propagation vector
 \begin{equation}
-\mathbf{d}
+d
 =
-\mathbf{x}_p-\mathbf{x}_s,
+x_p-x_s,
 \end{equation}
 and the unit direction vector
 \begin{equation}
-\hat{\mathbf{d}}
+\hat{d}
 =
-\frac{\mathbf{d}}{\|\mathbf{d}\|}.
+\frac{d}{\|d\|}.
 \end{equation}
-This source--probe representation allows the response to be interpreted along selected propagation directions. It is also compatible with simplified two-dimensional sections or local cross-sections when a full three-dimensional field is not being computed.
+This source--probe representation allows the response to be interpreted along selected propagation directions. It is also compatible with simplified two-dimensional sections or local cross-sections when a full two-dimensional field is not being computed.
 
 The output variables describe the predicted thermoelastic response. A general output vector may be written as
 \begin{equation}
-\widehat{\mathbf{Y}}
+\widehat{Y}
 =
 \left[
 \widehat{T},

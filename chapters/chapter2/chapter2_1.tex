@@ -8,20 +8,20 @@ The geological medium is represented as a continuum body occupying a spatial dom
 \end{equation}
 where \(\Omega\) denotes the region of the rock under consideration. A material point is described by the position vector
 \begin{equation}
-\mathbf{x} = (x,y,z),
+x = (x, y),
 \end{equation}
-and the time variable is denoted by \(t\). The main fields are the temperature field \(T(\mathbf{x},t)\) and the displacement field \(\mathbf{u}(\mathbf{x},t)\). The displacement field describes the motion of material points, while the temperature field describes the thermal state of the medium. Strain and stress are then derived from these fields through the kinematic and constitutive relations of linear thermoelasticity.
+and the time variable is denoted by \(t\). The main fields are the temperature field \(T(x,t)\) and the displacement field \(u(x,t)\). The displacement field describes the motion of material points, while the temperature field describes the thermal state of the medium. Strain and stress are then derived from these fields through the kinematic and constitutive relations of linear thermoelasticity.
 
-The mathematical formulation is introduced in three-dimensional Cartesian coordinates because real geological media are spatially three-dimensional. The displacement field is therefore represented by three components,
+The mathematical formulation is introduced in two-dimensional Cartesian coordinates under the plane-strain assumption, which is standard for cross-sectional analysis of geological media. The displacement field is therefore represented by two components,
 \begin{equation}
-\mathbf{u}(\mathbf{x},t) =
+u(x,t) =
 \begin{bmatrix}
-u(\mathbf{x},t) \\
-v(\mathbf{x},t) \\
-w(\mathbf{x},t)
+u(x,t) \\
+v(x,t)
 \end{bmatrix}.
 \end{equation}
-This provides the general physical framework for thermoelastic wave propagation. At the same time, this thesis does not claim to compute a complete high-fidelity three-dimensional field-scale solution. Where necessary, simplified two-dimensional sections, local cross-sections, or selected source--probe propagation directions may be used for interpretation and visualization. Thus, the governing equations are written in general three-dimensional form, while the practical analysis may focus on lower-dimensional sections or selected directional responses.
+Throughout the rest of this chapter all tensor indices range over \(i,j,k \in \{1,2\}\), and the Laplace operator reduces to \(\nabla^2 = \partial^2/\partial x^2 + \partial^2/\partial y^2\).
+This provides the general physical framework for thermoelastic wave propagation. At the same time, this thesis does not claim to compute a complete high-fidelity two-dimensional field-scale solution. Where necessary, simplified two-dimensional sections, local cross-sections, or selected source--probe propagation directions may be used for interpretation and visualization. Thus, the governing equations are written in general two-dimensional form, while the practical analysis may focus on lower-dimensional sections or selected directional responses.
 
 Real geological media are heterogeneous, fractured, porous, and often anisotropic. However, a complete mathematical description of all pores, cracks, fractures, mineral grains, and fluid pathways is beyond the scope of this thesis. Therefore, the formulation adopts an effective continuum approximation. In this approximation, the rock is described by averaged material properties such as density, elastic moduli, thermal conductivity, heat capacity, and thermal expansion coefficient. These properties may represent sandstone, basalt, granite, or limestone as effective geological materials rather than as fully resolved microstructures \cite{jaeger2007,mavko2009}.
 

@@ -2,23 +2,23 @@
 
 Directional propagation is described by defining a source location and an observation location inside the spatial domain. Let the source point be
 \begin{equation}
-\mathbf{x}_s
+x_s
 =
 (x_s,y_s,z_s),
 \end{equation}
 and let the observation, receiver, or probe point be
 \begin{equation}
-\mathbf{x}_p
+x_p
 =
 (x_p,y_p,z_p).
 \end{equation}
 The propagation vector from the source to the observation point is then
 \begin{equation}
-\mathbf{d}
+d
 =
-\mathbf{x}_p
+x_p
 -
-\mathbf{x}_s .
+x_s .
 \end{equation}
 This vector defines the geometric direction along which the thermoelastic response may be interpreted.
 
@@ -26,19 +26,19 @@ The propagation distance is given by
 \begin{equation}
 L
 =
-\|\mathbf{d}\|,
+\|d\|,
 \end{equation}
 and the corresponding unit direction vector is
 \begin{equation}
-\hat{\mathbf{d}}
+\hat{d}
 =
-\frac{\mathbf{d}}{\|\mathbf{d}\|}.
+\frac{d}{\|d\|}.
 \end{equation}
-The unit vector \(\hat{\mathbf{d}}\) describes the propagation direction independently of the distance between the source and the observation point.
+The unit vector \(\hat{d}\) describes the propagation direction independently of the distance between the source and the observation point.
 
-In three-dimensional Cartesian coordinates, the same direction may also be described by angular quantities. If
+In two-dimensional Cartesian coordinates, the same direction may also be described by angular quantities. If
 \begin{equation}
-\mathbf{d}
+d
 =
 (d_x,d_y,d_z),
 \end{equation}
@@ -60,6 +60,6 @@ d_z,
 \end{equation}
 The azimuth \(\phi\) describes the horizontal orientation of the propagation direction, while the elevation \(\psi\) describes its inclination relative to the horizontal plane.
 
-In an ideal homogeneous isotropic medium, the material response does not depend on propagation direction. In that case, the direction vector mainly describes the geometry between source and receiver. In real geological media, however, direction may have physical significance. Bedding, foliation, aligned fractures, elongated pores, stress-induced crack patterns, and anisotropic thermal conductivity can cause wave velocity, attenuation, thermal diffusion, and stress response to vary with orientation. Therefore, defining \(\mathbf{d}\), \(\hat{\mathbf{d}}\), \(\phi\), and \(\psi\) provides a mathematical basis for describing directional thermoelastic behavior.
+In an ideal homogeneous isotropic medium, the material response does not depend on propagation direction. In that case, the direction vector mainly describes the geometry between source and receiver. In real geological media, however, direction may have physical significance. Bedding, foliation, aligned fractures, elongated pores, stress-induced crack patterns, and anisotropic thermal conductivity can cause wave velocity, attenuation, thermal diffusion, and stress response to vary with orientation. Therefore, defining \(d\), \(\hat{d}\), \(\phi\), and \(\psi\) provides a mathematical basis for describing directional thermoelastic behavior.
 
-The directional quantities introduced here do not require the full three-dimensional field to be solved everywhere in the domain. They provide a way to interpret the response along selected source--probe paths or within selected cross-sections. This is consistent with the general three-dimensional formulation while allowing later analysis to focus on specific propagation directions relevant to geological structure.
+The directional quantities introduced here do not require the full two-dimensional field to be solved everywhere in the domain. They provide a way to interpret the response along selected source--probe paths or within selected cross-sections. This is consistent with the general two-dimensional formulation while allowing later analysis to focus on specific propagation directions relevant to geological structure.

@@ -8,19 +8,19 @@ The material-related part of the contract is conceptually grounded in the parame
 
 The next input group describes the thermoelastic scenario. In the current backend schema this role is played by the \texttt{scenario} object, which includes at least \texttt{temperature\_c}, \texttt{pressure\_mpa}, and \texttt{time\_ms}. These parameters encode the thermal and mechanical state under which the prediction is requested. The source object adds the excitation description through fields such as source type, source coordinates, amplitude, frequency, and a direction vector. The probe object specifies the observation point. Together, these fields provide the practical representation of the source--probe geometry introduced theoretically in Chapter~2.
 
-The directional part of the contract follows directly from the mathematical formulation. If the source position is denoted by \(\mathbf{x}_s\) and the probe position by \(\mathbf{x}_p\), then the propagation vector is
+The directional part of the contract follows directly from the mathematical formulation. If the source position is denoted by \(x_s\) and the probe position by \(x_p\), then the propagation vector is
 \begin{equation}
-\mathbf{d}
+d
 =
-\mathbf{x}_p - \mathbf{x}_s,
+x_p - x_s,
 \end{equation}
 and the corresponding unit direction vector is
 \begin{equation}
-\hat{\mathbf{d}}
+\hat{d}
 =
-\frac{\mathbf{d}}{\|\mathbf{d}\|}.
+\frac{d}{\|d\|}.
 \end{equation}
-From this vector, directional quantities such as propagation distance, azimuth, and elevation can be computed. In three-dimensional notation, if \(\mathbf{d}=(d_x,d_y,d_z)\), then the azimuth is given by
+From this vector, directional quantities such as propagation distance, azimuth, and elevation can be computed. In two-dimensional notation, if \(d=(d_x,d_y,d_z)\), then the azimuth is given by
 \begin{equation}
 \phi = \operatorname{atan2}(d_y,d_x),
 \end{equation}
@@ -34,7 +34,7 @@ d_z,\sqrt{d_x^2+d_y^2}
 \end{equation}
 The backend request schema additionally validates the user-provided source direction to ensure that it is finite and nonzero before normalization. This is important because the source direction may later be compared with the source--probe direction or combined with geometry-aware post-processing in model-specific inference pipelines.
 
-Another required input group is the domain description. In the current backend, this is represented by the \texttt{domain} object with subfields such as \texttt{type}, \texttt{size}, \texttt{resolution}, and boundary conditions. At the theoretical level, Chapter~2 is formulated in general three-dimensional form, so a general contract may allow both \texttt{rect\_2d} and \texttt{rect\_3d}. However, the practical thesis experiments are prototype experiments and are primarily based on \texttt{rect\_2d} domains. The backend validator explicitly requires \texttt{lz = 0} and \texttt{nz = 1} when \texttt{domain.type = rect\_2d}. This is a useful implementation detail because it encodes the practical scope directly in the API contract: the general request shape remains compatible with future three-dimensional extensions, but the current experiments operate on planar cross-sections or selected directional paths.
+Another required input group is the domain description. In the current backend, this is represented by the \texttt{domain} object with subfields such as \texttt{type}, \texttt{size}, \texttt{resolution}, and boundary conditions. At the theoretical level, Chapter~2 is formulated in general two-dimensional form, so a general contract may allow both \texttt{rect\_2d} and \texttt{rect\_2d}. However, the practical thesis experiments are prototype experiments and are primarily based on \texttt{rect\_2d} domains. The backend validator explicitly requires \texttt{lz = 0} and \texttt{nz = 1} when \texttt{domain.type = rect\_2d}. This is a useful implementation detail because it encodes the practical scope directly in the API contract: the general request shape remains compatible with future two-dimensional extensions, but the current experiments operate on planar cross-sections or selected directional paths.
 
 The output side of the contract is designed to provide one normalized summary format across different services. According to the backend response schema and repository model card, the normalized prediction response contains a selected model identifier, a medium summary, directional prediction quantities, field-summary quantities, and technical metadata. The directional summary includes a direction vector, azimuth, elevation, response magnitude, wave type, and predicted travel time. The field summary includes at least maximum displacement and maximum temperature perturbation. The metadata block includes items such as model version, latency, and request identifier. These outputs correspond naturally to the comparative prediction goal of the thesis because they summarize directional thermoelastic behavior without requiring every model route to expose the same internal field representation.
 
@@ -90,4 +90,4 @@ The unified contract also clarifies how the models should be compared. All route
 
 At the same time, the contract does not imply physical equivalence of the models. A common interface is not the same as a common solver. The PINN is the only explicitly physics-informed component in the present comparison because it includes thermoelastic residuals derived from the governing equations. The FNO, MeshGraphNet, and Transformer-style services use physically meaningful inputs and outputs, but they do not enforce the governing thermoelastic PDE system in the same way. The API contract therefore supports comparative experimentation under one physically motivated input-output framework, while preserving the important distinction between physics-informed and primarily data-driven routes.
 
-The limitations of this contract follow naturally from the limitations of the prototype itself. The contract standardizes communication and comparison, but it does not guarantee validated field realism. The public outputs are comparative prototype predictions, not engineering-grade measurements. Material presets in the current repository are starter values. Some services may operate in fallback mode under missing-artifact conditions. The practical experiments are predominantly \texttt{rect\_2d} and should not be described as full three-dimensional field simulations. For these reasons, the API contract should be presented in the thesis as a disciplined experimental interface that supports fair comparison and reproducible software behavior, while remaining subordinate to the more general physical formulation of Chapter~2.
+The limitations of this contract follow naturally from the limitations of the prototype itself. The contract standardizes communication and comparison, but it does not guarantee validated field realism. The public outputs are comparative prototype predictions, not engineering-grade measurements. Material presets in the current repository are starter values. Some services may operate in fallback mode under missing-artifact conditions. The practical experiments are predominantly \texttt{rect\_2d} and should not be described as full two-dimensional field simulations. For these reasons, the API contract should be presented in the thesis as a disciplined experimental interface that supports fair comparison and reproducible software behavior, while remaining subordinate to the more general physical formulation of Chapter~2.

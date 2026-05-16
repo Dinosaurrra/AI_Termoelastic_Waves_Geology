@@ -10,9 +10,9 @@ where \(\Omega\) denotes the part of space occupied by the rock volume under con
 \end{equation}
 In a geological interpretation, this boundary may correspond to a natural surface, a lithological contact, a fracture or fault surface, or an artificial boundary introduced to restrict the region of analysis. Describing the medium as a bounded domain provides the mathematical setting for defining thermal and mechanical fields inside the rock.
 
-A three-dimensional Cartesian coordinate system is used to describe the position of material points inside the domain. The position vector is written as
+A two-dimensional Cartesian coordinate system is used to describe the position of material points inside the domain. The position vector is written as
 \begin{equation}
-\mathbf{x} = (x,y,z),
+x = (x, y),
 \end{equation}
 where \(x\), \(y\), and \(z\) are spatial coordinates. The coordinate axes may be chosen according to the convenience of the problem. For example, in a geological setting they may be aligned with bedding, fracture orientation, or principal structural directions. In the simplified isotropic formulation adopted as a first approximation, the choice of coordinate direction does not change the formal structure of the governing equations. However, for real anisotropic or layered rocks, direction relative to geological fabric may significantly influence wave propagation and heat transfer.
 
@@ -24,12 +24,12 @@ where \(t\) is time and \(T_f\) is the final observation time. This notation ind
 
 The combined space--time domain is therefore written as
 \begin{equation}
-(\mathbf{x},t) \in \Omega \times [0,T_f].
+(x,t) \in \Omega \times [0,T_f].
 \end{equation}
-All primary physical fields are defined on this domain. For example, the temperature field is written as \(T(\mathbf{x},t)\), and the displacement field is written as \(\mathbf{u}(\mathbf{x},t)\). This means that temperature and displacement are evaluated at each point of the rock volume and at each time within the observation interval. Strain and stress are then obtained from the displacement and temperature fields through the relations introduced in the following sections.
+All primary physical fields are defined on this domain. For example, the temperature field is written as \(T(x,t)\), and the displacement field is written as \(u(x,t)\). This means that temperature and displacement are evaluated at each point of the rock volume and at each time within the observation interval. Strain and stress are then obtained from the displacement and temperature fields through the relations introduced in the following sections.
 
 The boundary \(\partial\Omega\) is important because it determines how the selected domain interacts with its surroundings. Mechanical boundary conditions may prescribe displacement or traction, while thermal boundary conditions may prescribe temperature or heat flux. A full discussion of boundary and initial conditions is given later in this chapter. At this stage, it is sufficient to note that boundaries influence how elastic and thermal disturbances are reflected, transmitted, constrained, or allowed to leave the considered region.
 
-The mathematical formulation is written in three-dimensional form because real geological media extend in all three spatial directions. However, this thesis does not claim to compute a complete high-fidelity three-dimensional field-scale solution. For interpretation, visualization, or simplified analysis, it may be useful to consider two-dimensional cross-sections, local planes, or selected source--probe propagation directions. Thus, the theoretical framework is general in 3D, while later analysis may focus on lower-dimensional views or specific propagation paths.
+The mathematical formulation is written in two-dimensional form because real geological media extend in all three spatial directions. However, this thesis does not claim to compute a complete high-fidelity two-dimensional field-scale solution. For interpretation, visualization, or simplified analysis, it may be useful to consider two-dimensional cross-sections, local planes, or selected source--probe propagation directions. Thus, the theoretical framework is general in 2D, while later analysis may focus on lower-dimensional views or specific propagation paths.
 
 This coordinate description also prepares the formulation of directional propagation. A source point and an observation point can be represented as points inside the domain \(\Omega\). The direction of propagation can then be defined by the vector connecting these points. In homogeneous isotropic media, this direction does not change the material response. In geological media with bedding, fractures, aligned pores, anisotropy, or lithological contrasts, the same direction may become physically significant because elastic stiffness, wave velocity, and thermal conductivity may depend on orientation. Therefore, the spatial domain and coordinate system provide the basis for defining directional thermoelastic wave behavior in the following sections.

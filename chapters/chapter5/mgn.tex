@@ -23,14 +23,14 @@ The model is used as a surrogate model. Instead of solving the full numerical th
 \[
 f_{\theta}:
 \left(
-\mathbf{X}^{t},
+X^{t},
 \mathcal{G}
 \right)
 \mapsto
-\hat{\mathbf{Y}}^{t+\Delta t}
+\hat{Y}^{t+\Delta t}
 \]
 
-where \(f_{\theta}\) is the trainable MeshGraphNet model with parameters \(\theta\), \(\mathbf{X}^{t}\) is the matrix of input node features at time \(t\), \(\mathcal{G}\) is the graph representation of the finite-element mesh, and \(\hat{\mathbf{Y}}^{t+\Delta t}\) is the predicted matrix of physical fields at the next time step \(t+\Delta t\).
+where \(f_{\theta}\) is the trainable MeshGraphNet model with parameters \(\theta\), \(X^{t}\) is the matrix of input node features at time \(t\), \(\mathcal{G}\) is the graph representation of the finite-element mesh, and \(\hat{Y}^{t+\Delta t}\) is the predicted matrix of physical fields at the next time step \(t+\Delta t\).
 
 This surrogate modelling approach is useful because inference with a trained neural network is usually much faster than running a full COMSOL simulation. Therefore, MeshGraphNet can be used for rapid prediction, visualization, comparison of scenarios, and further analysis of thermoelastic wave propagation in geological materials.
 
@@ -62,10 +62,10 @@ where \((i,j)\) is an edge between node \(i\) and node \(j\), and \(i\) and \(j\
 
 An edge \((i,j)\) means that there is a local physical connection between two neighboring parts of the medium. In the thermoelastic problem, this local connection is important because heat transfer, deformation, stress redistribution, and wave propagation are all governed by interactions between nearby spatial regions.
 
-Each node has a coordinate vector in three-dimensional space:
+Each node has a coordinate vector in two-dimensional space:
 
 \[
-\mathbf{p}_i =
+p_i =
 \begin{bmatrix}
 x_i \\
 y_i \\
@@ -73,36 +73,36 @@ z_i
 \end{bmatrix}
 \]
 
-where \(\mathbf{p}_i\) is the position vector of node \(i\), and \(x_i\), \(y_i\), and \(z_i\) are the Cartesian coordinates of this node.
+where \(p_i\) is the position vector of node \(i\), and \(x_i\), \(y_i\), and \(z_i\) are the Cartesian coordinates of this node.
 
 For each edge \((i,j)\), the relative geometric vector is defined as
 
 \[
-\mathbf{r}_{ij} = \mathbf{p}_j - \mathbf{p}_i
+r_{ij} = p_j - p_i
 \]
 
-where \(\mathbf{r}_{ij}\) is the vector directed from node \(i\) to node \(j\), \(\mathbf{p}_i\) is the coordinate vector of the source node, and \(\mathbf{p}_j\) is the coordinate vector of the neighboring destination node.
+where \(r_{ij}\) is the vector directed from node \(i\) to node \(j\), \(p_i\) is the coordinate vector of the source node, and \(p_j\) is the coordinate vector of the neighboring destination node.
 
 The length of the edge is computed as
 
 \[
-d_{ij} = \|\mathbf{r}_{ij}\|_2
+d_{ij} = \|r_{ij}\|_2
 \]
 
-where \(d_{ij}\) is the Euclidean distance between nodes \(i\) and \(j\), \(\mathbf{r}_{ij}\) is the relative position vector, and \(\|\cdot\|_2\) denotes the Euclidean norm.
+where \(d_{ij}\) is the Euclidean distance between nodes \(i\) and \(j\), \(r_{ij}\) is the relative position vector, and \(\|\cdot\|_2\) denotes the Euclidean norm.
 
 The edge feature vector is then defined as
 
 \[
-\mathbf{a}_{ij}
+a_{ij}
 =
 \begin{bmatrix}
-\mathbf{r}_{ij} \\
+r_{ij} \\
 d_{ij}
 \end{bmatrix}
 \]
 
-where \(\mathbf{a}_{ij}\) is the feature vector of edge \((i,j)\), \(\mathbf{r}_{ij}\) describes the direction and relative displacement between neighboring nodes, and \(d_{ij}\) describes the distance between these nodes.
+where \(a_{ij}\) is the feature vector of edge \((i,j)\), \(r_{ij}\) describes the direction and relative displacement between neighboring nodes, and \(d_{ij}\) describes the distance between these nodes.
 
 This geometric edge representation is essential for the model. In a physical medium, the interaction between two points depends not only on their states, but also on their relative position and distance. For example, heat transfer between close nodes is usually stronger than between distant nodes, and the direction of mechanical disturbance is related to the geometry of the mesh.
 
@@ -111,78 +111,72 @@ This geometric edge representation is essential for the model. In a physical med
 Each graph node contains a feature vector that combines geometry, material properties, simulation conditions, and current physical fields. The input feature vector of node \(i\) at time \(t\) is written as
 
 \[
-\mathbf{x}_i^t =
+x_i^t =
 \begin{bmatrix}
-\mathbf{p}_i \\
-\mathbf{m}_i \\
-\mathbf{s} \\
-\mathbf{q}_i^t
+p_i \\
+m_i \\
+s \\
+q_i^t
 \end{bmatrix}
 \]
 
-where \(\mathbf{x}_i^t\) is the full input feature vector of node \(i\) at time \(t\), \(\mathbf{p}_i\) is the coordinate vector of the node, \(\mathbf{m}_i\) is the vector of material parameters, \(\mathbf{s}\) is the vector of scenario parameters, and \(\mathbf{q}_i^t\) is the dynamic physical state of the node at time \(t\).
+where \(x_i^t\) is the full input feature vector of node \(i\) at time \(t\), \(p_i\) is the coordinate vector of the node, \(m_i\) is the vector of material parameters, \(s\) is the vector of scenario parameters, and \(q_i^t\) is the dynamic physical state of the node at time \(t\).
 
-The vector \(\mathbf{m}_i\) describes the local material properties of the geological medium. In the thermoelastic task, these properties may include density, heat capacity, thermal conductivity, Young's modulus, Poisson's ratio, and thermal expansion coefficient. These parameters are important because different rocks react differently to heating and mechanical disturbance.
+The vector \(m_i\) describes the local material properties of the geological medium. In the thermoelastic task, these properties may include density, heat capacity, thermal conductivity, Young's modulus, Poisson's ratio, and thermal expansion coefficient. These parameters are important because different rocks react differently to heating and mechanical disturbance.
 
-The vector \(\mathbf{s}\) describes global simulation parameters. These may include the temperature of the inserted rod, loading conditions, boundary conditions, or other scenario-level parameters. In the implemented ConditionalMeshGraphNet pipeline, the conditional information is already concatenated with node features. Therefore, the model receives one combined node feature vector containing coordinates, material properties, scenario parameters, and the current physical state.
+The vector \(s\) describes global simulation parameters. These may include the temperature of the inserted rod, loading conditions, boundary conditions, or other scenario-level parameters. In the implemented ConditionalMeshGraphNet pipeline, the conditional information is already concatenated with node features. Therefore, the model receives one combined node feature vector containing coordinates, material properties, scenario parameters, and the current physical state.
 
 The dynamic physical state of node \(i\) can be represented as
 
 \[
-\mathbf{q}_i^t =
+q_i^t =
 \begin{bmatrix}
 T_i^t \\
 u_i^t \\
 v_i^t \\
-w_i^t \\
 \dot{u}_i^t \\
 \dot{v}_i^t \\
-\dot{w}_i^t \\
 \sigma_{x,i}^t \\
 \sigma_{y,i}^t \\
-\sigma_{z,i}^t \\
 \sigma_{xy,i}^t \\
-\sigma_{yz,i}^t \\
-\sigma_{xz,i}^t \\
 \varepsilon_{x,i}^t \\
-\varepsilon_{y,i}^t \\
-\varepsilon_{z,i}^t
+\varepsilon_{y,i}^t
 \end{bmatrix}
 \]
 
-where \(\mathbf{q}_i^t\) is the physical state vector of node \(i\) at time \(t\), \(T_i^t\) is the temperature, \(u_i^t\), \(v_i^t\), and \(w_i^t\) are displacement components, \(\dot{u}_i^t\), \(\dot{v}_i^t\), and \(\dot{w}_i^t\) are velocity components, \(\sigma_{x,i}^t\), \(\sigma_{y,i}^t\), \(\sigma_{z,i}^t\), \(\sigma_{xy,i}^t\), \(\sigma_{yz,i}^t\), and \(\sigma_{xz,i}^t\) are stress components, and \(\varepsilon_{x,i}^t\), \(\varepsilon_{y,i}^t\), and \(\varepsilon_{z,i}^t\) are strain components.
+where \(q_i^t\) is the physical state vector of node \(i\) at time \(t\), \(T_i^t\) is the temperature, \(u_i^t\) and \(v_i^t\) are the in-plane displacement components, \(\dot{u}_i^t\) and \(\dot{v}_i^t\) are velocity components, \(\sigma_{x,i}^t\), \(\sigma_{y,i}^t\), and \(\sigma_{xy,i}^t\) are the in-plane stress components, and \(\varepsilon_{x,i}^t\), \(\varepsilon_{y,i}^t\) are diagonal strain components under the plane-strain assumption.
 
-The temperature component \(T_i^t\) describes the thermal state of the medium at node \(i\). The displacement components \(u_i^t\), \(v_i^t\), and \(w_i^t\) describe mechanical movement in three spatial directions. The velocity components \(\dot{u}_i^t\), \(\dot{v}_i^t\), and \(\dot{w}_i^t\) describe the rate of this movement. The stress components \(\sigma_{x,i}^t\), \(\sigma_{y,i}^t\), \(\sigma_{z,i}^t\), \(\sigma_{xy,i}^t\), \(\sigma_{yz,i}^t\), and \(\sigma_{xz,i}^t\) describe internal mechanical forces. The strain components \(\varepsilon_{x,i}^t\), \(\varepsilon_{y,i}^t\), and \(\varepsilon_{z,i}^t\) describe local deformation of the material.
+The temperature component \(T_i^t\) describes the thermal state of the medium at node \(i\). The displacement components \(u_i^t\) and \(v_i^t\) describe mechanical motion in the two in-plane directions; the velocity components \(\dot{u}_i^t\) and \(\dot{v}_i^t\) describe its rate. The stress components \(\sigma_{x,i}^t\), \(\sigma_{y,i}^t\), and \(\sigma_{xy,i}^t\) describe internal mechanical forces; the strain components \(\varepsilon_{x,i}^t\) and \(\varepsilon_{y,i}^t\) describe local deformation.
 
 For the whole graph, the node feature matrix at time \(t\) is written as
 
 \[
-\mathbf{X}^{t}
+X^{t}
 =
 \begin{bmatrix}
-(\mathbf{x}_1^t)^{\top} \\
-(\mathbf{x}_2^t)^{\top} \\
+(x_1^t)^{\top} \\
+(x_2^t)^{\top} \\
 \vdots \\
-(\mathbf{x}_N^t)^{\top}
+(x_N^t)^{\top}
 \end{bmatrix}
 \]
 
-where \(\mathbf{X}^{t}\) is the full node feature matrix at time \(t\), \(\mathbf{x}_i^t\) is the input feature vector of node \(i\), and \(N\) is the total number of nodes in the graph.
+where \(X^{t}\) is the full node feature matrix at time \(t\), \(x_i^t\) is the input feature vector of node \(i\), and \(N\) is the total number of nodes in the graph.
 
 The target matrix can be written as
 
 \[
-\mathbf{Y}^{t+\Delta t}
+Y^{t+\Delta t}
 =
 \begin{bmatrix}
-(\mathbf{y}_1^{t+\Delta t})^{\top} \\
-(\mathbf{y}_2^{t+\Delta t})^{\top} \\
+(y_1^{t+\Delta t})^{\top} \\
+(y_2^{t+\Delta t})^{\top} \\
 \vdots \\
-(\mathbf{y}_N^{t+\Delta t})^{\top}
+(y_N^{t+\Delta t})^{\top}
 \end{bmatrix}
 \]
 
-where \(\mathbf{Y}^{t+\Delta t}\) is the target matrix at the next time step, \(\mathbf{y}_i^{t+\Delta t}\) is the target physical field vector for node \(i\), \(N\) is the total number of nodes, and \(\Delta t\) is the time interval between the current and predicted states.
+where \(Y^{t+\Delta t}\) is the target matrix at the next time step, \(y_i^{t+\Delta t}\) is the target physical field vector for node \(i\), \(N\) is the total number of nodes, and \(\Delta t\) is the time interval between the current and predicted states.
 
 \subsection{Prediction Target}
 
@@ -191,85 +185,85 @@ The objective of ConditionalMeshGraphNet is to predict the future physical state
 For node \(i\), the prediction can be written as
 
 \[
-\hat{\mathbf{y}}_i^{t+\Delta t}
+\hat{y}_i^{t+\Delta t}
 =
 f_{\theta}
 \left(
-\mathbf{x}_i^t,
+x_i^t,
 \mathcal{G}
 \right)
 \]
 
-where \(\hat{\mathbf{y}}_i^{t+\Delta t}\) is the predicted output vector for node \(i\) at time \(t+\Delta t\), \(f_{\theta}\) is the trainable ConditionalMeshGraphNet model, \(\theta\) denotes all trainable parameters of the model, \(\mathbf{x}_i^t\) is the input feature vector of node \(i\) at time \(t\), \(\mathcal{G}\) is the graph representation of the COMSOL mesh, and \(\Delta t\) is the time interval between the current and predicted states.
+where \(\hat{y}_i^{t+\Delta t}\) is the predicted output vector for node \(i\) at time \(t+\Delta t\), \(f_{\theta}\) is the trainable ConditionalMeshGraphNet model, \(\theta\) denotes all trainable parameters of the model, \(x_i^t\) is the input feature vector of node \(i\) at time \(t\), \(\mathcal{G}\) is the graph representation of the COMSOL mesh, and \(\Delta t\) is the time interval between the current and predicted states.
 
 For the whole graph, the model prediction can be written as
 
 \[
-\hat{\mathbf{Y}}^{t+\Delta t}
+\hat{Y}^{t+\Delta t}
 =
 f_{\theta}
 \left(
-\mathbf{X}^{t},
+X^{t},
 \mathcal{G}
 \right)
 \]
 
-where \(\hat{\mathbf{Y}}^{t+\Delta t}\) is the predicted matrix of physical fields for all graph nodes at time \(t+\Delta t\), \(\mathbf{X}^{t}\) is the input node feature matrix at time \(t\), \(f_{\theta}\) is the neural network surrogate model, and \(\mathcal{G}\) is the graph structure of the finite-element mesh.
+where \(\hat{Y}^{t+\Delta t}\) is the predicted matrix of physical fields for all graph nodes at time \(t+\Delta t\), \(X^{t}\) is the input node feature matrix at time \(t\), \(f_{\theta}\) is the neural network surrogate model, and \(\mathcal{G}\) is the graph structure of the finite-element mesh.
 
 The output matrix has the following form:
 
 \[
-\hat{\mathbf{Y}}^{t+\Delta t}
+\hat{Y}^{t+\Delta t}
 =
 \begin{bmatrix}
-(\hat{\mathbf{y}}_1^{t+\Delta t})^{\top} \\
-(\hat{\mathbf{y}}_2^{t+\Delta t})^{\top} \\
+(\hat{y}_1^{t+\Delta t})^{\top} \\
+(\hat{y}_2^{t+\Delta t})^{\top} \\
 \vdots \\
-(\hat{\mathbf{y}}_N^{t+\Delta t})^{\top}
+(\hat{y}_N^{t+\Delta t})^{\top}
 \end{bmatrix}
 \]
 
-where \(\hat{\mathbf{Y}}^{t+\Delta t}\) is the full predicted output matrix, \(\hat{\mathbf{y}}_i^{t+\Delta t}\) is the predicted physical field vector for node \(i\), and \(N\) is the total number of graph nodes.
+where \(\hat{Y}^{t+\Delta t}\) is the full predicted output matrix, \(\hat{y}_i^{t+\Delta t}\) is the predicted physical field vector for node \(i\), and \(N\) is the total number of graph nodes.
 
 The model can be trained in two main target modes. In the first mode, the model directly predicts the absolute physical state at the next time step:
 
 \[
-\hat{\mathbf{q}}_i^{t+\Delta t}
+\hat{q}_i^{t+\Delta t}
 =
 f_{\theta}
 \left(
-\mathbf{x}_i^t,
+x_i^t,
 \mathcal{G}
 \right)
 \]
 
-where \(\hat{\mathbf{q}}_i^{t+\Delta t}\) is the predicted physical state of node \(i\) at time \(t+\Delta t\), \(f_{\theta}\) is the trainable graph neural network, \(\mathbf{x}_i^t\) is the current input feature vector of node \(i\), and \(\mathcal{G}\) is the graph representation of the mesh.
+where \(\hat{q}_i^{t+\Delta t}\) is the predicted physical state of node \(i\) at time \(t+\Delta t\), \(f_{\theta}\) is the trainable graph neural network, \(x_i^t\) is the current input feature vector of node \(i\), and \(\mathcal{G}\) is the graph representation of the mesh.
 
 In the second mode, the model predicts the increment of the physical state. This mode is called delta prediction. The predicted increment is written as
 
 \[
-\Delta \hat{\mathbf{q}}_i^t
+\Delta \hat{q}_i^t
 =
 f_{\theta}
 \left(
-\mathbf{x}_i^t,
+x_i^t,
 \mathcal{G}
 \right)
 \]
 
-where \(\Delta \hat{\mathbf{q}}_i^t\) is the predicted change of the physical state at node \(i\), \(f_{\theta}\) is the trainable ConditionalMeshGraphNet model, \(\mathbf{x}_i^t\) is the input feature vector at time \(t\), and \(\mathcal{G}\) is the graph structure of the finite-element mesh.
+where \(\Delta \hat{q}_i^t\) is the predicted change of the physical state at node \(i\), \(f_{\theta}\) is the trainable ConditionalMeshGraphNet model, \(x_i^t\) is the input feature vector at time \(t\), and \(\mathcal{G}\) is the graph structure of the finite-element mesh.
 
 The next physical state is then reconstructed as
 
 \[
-\hat{\mathbf{q}}_i^{t+\Delta t}
+\hat{q}_i^{t+\Delta t}
 =
-\mathbf{q}_i^t
+q_i^t
 +
-\Delta \hat{\mathbf{q}}_i^t
+\Delta \hat{q}_i^t
 \]
 
-where \(\hat{\mathbf{q}}_i^{t+\Delta t}\) is the reconstructed prediction of the physical state at the next time step, \(\mathbf{q}_i^t\) is the current physical state of node \(i\), and \(\Delta \hat{\mathbf{q}}_i^t\) is the predicted increment of the state.
+where \(\hat{q}_i^{t+\Delta t}\) is the reconstructed prediction of the physical state at the next time step, \(q_i^t\) is the current physical state of node \(i\), and \(\Delta \hat{q}_i^t\) is the predicted increment of the state.
 
 Delta prediction can be more stable than direct prediction of absolute values. In thermoelastic simulations, the difference between two neighboring time steps is often smoother and smaller in magnitude than the full physical field. Therefore, learning the increment allows the model to focus on the local temporal evolution of the system. This is especially useful for wave propagation, where the model must capture small changes in displacement, velocity, stress, and strain over time.
 
@@ -308,119 +302,119 @@ where \(\theta\) is the complete parameter set of the model, \(\theta_E\) is the
 The input of the model consists of node features and edge features. The node feature matrix is written as
 
 \[
-\mathbf{X}^{t}
+X^{t}
 \in
 \mathbb{R}^{N \times F_v}
 \]
 
-where \(\mathbf{X}^{t}\) is the node feature matrix at time \(t\), \(N\) is the number of graph nodes, and \(F_v\) is the number of input node features.
+where \(X^{t}\) is the node feature matrix at time \(t\), \(N\) is the number of graph nodes, and \(F_v\) is the number of input node features.
 
 The edge feature matrix is written as
 
 \[
-\mathbf{A}
+A
 \in
 \mathbb{R}^{M \times F_e}
 \]
 
-where \(\mathbf{A}\) is the edge feature matrix, \(M\) is the number of graph edges, and \(F_e\) is the number of edge features.
+where \(A\) is the edge feature matrix, \(M\) is the number of graph edges, and \(F_e\) is the number of edge features.
 
 The output of the model is written as
 
 \[
-\hat{\mathbf{Y}}^{t+\Delta t}
+\hat{Y}^{t+\Delta t}
 \in
 \mathbb{R}^{N \times C}
 \]
 
-where \(\hat{\mathbf{Y}}^{t+\Delta t}\) is the predicted output matrix at time \(t+\Delta t\), \(N\) is the number of graph nodes, and \(C\) is the number of predicted physical fields.
+where \(\hat{Y}^{t+\Delta t}\) is the predicted output matrix at time \(t+\Delta t\), \(N\) is the number of graph nodes, and \(C\) is the number of predicted physical fields.
 
 \subsubsection{Node and Edge Encoders}
 
 The node encoder maps the raw node feature vector into a latent representation. For node \(i\), this operation is written as
 
 \[
-\mathbf{h}_i^{0}
+h_i^{0}
 =
 \phi_v^{enc}
 \left(
-\mathbf{x}_i^t
+x_i^t
 \right)
 \]
 
-where \(\mathbf{h}_i^{0}\) is the initial latent representation of node \(i\), \(\phi_v^{enc}\) is the node encoder network, and \(\mathbf{x}_i^t\) is the input feature vector of node \(i\) at time \(t\).
+where \(h_i^{0}\) is the initial latent representation of node \(i\), \(\phi_v^{enc}\) is the node encoder network, and \(x_i^t\) is the input feature vector of node \(i\) at time \(t\).
 
 For all nodes, the node encoding operation can be written as
 
 \[
-\mathbf{H}^{0}
+H^{0}
 =
 \phi_v^{enc}
 \left(
-\mathbf{X}^{t}
+X^{t}
 \right)
 \]
 
-where \(\mathbf{H}^{0}\) is the matrix of initial latent node representations, \(\phi_v^{enc}\) is the node encoder, and \(\mathbf{X}^{t}\) is the input node feature matrix.
+where \(H^{0}\) is the matrix of initial latent node representations, \(\phi_v^{enc}\) is the node encoder, and \(X^{t}\) is the input node feature matrix.
 
 The matrix of latent node representations has the following form:
 
 \[
-\mathbf{H}^{0}
+H^{0}
 =
 \begin{bmatrix}
-(\mathbf{h}_1^{0})^{\top} \\
-(\mathbf{h}_2^{0})^{\top} \\
+(h_1^{0})^{\top} \\
+(h_2^{0})^{\top} \\
 \vdots \\
-(\mathbf{h}_N^{0})^{\top}
+(h_N^{0})^{\top}
 \end{bmatrix}
 \]
 
-where \(\mathbf{H}^{0}\) is the latent node representation matrix, \(\mathbf{h}_i^{0}\) is the initial latent vector of node \(i\), and \(N\) is the total number of nodes.
+where \(H^{0}\) is the latent node representation matrix, \(h_i^{0}\) is the initial latent vector of node \(i\), and \(N\) is the total number of nodes.
 
 The edge encoder maps the raw edge feature vector into a latent representation. For edge \((i,j)\), this operation is written as
 
 \[
-\mathbf{e}_{ij}^{0}
+e_{ij}^{0}
 =
 \phi_e^{enc}
 \left(
-\mathbf{a}_{ij}
+a_{ij}
 \right)
 \]
 
-where \(\mathbf{e}_{ij}^{0}\) is the initial latent representation of edge \((i,j)\), \(\phi_e^{enc}\) is the edge encoder network, and \(\mathbf{a}_{ij}\) is the raw edge feature vector.
+where \(e_{ij}^{0}\) is the initial latent representation of edge \((i,j)\), \(\phi_e^{enc}\) is the edge encoder network, and \(a_{ij}\) is the raw edge feature vector.
 
 Both \(\phi_v^{enc}\) and \(\phi_e^{enc}\) are multilayer perceptrons. Their purpose is to transform heterogeneous physical inputs into a common latent space. This is important because the raw input variables may have different units, scales, and physical meanings. For example, coordinates, temperature, displacement, velocity, stress, strain, density, and elastic constants cannot be processed effectively as a single unstructured set of raw values without feature transformation.
 
 A simplified multilayer perceptron transformation can be written as
 
 \[
-\phi(\mathbf{z})
+\phi(z)
 =
-\mathbf{W}_L
+W_L
 \psi
 \left(
-\mathbf{W}_{L-1}
+W_{L-1}
 \psi
 \left(
 \dots
 \psi
 \left(
-\mathbf{W}_1 \mathbf{z}
+W_1 z
 +
-\mathbf{b}_1
+b_1
 \right)
 \dots
 \right)
 +
-\mathbf{b}_{L-1}
+b_{L-1}
 \right)
 +
-\mathbf{b}_L
+b_L
 \]
 
-where \(\phi(\mathbf{z})\) is the output of the multilayer perceptron, \(\mathbf{z}\) is the input vector, \(L\) is the number of linear layers, \(\mathbf{W}_{\ell}\) is the weight matrix of layer \(\ell\), \(\mathbf{b}_{\ell}\) is the bias vector of layer \(\ell\), and \(\psi(\cdot)\) is the nonlinear activation function.
+where \(\phi(z)\) is the output of the multilayer perceptron, \(z\) is the input vector, \(L\) is the number of linear layers, \(W_{\ell}\) is the weight matrix of layer \(\ell\), \(b_{\ell}\) is the bias vector of layer \(\ell\), and \(\psi(\cdot)\) is the nonlinear activation function.
 
 In this model, the activation function is the SiLU function:
 
@@ -459,100 +453,100 @@ where \(k\) is the index of the current message passing step, and \(K\) is the t
 At step \(k\), each edge \((i,j)\) is updated using the latent representation of the source node, the latent representation of the destination node, and the current latent representation of the edge. The temporary edge update is computed as
 
 \[
-\tilde{\mathbf{e}}_{ij}^{k+1}
+\tilde{e}_{ij}^{k+1}
 =
 \phi_e^{k}
 \left(
 \begin{bmatrix}
-\mathbf{h}_i^k \\
-\mathbf{h}_j^k \\
-\mathbf{e}_{ij}^k
+h_i^k \\
+h_j^k \\
+e_{ij}^k
 \end{bmatrix}
 \right)
 \]
 
-where \(\tilde{\mathbf{e}}_{ij}^{k+1}\) is the proposed update for edge \((i,j)\), \(\phi_e^{k}\) is the edge update network at message passing step \(k\), \(\mathbf{h}_i^k\) is the latent representation of the source node \(i\), \(\mathbf{h}_j^k\) is the latent representation of the destination node \(j\), and \(\mathbf{e}_{ij}^k\) is the current latent representation of edge \((i,j)\).
+where \(\tilde{e}_{ij}^{k+1}\) is the proposed update for edge \((i,j)\), \(\phi_e^{k}\) is the edge update network at message passing step \(k\), \(h_i^k\) is the latent representation of the source node \(i\), \(h_j^k\) is the latent representation of the destination node \(j\), and \(e_{ij}^k\) is the current latent representation of edge \((i,j)\).
 
 Then a residual connection is applied to the edge representation:
 
 \[
-\mathbf{e}_{ij}^{k}
+e_{ij}^{k}
 +
-\tilde{\mathbf{e}}_{ij}^{k+1}
+\tilde{e}_{ij}^{k+1}
 \]
 
-where \(\mathbf{e}_{ij}^{k}\) is the previous edge representation and \(\tilde{\mathbf{e}}_{ij}^{k+1}\) is the learned edge update.
+where \(e_{ij}^{k}\) is the previous edge representation and \(\tilde{e}_{ij}^{k+1}\) is the learned edge update.
 
 After the residual connection, layer normalization is applied:
 
 \[
-\mathbf{e}_{ij}^{k+1}
+e_{ij}^{k+1}
 =
 \operatorname{LayerNorm}
 \left(
-\mathbf{e}_{ij}^{k}
+e_{ij}^{k}
 +
-\tilde{\mathbf{e}}_{ij}^{k+1}
+\tilde{e}_{ij}^{k+1}
 \right)
 \]
 
-where \(\mathbf{e}_{ij}^{k+1}\) is the updated edge representation, \(\operatorname{LayerNorm}\) is the layer normalization operation, \(\mathbf{e}_{ij}^{k}\) is the previous edge representation, and \(\tilde{\mathbf{e}}_{ij}^{k+1}\) is the computed edge update.
+where \(e_{ij}^{k+1}\) is the updated edge representation, \(\operatorname{LayerNorm}\) is the layer normalization operation, \(e_{ij}^{k}\) is the previous edge representation, and \(\tilde{e}_{ij}^{k+1}\) is the computed edge update.
 
 The edge update can be interpreted as a learned local interaction between two neighboring mesh points. In the thermoelastic problem, this interaction may depend on relative position, distance, material parameters, temperature difference, displacement difference, velocity, stress, and strain. Therefore, the edge update is responsible for modelling how physical information is transferred between neighboring parts of the geological medium.
 
 After all edge representations are updated, messages are aggregated for every destination node. For node \(j\), the aggregated message is defined as
 
 \[
-\mathbf{m}_j^{k+1}
+m_j^{k+1}
 =
 \sum_{i:(i,j)\in\mathcal{E}}
-\mathbf{e}_{ij}^{k+1}
+e_{ij}^{k+1}
 \]
 
-where \(\mathbf{m}_j^{k+1}\) is the aggregated message received by node \(j\), \(\mathbf{e}_{ij}^{k+1}\) is the updated edge representation from node \(i\) to node \(j\), and the summation is taken over all incoming edges \((i,j)\) connected to node \(j\).
+where \(m_j^{k+1}\) is the aggregated message received by node \(j\), \(e_{ij}^{k+1}\) is the updated edge representation from node \(i\) to node \(j\), and the summation is taken over all incoming edges \((i,j)\) connected to node \(j\).
 
 This operation is equivalent to collecting information from all neighboring nodes. In implementation terms, it corresponds to a scatter-add operation over destination nodes. In physical terms, it means that the future state of a node is influenced by the surrounding local region of the geological medium.
 
 After message aggregation, the node representation is updated. The temporary node update is computed as
 
 \[
-\tilde{\mathbf{h}}_j^{k+1}
+\tilde{h}_j^{k+1}
 =
 \phi_v^{k}
 \left(
 \begin{bmatrix}
-\mathbf{h}_j^k \\
-\mathbf{m}_j^{k+1}
+h_j^k \\
+m_j^{k+1}
 \end{bmatrix}
 \right)
 \]
 
-where \(\tilde{\mathbf{h}}_j^{k+1}\) is the proposed update for node \(j\), \(\phi_v^{k}\) is the node update network at message passing step \(k\), \(\mathbf{h}_j^k\) is the previous latent representation of node \(j\), and \(\mathbf{m}_j^{k+1}\) is the aggregated message received from neighboring nodes.
+where \(\tilde{h}_j^{k+1}\) is the proposed update for node \(j\), \(\phi_v^{k}\) is the node update network at message passing step \(k\), \(h_j^k\) is the previous latent representation of node \(j\), and \(m_j^{k+1}\) is the aggregated message received from neighboring nodes.
 
 A residual connection is then applied to the node representation:
 
 \[
-\mathbf{h}_j^k
+h_j^k
 +
-\tilde{\mathbf{h}}_j^{k+1}
+\tilde{h}_j^{k+1}
 \]
 
-where \(\mathbf{h}_j^k\) is the previous node representation and \(\tilde{\mathbf{h}}_j^{k+1}\) is the learned node update.
+where \(h_j^k\) is the previous node representation and \(\tilde{h}_j^{k+1}\) is the learned node update.
 
 The final updated node representation is obtained after layer normalization:
 
 \[
-\mathbf{h}_j^{k+1}
+h_j^{k+1}
 =
 \operatorname{LayerNorm}
 \left(
-\mathbf{h}_j^k
+h_j^k
 +
-\tilde{\mathbf{h}}_j^{k+1}
+\tilde{h}_j^{k+1}
 \right)
 \]
 
-where \(\mathbf{h}_j^{k+1}\) is the updated latent representation of node \(j\), \(\operatorname{LayerNorm}\) is the normalization operation, \(\mathbf{h}_j^k\) is the previous node representation, and \(\tilde{\mathbf{h}}_j^{k+1}\) is the learned node update.
+where \(h_j^{k+1}\) is the updated latent representation of node \(j\), \(\operatorname{LayerNorm}\) is the normalization operation, \(h_j^k\) is the previous node representation, and \(\tilde{h}_j^{k+1}\) is the learned node update.
 
 Residual connections help preserve information from previous representations and improve gradient flow during training. Layer normalization stabilizes the distribution of latent features and makes training more robust. This is important because the model performs several message passing steps, and without stabilization, the latent representations may become difficult to optimize.
 \subsubsection{Decoder}
@@ -560,30 +554,30 @@ Residual connections help preserve information from previous representations and
 After \(K\) message passing steps, each graph node contains a final latent representation that already includes information from its local neighborhood. The decoder transforms this latent representation into predicted physical fields. For node \(i\), the decoding operation is written as
 
 \[
-\hat{\mathbf{y}}_i
+\hat{y}_i
 =
 \phi^{dec}
 \left(
-\mathbf{h}_i^K
+h_i^K
 \right)
 \]
 
-where \(\hat{\mathbf{y}}_i\) is the predicted output vector for node \(i\), \(\phi^{dec}\) is the decoder network, and \(\mathbf{h}_i^K\) is the latent representation of node \(i\) after \(K\) message passing steps.
+where \(\hat{y}_i\) is the predicted output vector for node \(i\), \(\phi^{dec}\) is the decoder network, and \(h_i^K\) is the latent representation of node \(i\) after \(K\) message passing steps.
 
 For the whole graph, the output matrix is written as
 
 \[
-\hat{\mathbf{Y}}
+\hat{Y}
 =
 \begin{bmatrix}
-\hat{\mathbf{y}}_1^{\top} \\
-\hat{\mathbf{y}}_2^{\top} \\
+\hat{y}_1^{\top} \\
+\hat{y}_2^{\top} \\
 \vdots \\
-\hat{\mathbf{y}}_N^{\top}
+\hat{y}_N^{\top}
 \end{bmatrix}
 \]
 
-where \(\hat{\mathbf{Y}}\) is the predicted output matrix for all graph nodes, \(\hat{\mathbf{y}}_i\) is the predicted physical field vector for node \(i\), and \(N\) is the total number of graph nodes.
+where \(\hat{Y}\) is the predicted output matrix for all graph nodes, \(\hat{y}_i\) is the predicted physical field vector for node \(i\), and \(N\) is the total number of graph nodes.
 
 The decoder is responsible for converting abstract latent features into physically interpretable quantities. Depending on the selected target fields, the output may contain temperature, displacement components, velocity components, stress components, strain components, or increments of these quantities. In the context of thermoelastic wave prediction, this means that the decoder learns how the latent representation of each node should be translated into the next physical state of the geological medium.
 
@@ -611,19 +605,19 @@ Mechanical wave propagation in an elastic medium is related to displacement, str
 
 \[
 \rho
-\frac{\partial^2 \mathbf{u}}{\partial t^2}
+\frac{\partial^2 u}{\partial t^2}
 =
-\nabla \cdot \boldsymbol{\sigma}
+\nabla \cdot \sigma
 +
-\mathbf{b}
+b
 \]
 
-where \(\rho\) is the material density, \(\mathbf{u}\) is the displacement vector, \(t\) is time, \(\boldsymbol{\sigma}\) is the stress tensor, and \(\mathbf{b}\) is the body force vector.
+where \(\rho\) is the material density, \(u\) is the displacement vector, \(t\) is time, \(\sigma\) is the stress tensor, and \(b\) is the body force vector.
 
 The displacement vector is written as
 
 \[
-\mathbf{u}
+u
 =
 \begin{bmatrix}
 u \\
@@ -632,12 +626,12 @@ w
 \end{bmatrix}
 \]
 
-where \(\mathbf{u}\) is the displacement vector, and \(u\), \(v\), and \(w\) are displacement components along the three spatial directions.
+where \(u\) is the displacement vector, and \(u\), \(v\), and \(w\) are displacement components along the three spatial directions.
 
 The stress tensor can be written as
 
 \[
-\boldsymbol{\sigma}
+\sigma
 =
 \begin{bmatrix}
 \sigma_x & \sigma_{xy} & \sigma_{xz} \\
@@ -646,48 +640,48 @@ The stress tensor can be written as
 \end{bmatrix}
 \]
 
-where \(\boldsymbol{\sigma}\) is the stress tensor, \(\sigma_x\), \(\sigma_y\), and \(\sigma_z\) are normal stress components, and \(\sigma_{xy}\), \(\sigma_{xz}\), and \(\sigma_{yz}\) are shear stress components.
+where \(\sigma\) is the stress tensor, \(\sigma_x\), \(\sigma_y\), and \(\sigma_z\) are normal stress components, and \(\sigma_{xy}\), \(\sigma_{xz}\), and \(\sigma_{yz}\) are shear stress components.
 
 The strain tensor is related to displacement gradients. In the small-strain approximation, it is defined as
 
 \[
-\boldsymbol{\varepsilon}
+\varepsilon
 =
 \frac{1}{2}
 \left(
-\nabla \mathbf{u}
+\nabla u
 +
-(\nabla \mathbf{u})^{\top}
+(\nabla u)^{\top}
 \right)
 \]
 
-where \(\boldsymbol{\varepsilon}\) is the strain tensor, \(\mathbf{u}\) is the displacement vector, \(\nabla \mathbf{u}\) is the displacement gradient tensor, and \((\nabla \mathbf{u})^{\top}\) is its transpose.
+where \(\varepsilon\) is the strain tensor, \(u\) is the displacement vector, \(\nabla u\) is the displacement gradient tensor, and \((\nabla u)^{\top}\) is its transpose.
 
 Thermal expansion couples the thermal and mechanical parts of the problem. A simplified thermoelastic strain relation can be written as
 
 \[
-\boldsymbol{\varepsilon}
+\varepsilon
 =
-\boldsymbol{\varepsilon}^{mech}
+\varepsilon^{mech}
 +
-\boldsymbol{\varepsilon}^{th}
+\varepsilon^{th}
 \]
 
-where \(\boldsymbol{\varepsilon}\) is the total strain tensor, \(\boldsymbol{\varepsilon}^{mech}\) is the mechanical strain tensor, and \(\boldsymbol{\varepsilon}^{th}\) is the thermal strain tensor.
+where \(\varepsilon\) is the total strain tensor, \(\varepsilon^{mech}\) is the mechanical strain tensor, and \(\varepsilon^{th}\) is the thermal strain tensor.
 
 The thermal strain may be written as
 
 \[
-\boldsymbol{\varepsilon}^{th}
+\varepsilon^{th}
 =
 \alpha
 \left(
 T - T_0
 \right)
-\mathbf{I}
+I
 \]
 
-where \(\boldsymbol{\varepsilon}^{th}\) is the thermal strain tensor, \(\alpha\) is the coefficient of thermal expansion, \(T\) is the current temperature, \(T_0\) is the reference temperature, and \(\mathbf{I}\) is the identity tensor.
+where \(\varepsilon^{th}\) is the thermal strain tensor, \(\alpha\) is the coefficient of thermal expansion, \(T\) is the current temperature, \(T_0\) is the reference temperature, and \(I\) is the identity tensor.
 
 After finite-element discretization, these continuous equations are represented through local interactions between neighboring mesh nodes and elements. MeshGraphNet learns a data-driven approximation of these interactions. The edge update models pairwise interactions between neighboring nodes, the aggregation step collects information from the local neighborhood, and the node update changes the hidden state of each node according to the received information.
 
@@ -879,34 +873,34 @@ The training pipeline loads processed datasets from the dataset registry. Each s
 
 \[
 \left(
-\mathbf{X},
-\mathbf{Y},
+X,
+Y,
 \texttt{edge\_index},
 \texttt{edge\_attr}
 \right)
 \]
 
-where \(\mathbf{X}\) is the node feature matrix, \(\mathbf{Y}\) is the target matrix of physical fields, \(\texttt{edge\_index}\) is the graph connectivity matrix, and \(\texttt{edge\_attr}\) is the matrix of edge features.
+where \(X\) is the node feature matrix, \(Y\) is the target matrix of physical fields, \(\texttt{edge\_index}\) is the graph connectivity matrix, and \(\texttt{edge\_attr}\) is the matrix of edge features.
 
 The node feature matrix has the following dimensionality:
 
 \[
-\mathbf{X}
+X
 \in
 \mathbb{R}^{N \times F_v}
 \]
 
-where \(\mathbf{X}\) is the node feature matrix, \(N\) is the number of nodes, and \(F_v\) is the number of node features.
+where \(X\) is the node feature matrix, \(N\) is the number of nodes, and \(F_v\) is the number of node features.
 
 The target matrix has the following dimensionality:
 
 \[
-\mathbf{Y}
+Y
 \in
 \mathbb{R}^{N \times C}
 \]
 
-where \(\mathbf{Y}\) is the target matrix, \(N\) is the number of nodes, and \(C\) is the number of predicted physical fields.
+where \(Y\) is the target matrix, \(N\) is the number of nodes, and \(C\) is the number of predicted physical fields.
 
 The graph connectivity matrix is written as
 
@@ -946,18 +940,18 @@ where \(\theta_t\) is the parameter vector at optimization step \(t\), \(\theta_
 Gradient clipping is applied to prevent unstable updates. The clipped gradient is computed as
 
 \[
-\mathbf{g}
+g
 \leftarrow
-\mathbf{g}
+g
 \cdot
 \min
 \left(
 1,
-\frac{\tau}{\|\mathbf{g}\|_2}
+\frac{\tau}{\|g\|_2}
 \right)
 \]
 
-where \(\mathbf{g}\) is the gradient vector, \(\tau\) is the maximum allowed gradient norm, and \(\|\mathbf{g}\|_2\) is the Euclidean norm of the gradient.
+where \(g\) is the gradient vector, \(\tau\) is the maximum allowed gradient norm, and \(\|g\|_2\) is the Euclidean norm of the gradient.
 
 The average training loss for epoch \(e\) is written as
 
@@ -1178,18 +1172,18 @@ The relationship between numerical simulation and surrogate prediction can be su
 \[
 \mathcal{S}_{COMSOL}
 \left(
-\mathbf{X}^{t},
+X^{t},
 \mathcal{G}
 \right)
 \approx
 f_{\theta}
 \left(
-\mathbf{X}^{t},
+X^{t},
 \mathcal{G}
 \right)
 \]
 
-where \(\mathcal{S}_{COMSOL}\) denotes the numerical simulation operator represented by COMSOL, \(f_{\theta}\) denotes the trained MeshGraphNet surrogate model, \(\mathbf{X}^{t}\) is the input node feature matrix at time \(t\), and \(\mathcal{G}\) is the graph representation of the finite-element mesh.
+where \(\mathcal{S}_{COMSOL}\) denotes the numerical simulation operator represented by COMSOL, \(f_{\theta}\) denotes the trained MeshGraphNet surrogate model, \(X^{t}\) is the input node feature matrix at time \(t\), and \(\mathcal{G}\) is the graph representation of the finite-element mesh.
 
 This expression means that the neural network is trained to approximate the behavior of the numerical solver. The goal is not to replace the physical formulation itself, but to learn a fast approximation of the simulated state transition for the considered range of scenarios.
 
@@ -1204,43 +1198,43 @@ The training distribution can be denoted as
 =
 \left\{
 \left(
-\mathbf{X}_n,
-\mathbf{Y}_n,
+X_n,
+Y_n,
 \mathcal{G}_n
 \right)
 \right\}_{n=1}^{N_s}
 \]
 
-where \(\mathcal{D}_{train}\) is the training dataset, \(\mathbf{X}_n\) is the input feature matrix of sample \(n\), \(\mathbf{Y}_n\) is the target matrix of sample \(n\), \(\mathcal{G}_n\) is the graph structure of sample \(n\), and \(N_s\) is the number of training samples.
+where \(\mathcal{D}_{train}\) is the training dataset, \(X_n\) is the input feature matrix of sample \(n\), \(Y_n\) is the target matrix of sample \(n\), \(\mathcal{G}_n\) is the graph structure of sample \(n\), and \(N_s\) is the number of training samples.
 
 The model is expected to perform best when new samples are drawn from a similar distribution:
 
 \[
 \left(
-\mathbf{X}_{new},
+X_{new},
 \mathcal{G}_{new}
 \right)
 \sim
 \mathcal{D}_{train}
 \]
 
-where \(\mathbf{X}_{new}\) is the input feature matrix for a new sample, \(\mathcal{G}_{new}\) is the graph structure for the new sample, and \(\mathcal{D}_{train}\) represents the distribution of training data.
+where \(X_{new}\) is the input feature matrix for a new sample, \(\mathcal{G}_{new}\) is the graph structure for the new sample, and \(\mathcal{D}_{train}\) represents the distribution of training data.
 
 If the new scenario lies far outside the training distribution, the model may extrapolate poorly. This may occur when the temperature range, material parameters, boundary conditions, mesh density, or excitation type differ strongly from the simulations used during training.
 
 The second limitation is related to multi-step rollout. If the model is used recursively for long-term prediction, the output from one step becomes the input for the next step. This can be written as
 
 \[
-\hat{\mathbf{q}}^{t+(n+1)\Delta t}
+\hat{q}^{t+(n+1)\Delta t}
 =
 f_{\theta}
 \left(
-\hat{\mathbf{q}}^{t+n\Delta t},
+\hat{q}^{t+n\Delta t},
 \mathcal{G}
 \right)
 \]
 
-where \(\hat{\mathbf{q}}^{t+(n+1)\Delta t}\) is the predicted physical state at rollout step \(n+1\), \(f_{\theta}\) is the trained surrogate model, \(\hat{\mathbf{q}}^{t+n\Delta t}\) is the predicted physical state from the previous rollout step, and \(\mathcal{G}\) is the graph structure.
+where \(\hat{q}^{t+(n+1)\Delta t}\) is the predicted physical state at rollout step \(n+1\), \(f_{\theta}\) is the trained surrogate model, \(\hat{q}^{t+n\Delta t}\) is the predicted physical state from the previous rollout step, and \(\mathcal{G}\) is the graph structure.
 
 In this setting, prediction errors can accumulate over time. Even a small error at one step may influence the next input and gradually lead to drift in the predicted trajectory. Therefore, long-horizon prediction requires careful validation.
 
@@ -1252,17 +1246,17 @@ A general supervised learning objective can be written as
 \theta^{*}
 =
 \arg\min_{\theta}
-\mathbb{E}_{(\mathbf{X},\mathbf{Y},\mathcal{G})\sim\mathcal{D}_{train}}
+\mathbb{E}_{(X,Y,\mathcal{G})\sim\mathcal{D}_{train}}
 \left[
 \mathcal{L}
 \left(
-f_{\theta}(\mathbf{X},\mathcal{G}),
-\mathbf{Y}
+f_{\theta}(X,\mathcal{G}),
+Y
 \right)
 \right]
 \]
 
-where \(\theta^{*}\) is the optimized parameter set, \(\theta\) is the model parameter set, \(\mathcal{D}_{train}\) is the training data distribution, \(\mathbf{X}\) is the input feature matrix, \(\mathbf{Y}\) is the target matrix, \(\mathcal{G}\) is the graph representation of the mesh, \(f_{\theta}\) is the model prediction, and \(\mathcal{L}\) is the training loss function.
+where \(\theta^{*}\) is the optimized parameter set, \(\theta\) is the model parameter set, \(\mathcal{D}_{train}\) is the training data distribution, \(X\) is the input feature matrix, \(Y\) is the target matrix, \(\mathcal{G}\) is the graph representation of the mesh, \(f_{\theta}\) is the model prediction, and \(\mathcal{L}\) is the training loss function.
 
 This objective shows that the model is optimized to minimize prediction error on the training distribution. It does not automatically guarantee exact satisfaction of the original physical equations. For this reason, model predictions should be evaluated not only using statistical metrics, but also through physical visualization and comparison with reference simulations.
 
@@ -1303,31 +1297,31 @@ where \(\mathcal{G}\) is the mesh graph, \(\mathcal{V}\) is the set of mesh node
 Each node contains a feature vector that includes geometry, material parameters, scenario parameters, and the current physical state:
 
 \[
-\mathbf{x}_i^t
+x_i^t
 =
 \begin{bmatrix}
-\mathbf{p}_i \\
-\mathbf{m}_i \\
-\mathbf{s} \\
-\mathbf{q}_i^t
+p_i \\
+m_i \\
+s \\
+q_i^t
 \end{bmatrix}
 \]
 
-where \(\mathbf{x}_i^t\) is the input feature vector of node \(i\) at time \(t\), \(\mathbf{p}_i\) is the coordinate vector, \(\mathbf{m}_i\) is the material parameter vector, \(\mathbf{s}\) is the scenario parameter vector, and \(\mathbf{q}_i^t\) is the current physical state vector.
+where \(x_i^t\) is the input feature vector of node \(i\) at time \(t\), \(p_i\) is the coordinate vector, \(m_i\) is the material parameter vector, \(s\) is the scenario parameter vector, and \(q_i^t\) is the current physical state vector.
 
 The model learns the transition from the current physical state to the future physical state:
 
 \[
-\hat{\mathbf{Y}}^{t+\Delta t}
+\hat{Y}^{t+\Delta t}
 =
 f_{\theta}
 \left(
-\mathbf{X}^{t},
+X^{t},
 \mathcal{G}
 \right)
 \]
 
-where \(\hat{\mathbf{Y}}^{t+\Delta t}\) is the predicted matrix of physical fields, \(f_{\theta}\) is the trained ConditionalMeshGraphNet model, \(\mathbf{X}^{t}\) is the current node feature matrix, and \(\mathcal{G}\) is the graph structure.
+where \(\hat{Y}^{t+\Delta t}\) is the predicted matrix of physical fields, \(f_{\theta}\) is the trained ConditionalMeshGraphNet model, \(X^{t}\) is the current node feature matrix, and \(\mathcal{G}\) is the graph structure.
 
 The architecture follows the Encoder--Processor--Decoder principle:
 

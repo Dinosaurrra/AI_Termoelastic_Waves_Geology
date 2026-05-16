@@ -4,45 +4,45 @@ The mathematical formulation of thermoelastic wave propagation requires the defi
 
 The temperature field is introduced as a scalar function of position and time:
 \begin{equation}
-T = T(\mathbf{x},t),
+T = T(x,t),
 \end{equation}
-where \(\mathbf{x} \in \Omega\) is the position vector and \(t\) is time. This field describes the thermal state of the rock at every point of the domain and at every moment of time. Since temperature may vary spatially and temporally, it provides the basis for describing heat conduction, thermal gradients, thermal expansion, and the development of thermal stress in the medium.
+where \(x \in \Omega\) is the position vector and \(t\) is time. This field describes the thermal state of the rock at every point of the domain and at every moment of time. Since temperature may vary spatially and temporally, it provides the basis for describing heat conduction, thermal gradients, thermal expansion, and the development of thermal stress in the medium.
 
 For thermoelastic analysis, it is convenient to introduce the temperature perturbation
 \begin{equation}
-\theta(\mathbf{x},t) = T(\mathbf{x},t) - T_0,
+\theta(x,t) = T(x,t) - T_0,
 \end{equation}
-where \(\theta(\mathbf{x},t)\) is the temperature change relative to a reference temperature \(T_0\). The reference temperature may be interpreted as the initial or background temperature of the rock. In linear thermoelasticity, thermal strain and thermal stress are controlled by temperature change rather than by absolute temperature alone. Therefore, the perturbation \(\theta\) is the quantity that enters the thermoelastic constitutive relations \cite{boley1960,nowacki1986}.
+where \(\theta(x,t)\) is the temperature change relative to a reference temperature \(T_0\). The reference temperature may be interpreted as the initial or background temperature of the rock. In linear thermoelasticity, thermal strain and thermal stress are controlled by temperature change rather than by absolute temperature alone. Therefore, the perturbation \(\theta\) is the quantity that enters the thermoelastic constitutive relations \cite{boley1960,nowacki1986}.
 
-The mechanical state of the medium is described by the displacement field. In three-dimensional Cartesian coordinates, the displacement vector is written as
+The mechanical state of the medium is described by the displacement field. In two-dimensional Cartesian coordinates, the displacement vector is written as
 \begin{equation}
-\mathbf{u}(\mathbf{x},t)
+u(x,t)
 =
 \begin{bmatrix}
-u(\mathbf{x},t) \\
-v(\mathbf{x},t) \\
-w(\mathbf{x},t)
+u(x,t) \\
+v(x,t) \\
+w(x,t)
 \end{bmatrix},
 \end{equation}
 where \(u\), \(v\), and \(w\) are the displacement components in the \(x\)-, \(y\)-, and \(z\)-directions, respectively. The displacement field describes how material points move from their reference positions as a result of thermal and mechanical disturbances. It is the primary mechanical unknown in the wave-propagation problem, because elastic waves are expressed through time-dependent particle motion in the medium.
 
-The velocity and acceleration of material points are obtained from the time derivatives of the displacement field. To avoid confusion with the displacement component \(v(\mathbf{x},t)\), the velocity field is written using dot notation:
+The velocity and acceleration of material points are obtained from the time derivatives of the displacement field. To avoid confusion with the displacement component \(v(x,t)\), the velocity field is written using dot notation:
 \begin{equation}
-\dot{\mathbf{u}}(\mathbf{x},t)
+\dot{u}(x,t)
 =
-\frac{\partial \mathbf{u}}{\partial t},
+\frac{\partial u}{\partial t},
 \end{equation}
 and the acceleration field is
 \begin{equation}
-\ddot{\mathbf{u}}(\mathbf{x},t)
+\ddot{u}(x,t)
 =
-\frac{\partial^2 \mathbf{u}}{\partial t^2}.
+\frac{\partial^2 u}{\partial t^2}.
 \end{equation}
 The velocity field describes the instantaneous rate of motion of each material point, while acceleration appears directly in the equation of motion. In the balance of linear momentum, acceleration is related to stress gradients; therefore, it is essential for describing the dynamic nature of elastic and thermoelastic wave propagation \cite{aki2002}.
 
 The strain field is derived from spatial derivatives of the displacement field. Under the small-strain assumption, the infinitesimal strain tensor is defined as
 \begin{equation}
-\varepsilon_{ij}(\mathbf{x},t)
+\varepsilon_{ij}(x,t)
 =
 \frac{1}{2}
 \left(
@@ -65,7 +65,7 @@ represents volumetric strain, or the relative change of volume. This quantity is
 
 The stress field is represented by the stress tensor
 \begin{equation}
-\sigma_{ij} = \sigma_{ij}(\mathbf{x},t).
+\sigma_{ij} = \sigma_{ij}(x,t).
 \end{equation}
 The component \(\sigma_{ij}\) describes the \(i\)-direction component of internal force per unit area acting on a surface whose normal is oriented in the \(j\)-direction. In linear thermoelasticity, stress is produced by both mechanical strain and temperature change. The precise constitutive relation between stress, strain, and temperature perturbation is introduced in the following sections, but at this stage it is important to note that stress gradients are responsible for the acceleration of material points in the equation of motion.
 
@@ -81,12 +81,12 @@ These fields are not independent in a thermoelastic medium. A temperature pertur
 \end{equation}
 and
 \begin{equation}
-\mathbf{u}
+u
 \rightarrow
-\boldsymbol{\varepsilon}
+\varepsilon
 \rightarrow
-\boldsymbol{\sigma}
+\sigma
 \rightarrow
-\ddot{\mathbf{u}}.
+\ddot{u}.
 \end{equation}
-Thus, the primary fields \(T\), \(\theta\), \(\mathbf{u}\), \(\boldsymbol{\varepsilon}\), and \(\boldsymbol{\sigma}\) form the mathematical basis for the coupled description of thermoelastic wave propagation in geological media.
+Thus, the primary fields \(T\), \(\theta\), \(u\), \(\varepsilon\), and \(\sigma\) form the mathematical basis for the coupled description of thermoelastic wave propagation in geological media.
