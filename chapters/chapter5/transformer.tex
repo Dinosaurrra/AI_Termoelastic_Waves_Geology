@@ -1,0 +1,480 @@
+\subsection{Transformer-Based Neural Operator}
+
+\subsubsection{Motivation for an attention-based surrogate}
+
+The coupled thermoelastic system written down in Chapter~2 defines a
+deterministic mapping
+\[
+\mathcal{G}: (a,\,\mathrm{IC},\,\mathrm{BC},\,s) \;\longmapsto\; \big(T(\mathbf{x},t),\,\mathbf{u}(\mathbf{x},t),\,\sigma(\mathbf{x},t)\big),
+\]
+where the input collects the material parameter field
+\(a(\mathbf{x}) = (\rho,\lambda,\mu,\gamma,k,C_p)\), the initial and
+boundary conditions, and the source description. A neural surrogate
+\(\mathcal{G}_\theta\) with learnable parameters \(\theta\) is intended
+to approximate this mapping at a fraction of the cost of running the
+COMSOL solver of Chapter~4. Three properties of the present problem
+constrain the choice of architecture. First, the geological domain is
+discretised by an unstructured tetrahedral mesh and not by a regular
+grid, so the surrogate must accept arbitrary point clouds. Second, the
+thermoelastic response is non-local: a thermal pulse in one region of
+the rock eventually influences distant nodes through both heat
+diffusion and elastic wave propagation, and the surrogate has to relate
+sample points that may be far apart in physical space. Third, training
+and inference should ideally operate on \emph{different} samplings of
+the domain, since the available number of nodes is dictated by the
+COMSOL mesh whereas a user of the predictor may ask for a value at any
+spatial coordinate. The Transformer architecture, originally introduced
+for sequence modelling \cite{vaswani2017}, naturally satisfies all
+three constraints when it is reformulated as a neural operator acting
+on a set of points \cite{liNeuralOperator2023}. It treats the
+discretisation as a finite token set rather than as a regular array,
+its attention mechanism couples every pair of tokens directly, and the
+output is queried at locations that need not coincide with the input
+sampling. For these reasons we adopt a Transformer-based neural
+operator as one of the four surrogate families compared in this
+thesis.
+
+\subsubsection{Tokenisation of the thermoelastic state}
+
+The first step is to encode the physical state of the medium as a
+sequence of \emph{tokens}. For every retained mesh node
+\(\mathbf{x}_i\in\Omega\) we form an input token whose feature vector
+combines the local geometry, the initial physical state, and the
+material parameters of the medium:
+\begin{equation}
+a_i =
+\big[\,
+  x_i,\,y_i,\,z_i,\;
+  T_i^{(0)},\;
+  u_i^{(0)},\,v_i^{(0)},\,w_i^{(0)},\;
+  \dot u_i^{(0)},\,\dot v_i^{(0)},\,\dot w_i^{(0)},\;
+  E_i,\,\nu_i,\,\rho_i,\,\alpha_i,\,k_i,\,C_{p,i}
+\,\big]\in\mathbb{R}^{16}.
+\end{equation}
+The first three entries fix the location at which the token is
+attached, the next seven entries describe the state of the rock at the
+beginning of the simulation interval, and the remaining six entries are
+the static material constants of the medium. A separate set of
+\emph{query tokens} \(\{q_j\}_{j=1}^{N_q}\) is then formed from the
+locations at which the predicted fields are desired:
+\begin{equation}
+q_j = (x_q^{(j)},\,y_q^{(j)},\,z_q^{(j)})\in\mathbb{R}^{3}.
+\end{equation}
+The number of input tokens \(N_{\mathrm{in}}\) and the number of query
+tokens \(N_q\) are independent of each other and may differ between
+training and inference; this is the property that makes the
+construction discretisation-invariant.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  node distance=4mm and 14mm,
+  itok/.style={
+    rectangle, rounded corners=2pt,
+    draw=blue!55!black, fill=blue!8,
+    minimum width=64mm, minimum height=8mm,
+    inner sep=3pt, align=left
+  },
+  qtok/.style={
+    rectangle, rounded corners=2pt,
+    draw=teal!55!black, fill=teal!10,
+    minimum width=42mm, minimum height=8mm,
+    inner sep=3pt, align=left
+  }
+]
+
+\node[itok] (i1) {\(a_1 = (\mathbf{x}_1,\;T_1^{(0)},\;\mathbf{u}_1^{(0)},\;\dot{\mathbf{u}}_1^{(0)},\;a_1^{\text{mat}})\)};
+\node[itok, below=of i1] (i2) {\(a_2 = (\mathbf{x}_2,\;\ldots)\)};
+\node[below=2mm of i2] (idots) {\(\vdots\)};
+\node[itok, below=2mm of idots] (iN) {\(a_{N_{\mathrm{in}}} = (\mathbf{x}_{N_{\mathrm{in}}},\;\ldots)\)};
+
+\node[draw=black!50, dashed, fit=(i1) (iN), inner sep=4mm, label=above:{\textbf{Input set} (mesh nodes, ground-truth state at \(t=0\))}] (inset) {};
+
+\node[qtok, right=18mm of i1.east] (q1) {\(q_1 = (\mathbf{x}_q^{(1)})\)};
+\node[qtok, below=of q1] (q2) {\(q_2 = (\mathbf{x}_q^{(2)})\)};
+\node[below=2mm of q2] (qdots) {\(\vdots\)};
+\node[qtok, below=2mm of qdots] (qN) {\(q_{N_q} = (\mathbf{x}_q^{(N_q)})\)};
+
+\node[draw=black!50, dashed, fit=(q1) (qN), inner sep=4mm, label=above:{\textbf{Query set} (arbitrary points)}] (qset) {};
+
+\end{tikzpicture}
+\caption{Tokenisation of the thermoelastic state used by the
+Transformer-based neural operator. Input tokens carry their spatial
+coordinates together with the initial thermal and mechanical state of
+the rock and the local material parameters. Query tokens carry only
+coordinates and indicate where the predicted fields should be returned.}
+\label{fig:transformer-tokens}
+\end{figure}
+
+\subsubsection{Scaled dot-product attention}
+
+The basic operation in a Transformer is attention. Given a query
+representation \(\mathbf{Q}\in\mathbb{R}^{N_q\times d_k}\), key and
+value representations \(\mathbf{K}\in\mathbb{R}^{N_{\mathrm{in}}\times d_k}\)
+and \(\mathbf{V}\in\mathbb{R}^{N_{\mathrm{in}}\times d_v}\), the
+scaled dot-product attention is defined as
+\begin{equation}
+\operatorname{Attention}(\mathbf{Q},\mathbf{K},\mathbf{V}) =
+\operatorname{softmax}\!\left(
+  \frac{\mathbf{Q}\mathbf{K}^{\top}}{\sqrt{d_k}}
+\right)\mathbf{V}.
+\label{eq:dotproduct}
+\end{equation}
+The matrix \(\mathbf{Q}\mathbf{K}^{\top}\in\mathbb{R}^{N_q\times N_{\mathrm{in}}}\)
+contains a similarity score between every query and every input. The
+scaling factor \(\sqrt{d_k}\) prevents the dot products from growing
+with the embedding dimension and keeps the softmax in its informative
+regime. The row-wise softmax converts the scores into a non-negative
+weight matrix whose rows sum to one. Multiplying these weights by
+\(\mathbf{V}\) returns, for each query, a convex combination of input
+values that is selected by the learnt similarity pattern. From the
+operator-learning point of view this operation is a soft, data-driven
+analogue of an integral kernel, in which the kernel itself depends on
+the input through its keys and queries.
+
+\subsubsection{Multi-head attention}
+
+A single attention head describes one relational pattern. To express
+several patterns in parallel, the embedding space is split into
+\(h\) independent subspaces. For each head \(i\in\{1,\dots,h\}\) the
+tokens are projected by learnt matrices and a separate attention is
+computed:
+\begin{equation}
+\operatorname{head}_i =
+\operatorname{Attention}\!\big(
+  \mathbf{Q}\mathbf{W}^Q_i,\,
+  \mathbf{K}\mathbf{W}^K_i,\,
+  \mathbf{V}\mathbf{W}^V_i
+\big),
+\end{equation}
+\begin{equation}
+\operatorname{MultiHead}(\mathbf{Q},\mathbf{K},\mathbf{V}) =
+\operatorname{Concat}(\operatorname{head}_1,\dots,\operatorname{head}_h)\,\mathbf{W}^O,
+\end{equation}
+where the projection matrices satisfy
+\(\mathbf{W}^Q_i,\mathbf{W}^K_i,\mathbf{W}^V_i\in\mathbb{R}^{d_m\times d_k}\)
+and \(\mathbf{W}^O\in\mathbb{R}^{h d_v\times d_m}\). In the baseline
+configuration used in this thesis the embedding dimension is
+\(d_m=128\), the number of heads is \(h=4\), and the per-head key and
+value dimensions are \(d_k=d_v=d_m/h=32\). Different heads can in
+principle specialise in different physical interactions, for example
+near-field heat diffusion in one head and longer-range elastic
+coupling in another.
+
+\subsubsection{Encoder block}
+
+The input tokens \(\{a_i\}\) are first lifted into the embedding space
+by a learnt linear projection
+\(\mathbf{W}_{\mathrm{in}}\in\mathbb{R}^{C_{\mathrm{in}}\times d_m}\),
+yielding initial representations
+\(\mathbf{H}^{(0)}\in\mathbb{R}^{N_{\mathrm{in}}\times d_m}\) with
+\(C_{\mathrm{in}}=16\). They are then refined by a stack of
+\(L_{\mathrm{enc}}\) identical encoder blocks. Each block consists of
+multi-head self-attention followed by a position-wise feed-forward
+network, with residual connections and layer normalisation around
+both:
+\begin{equation}
+\mathbf{H}^{(\ell)'} =
+\operatorname{LayerNorm}\!\big(
+  \mathbf{H}^{(\ell)} +
+  \operatorname{MultiHead}(\mathbf{H}^{(\ell)},\mathbf{H}^{(\ell)},\mathbf{H}^{(\ell)})
+\big),
+\end{equation}
+\begin{equation}
+\mathbf{H}^{(\ell+1)} =
+\operatorname{LayerNorm}\!\big(
+  \mathbf{H}^{(\ell)'} +
+  \operatorname{FFN}(\mathbf{H}^{(\ell)'})
+\big).
+\end{equation}
+The feed-forward sub-block applies the same two-layer perceptron to
+every token independently,
+\begin{equation}
+\operatorname{FFN}(\mathbf{h}) =
+\mathbf{W}_2\,\phi\!\big(\mathbf{W}_1\mathbf{h} + \mathbf{b}_1\big) + \mathbf{b}_2,
+\end{equation}
+where \(\mathbf{W}_1\in\mathbb{R}^{d_{\mathrm{ff}}\times d_m}\),
+\(\mathbf{W}_2\in\mathbb{R}^{d_m\times d_{\mathrm{ff}}}\), and the
+activation \(\phi\) is taken to be the GELU function. The hidden width
+of the FFN sub-block is \(d_{\mathrm{ff}} = 4\,d_m\), in agreement with
+the original Transformer choice \cite{vaswani2017}. After
+\(L_{\mathrm{enc}}\) such layers the encoder produces a context tensor
+\(\mathbf{H}\in\mathbb{R}^{N_{\mathrm{in}}\times d_m}\) that captures
+how each input token relates to every other input token through the
+learnt self-attention pattern.
+
+\subsubsection{Cross-attention decoder for query points}
+
+The decoder is the operator-learning component. Its purpose is to
+compute the predicted state at every query location by attending to
+the encoded inputs. The query coordinates are first lifted by a
+separate linear projection
+\(\mathbf{W}_{\mathrm{q}}\in\mathbb{R}^{3\times d_m}\) into a query
+embedding \(\mathbf{Z}^{(0)}\in\mathbb{R}^{N_q\times d_m}\). A stack of
+\(L_{\mathrm{dec}}\) decoder blocks then refines this representation
+via cross-attention between the query embedding (as queries) and the
+encoder output (as keys and values):
+\begin{equation}
+\mathbf{Z}^{(\ell)'} =
+\operatorname{LayerNorm}\!\big(
+  \mathbf{Z}^{(\ell)} +
+  \operatorname{MultiHead}(\mathbf{Z}^{(\ell)},\mathbf{H},\mathbf{H})
+\big),
+\end{equation}
+\begin{equation}
+\mathbf{Z}^{(\ell+1)} =
+\operatorname{LayerNorm}\!\big(
+  \mathbf{Z}^{(\ell)'} +
+  \operatorname{FFN}(\mathbf{Z}^{(\ell)'})
+\big).
+\end{equation}
+After the final decoder layer a linear output head
+\(\mathbf{W}_{\mathrm{out}}\in\mathbb{R}^{d_m\times C_{\mathrm{out}}}\)
+maps every decoded query token to a vector of predicted physical
+quantities:
+\begin{equation}
+\hat{y}_j =
+\big(\hat T_j,\,\hat u_j,\,\hat v_j,\,\hat w_j\big) =
+\mathbf{W}_{\mathrm{out}}\,\mathbf{Z}^{(L_{\mathrm{dec}})}_{j,:}
+\in\mathbb{R}^{C_{\mathrm{out}}},
+\qquad C_{\mathrm{out}} = 4.
+\end{equation}
+Within the framework of Chapter~2 these four channels coincide with
+the primary unknowns of the thermoelastic system: the temperature
+field and the three components of the displacement vector. The other
+quantities of physical interest, in particular the strain and stress
+tensors, can either be derived from the predicted displacement by
+spatial differentiation or be added as additional output channels in
+future iterations of the model.
+
+\subsubsection{Architecture used in this work}
+
+Figure~\ref{fig:transformer-arch} shows the architecture in its
+complete form. The hyperparameters retained for the baseline of this
+thesis are \(d_m=128\), \(h=4\),
+\(L_{\mathrm{enc}}=L_{\mathrm{dec}}=4\), \(d_{\mathrm{ff}}=4\,d_m\),
+dropout~\(0.1\), and GELU activation in the feed-forward sub-blocks.
+The resulting model contains on the order of \(2.4\times 10^6\)
+trainable parameters, which is small by current standards and was
+chosen so that training and inference remain feasible on a CPU.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  node distance=3mm and 12mm,
+  inp/.style={
+    rectangle, rounded corners=2pt,
+    draw=blue!55!black, fill=blue!8,
+    minimum width=48mm, minimum height=9mm, align=center
+  },
+  enc/.style={
+    rectangle, rounded corners=2pt,
+    draw=violet!55!black, fill=violet!10,
+    minimum width=48mm, minimum height=9mm, align=center
+  },
+  qry/.style={
+    rectangle, rounded corners=2pt,
+    draw=teal!55!black, fill=teal!10,
+    minimum width=42mm, minimum height=9mm, align=center
+  },
+  dec/.style={
+    rectangle, rounded corners=2pt,
+    draw=orange!70!black, fill=orange!10,
+    minimum width=42mm, minimum height=9mm, align=center
+  },
+  outp/.style={
+    rectangle, rounded corners=2pt,
+    draw=green!50!black, fill=green!12,
+    minimum width=42mm, minimum height=9mm, align=center
+  },
+  arr/.style={-{Latex[length=2mm]}, thick, draw=black!65}
+]
+
+\node[inp] (in)   {Input tokens \(\{a_i\}\in\mathbb{R}^{16}\)};
+\node[inp, below=of in] (ip) {Input projection \(\mathbb{R}^{16}\!\to\!\mathbb{R}^{d_m}\)};
+\node[enc, below=of ip] (e1) {Self-attention layer \#1};
+\node[enc, below=of e1] (e2) {Self-attention layer \#2};
+\node[below=2mm of e2] (edots) {\(\vdots\)};
+\node[enc, below=2mm of edots] (eL) {Self-attention layer \(L_{\mathrm{enc}}\)};
+
+\node[qry, right=24mm of in] (q)  {Query tokens \(\{q_j\}\in\mathbb{R}^{3}\)};
+\node[qry, below=of q]   (qp) {Query projection \(\mathbb{R}^{3}\!\to\!\mathbb{R}^{d_m}\)};
+\node[dec, below=of qp]  (d1) {Cross-attention layer \#1};
+\node[dec, below=of d1]  (d2) {Cross-attention layer \#2};
+\node[below=2mm of d2]   (ddots) {\(\vdots\)};
+\node[dec, below=2mm of ddots] (dL) {Cross-attention layer \(L_{\mathrm{dec}}\)};
+
+\node[outp, below=18mm of $(eL)!0.5!(dL)$] (head) {Linear head \(\mathbb{R}^{d_m}\!\to\!\mathbb{R}^{4}\)};
+\node[outp, below=of head] (yhat) {\(\hat{y}_j = (\hat T_j,\,\hat u_j,\,\hat v_j,\,\hat w_j)\)};
+
+\draw[arr] (in) -- (ip);
+\draw[arr] (ip) -- (e1);
+\draw[arr] (e1) -- (e2);
+\draw[arr] (e2) -- (edots);
+\draw[arr] (edots) -- (eL);
+
+\draw[arr] (q)  -- (qp);
+\draw[arr] (qp) -- (d1);
+\draw[arr] (d1) -- (d2);
+\draw[arr] (d2) -- (ddots);
+\draw[arr] (ddots) -- (dL);
+
+\draw[arr] (eL.east) -- ++(8mm,0) |- (d1.west) node[pos=0.25, right] {\scriptsize \(\mathbf{K},\,\mathbf{V}\)};
+\draw[arr, dashed, draw=black!40] (eL.east) -- ++(8mm,0) |- (dL.west);
+
+\draw[arr] (dL.south) -- ++(0,-4mm) -| (head.north);
+\draw[arr] (head) -- (yhat);
+
+\end{tikzpicture}
+\caption{End-to-end architecture of the Transformer-based neural
+operator. The left column processes the input set with
+\(L_{\mathrm{enc}}\) self-attention layers. The right column lifts the
+query coordinates and applies \(L_{\mathrm{dec}}\) cross-attention
+layers in which the encoded context provides keys and values. A linear
+head maps the decoded query embeddings to the four predicted physical
+channels at every query location.}
+\label{fig:transformer-arch}
+\end{figure}
+
+\subsubsection{Training objective}
+
+The Transformer is trained on COMSOL ground-truth solutions of the
+coupled thermoelastic problem of Chapter~4. The primary supervised
+loss is the mean squared error between the predicted and the reference
+fields, evaluated on the set of query tokens that are randomly drawn
+at every training step:
+\begin{equation}
+\mathcal{L}_{\mathrm{sup}}(\theta) =
+\frac{1}{N_q\,C_{\mathrm{out}}}
+\sum_{j=1}^{N_q}\sum_{c=1}^{C_{\mathrm{out}}}
+\big(\hat{y}_{j,c} - y_{j,c}\big)^2.
+\label{eq:sup}
+\end{equation}
+A complementary \emph{velocity-consistency} term aligns the time
+derivative of the predicted displacement with the COMSOL velocity
+field. Since the displacement and its time derivative are available as
+two distinct exports from the solver, this term acts as an auxiliary
+regulariser that anchors the rate of change of the model output and
+not just its instantaneous value:
+\begin{equation}
+\mathcal{L}_{\mathrm{vel}}(\theta) =
+\frac{1}{N_q}\sum_{j=1}^{N_q}
+\big\|\,\partial_t \hat{\mathbf{u}}_j - \dot{\mathbf{u}}_j^{\mathrm{ref}}\big\|_2^2,
+\label{eq:vel}
+\end{equation}
+where the time derivative \(\partial_t\hat{\mathbf{u}}_j\) is obtained
+by automatic differentiation through the model output with respect to
+the query time coordinate. A third term enforces the diffusion side of
+the heat equation derived in Chapter~2,
+\begin{equation}
+\mathcal{L}_{\mathrm{th}}(\theta) =
+\frac{1}{N_q}\sum_{j=1}^{N_q}
+\bigg(
+  \partial_t \hat T_j
+  - \mathfrak{a}_j\,\nabla^2 \hat T_j
+\bigg)^{\!2},
+\qquad
+\mathfrak{a}_j = \frac{k_j}{\rho_j C_{p,j}},
+\label{eq:th}
+\end{equation}
+which couples the temperature prediction to the local thermal
+diffusivity. Equations~\eqref{eq:sup}--\eqref{eq:th} are combined into
+a single training objective with non-negative weights:
+\begin{equation}
+\mathcal{L}(\theta) =
+\lambda_{\mathrm{sup}}\mathcal{L}_{\mathrm{sup}}
++ \lambda_{\mathrm{vel}}\mathcal{L}_{\mathrm{vel}}
++ \lambda_{\mathrm{th}}\mathcal{L}_{\mathrm{th}}.
+\end{equation}
+The default weights used in our experiments are
+\((\lambda_{\mathrm{sup}},\,\lambda_{\mathrm{vel}},\,\lambda_{\mathrm{th}}) = (1.0,\;0.25,\;0.05)\).
+The objective is minimised with the AdamW optimiser, a cosine
+learning-rate schedule, gradient clipping at norm one, and a fixed
+random seed for reproducibility. To keep both the training cost and
+the memory footprint quadratic in a small token count rather than in
+the full mesh size, we sample \(N_{\mathrm{in}} = N_q = 1024\) tokens
+uniformly at random from the COMSOL nodes at every training step. This
+\emph{token subsampling} simultaneously plays two roles: it controls
+the cost of attention and it enforces discretisation invariance, since
+the model never sees the full mesh during a single forward pass.
+
+\subsubsection{Comparison with related Transformer neural operators}
+
+The architecture above is intentionally the simplest member of the
+family of Transformer neural operators. Three more elaborate variants
+are commonly cited in the recent operator-learning literature and are
+summarised in Table~\ref{tab:transformer-variants}. The OFormer
+\cite{liNeuralOperator2023} formalises the use of separate input and
+query token sets and demonstrates that the cross-attention decoder
+gives the neural operator its discretisation-invariance property. The
+Galerkin Transformer \cite{caoChooseTransformer2021} replaces the
+softmax attention by a linear attention whose cost scales linearly
+with the number of tokens; this is particularly attractive when one
+wishes to evaluate the operator on very large meshes. The Transolver
+\cite{wuTransolver2024} introduces a small number of physics-aware
+latent slots between the input and the queries, so that each slot can
+specialise to a different sub-region or physical regime; this is
+reported to be advantageous in problems with sharp material contrasts
+such as the rod-in-rock setup of Chapter~4. We treat the plain
+Transformer of this section as the natural starting point and leave
+Galerkin- and Transolver-style refinements as a direction for future
+work.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{l l l}
+\toprule
+\textbf{Architecture} & \textbf{Attention cost} & \textbf{Key idea} \\
+\midrule
+Vanilla Transformer \cite{vaswani2017} & \(\mathcal{O}(N^2 d_m)\) & Softmax dot-product on sequences \\
+OFormer \cite{liNeuralOperator2023} & \(\mathcal{O}(N_{\mathrm{in}} N_q d_m)\) & Cross-attention from input set to query set \\
+Galerkin Transformer \cite{caoChooseTransformer2021} & \(\mathcal{O}(N d_m^2)\) & Softmax replaced by Galerkin-style linear attention \\
+Transolver \cite{wuTransolver2024} & \(\mathcal{O}(N M d_m)\) & Latent physics-aware slots with \(M\!\ll\!N\) \\
+\midrule
+\textbf{This work} & \(\mathcal{O}(N_{\mathrm{in}} N_q d_m)\) & OFormer baseline, \(N_{\mathrm{in}}\!=\!N_q\!=\!1024\) subsampling \\
+\bottomrule
+\end{tabular}
+\caption{Position of the Transformer-based neural operator used in this
+thesis with respect to other set-based neural operators. The notation
+\(N\) refers to the total number of tokens, \(N_{\mathrm{in}}\) and
+\(N_q\) to the sizes of the input and query sets, \(d_m\) to the
+embedding dimension, and \(M\) to the number of latent slots used by
+the Transolver.}
+\label{tab:transformer-variants}
+\end{table}
+
+\subsubsection{Discretisation invariance and operator-learning view}
+
+Two properties of the construction together make it a neural operator
+in the strict sense of the term. First, the model treats the spatial
+discretisation as the set of input tokens; an arbitrary subset of the
+COMSOL mesh may be used during training without changing the
+parameters or the computational graph. Second, the predicted field is
+evaluated through a separate set of query coordinates that are not
+required to coincide with the inputs; in particular, the model can be
+trained on \(1024\) nodes per sample and queried at a much denser
+grid at inference. This makes the Transformer-based surrogate a useful
+complement to the Fourier neural operator of Section~5.2, which is
+intrinsically tied to a regular grid, and to the MeshGraphNet of
+Section~5.3, which is intrinsically tied to a particular graph
+topology.
+
+\subsubsection{Summary}
+
+The Transformer-based neural operator of this section is a
+discretisation-invariant surrogate for the coupled thermoelastic system
+of Chapter~2 trained on the COMSOL ground-truth solutions of
+Chapter~4. It tokenises the medium into input points with embedded
+material properties and queries it at arbitrary output locations; it
+relies on multi-head self-attention in the encoder to capture global
+relations within the rock and on multi-head cross-attention in the
+decoder to interpolate the predicted thermal and mechanical fields
+between mesh nodes; and it is trained with a hybrid loss that mixes
+supervised reconstruction, velocity consistency, and a thermal-residual
+regulariser. The architecture sits in the OFormer family of neural
+operators and is intentionally kept minimal so that its behaviour can
+be analysed and compared on an equal footing with the PINN, FNO, and
+MeshGraphNet routes evaluated in the remainder of Chapter~5.
