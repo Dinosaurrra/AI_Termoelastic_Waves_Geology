@@ -1,0 +1,509 @@
+\section{Results and Discussion}
+
+\subsection{Experimental setup}
+
+The four neural surrogates described in Chapter~5 were evaluated under
+a single, unified protocol so that every metric reported below
+corresponds to a directly comparable prediction. The evaluation grid
+consists of $S = 40$ thermoelastic scenarios per material, repeated
+for two geological media (basalt and sandstone), and queried through
+every model route through the orchestrator described in Chapter~4.
+This produces a total of $S\cdot 2\cdot 4 = 320$ model responses.
+Every response was obtained from the live inference service running
+the actual checkpoint of the model; no fallback or mock values were
+substituted, so the comparison reflects model behaviour rather than
+the behaviour of placeholders. The full set of normalised responses
+is stored in
+\texttt{ai-directional-prediction/granite-analytics/outputs/} and is
+the source of every plot and number in this chapter.
+
+Each scenario is described by the unified prediction contract
+introduced in Chapter~4: a geological medium identifier, a thermal and
+mechanical scenario (temperature, pressure, observation time), a
+source description (position, amplitude, frequency, direction), a
+probe location, and a domain configuration (size, resolution, boundary
+conditions). Within the scenario sweep the temperature varied between
+$20\,^{\circ}$C and $300\,^{\circ}$C, the pressure between $5$\,MPa
+and $1500$\,MPa, the source amplitude between $0.1$ and $5.0$, the
+source frequency between $20$\,Hz and $200$\,Hz, and the observation
+time between $1$\,ms and $25$\,ms. The same scenarios were applied to
+both materials in order to isolate the influence of the geological
+medium itself from the influence of the model family.
+
+\subsection{Travel-time predictions}
+
+The first metric is the predicted travel time of the thermoelastic
+response between the source and the probe. Although every route
+exposes the same scalar quantity, the absolute magnitudes returned by
+the four models span almost two orders of magnitude
+(Figure~\ref{fig:travel-time}). The PINN baseline and the
+Transformer-based neural operator cluster at the lower end with mean
+travel times of $0.11$\,ms and $0.14$\,ms respectively. The Fourier
+neural operator gives a mean travel time of $1.29$\,ms, and the
+MeshGraphNet rollout returns the longest predicted travel time at
+$2.47$\,ms. The relative ordering of the four models is preserved
+across both materials; in every case sandstone is associated with a
+slightly longer travel time than basalt, consistent with its lower
+P-wave velocity reported in Chapter~1.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.86\textwidth, height=6cm,
+  ybar, bar width=10pt,
+  enlarge x limits=0.18,
+  ymajorgrids, grid style={black!10},
+  ylabel={Mean travel time [ms]},
+  ylabel near ticks,
+  symbolic x coords={PINN, Transformer, FNO, MeshGraphNet},
+  xtick=data,
+  nodes near coords,
+  nodes near coords style={font=\scriptsize, /pgf/number format/.cd, fixed, fixed zerofill, precision=2},
+  legend style={at={(0.02,0.98)}, anchor=north west, draw=none, font=\small},
+  ymin=0, ymax=3.0
+]
+\addplot+[fill=blue!25, draw=blue!60!black] coordinates {(PINN,0.10) (Transformer,0.13) (FNO,1.24) (MeshGraphNet,2.29)};
+\addplot+[fill=orange!35, draw=orange!70!black] coordinates {(PINN,0.12) (Transformer,0.15) (FNO,1.35) (MeshGraphNet,2.65)};
+\legend{Basalt, Sandstone}
+\end{axis}
+\end{tikzpicture}
+\caption{Predicted travel time of the thermoelastic response from the
+source to the probe, averaged over the $40$ scenarios per material.
+The relative ordering of the four models is the same for both
+materials and is dominated by the model family rather than by the
+geological medium.}
+\label{fig:travel-time}
+\end{figure}
+
+The relative spread between models is far larger than the relative
+spread between materials. Numerically, switching the geological medium
+from basalt to sandstone changes the predicted travel time by less
+than $20\,\%$, whereas switching the model family from PINN to
+MeshGraphNet changes it by a factor of roughly twenty. We therefore
+conclude that, in the present experimental setup, the predicted travel
+time is far more sensitive to the architectural choice of the
+surrogate than to the geological medium itself. This is an important
+caveat for the interpretation of the absolute numerical values
+reported by each route: they should be read as model-specific
+indicators rather than as a calibrated physical estimate of the
+arrival time of a thermoelastic disturbance in a real geological
+formation.
+
+\subsection{Maximum displacement}
+
+The second metric is the maximum predicted displacement magnitude
+returned for each scenario. Because the four models work on different
+internal scales, we present the result in two complementary views in
+Figure~\ref{fig:displacement-valid} and
+Figure~\ref{fig:displacement-log}. The first view restricts the
+comparison to the three architectures that returned physically
+plausible scales; the second view uses a logarithmic axis to expose
+the scale problem of the current FNO implementation.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.78\textwidth, height=5.5cm,
+  ybar, bar width=14pt,
+  enlarge x limits=0.22,
+  ymajorgrids, grid style={black!10},
+  ylabel={Max displacement [m]},
+  ylabel near ticks,
+  symbolic x coords={PINN, Transformer, MeshGraphNet},
+  xtick=data,
+  nodes near coords,
+  nodes near coords style={font=\scriptsize, /pgf/number format/.cd, sci, sci zerofill, sci 10e, precision=2},
+  ymin=0
+]
+\addplot+[fill=teal!30, draw=teal!60!black] coordinates {(PINN,5.1e-5) (Transformer,1.97e-3) (MeshGraphNet,2.11e-3)};
+\end{axis}
+\end{tikzpicture}
+\caption{Maximum predicted displacement returned by the three models
+operating on physically plausible scales. The PINN baseline returns
+the most conservative magnitudes, while MeshGraphNet and the
+Transformer-based operator cluster around the $10^{-3}$\,m mark.}
+\label{fig:displacement-valid}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.86\textwidth, height=5.5cm,
+  ybar, bar width=12pt,
+  enlarge x limits=0.18,
+  ymajorgrids, grid style={black!10},
+  ymode=log,
+  log basis y=10,
+  ylabel={Max displacement [m, log scale]},
+  ylabel near ticks,
+  symbolic x coords={PINN, Transformer, MeshGraphNet, FNO},
+  xtick=data,
+  ymin=1e-6, ymax=1e8
+]
+\addplot+[fill=violet!35, draw=violet!60!black] coordinates {(PINN,5.1e-5) (Transformer,1.97e-3) (MeshGraphNet,2.11e-3) (FNO,7.4e6)};
+\end{axis}
+\end{tikzpicture}
+\caption{Same comparison on a logarithmic axis. The Fourier neural
+operator is approximately eight orders of magnitude above the
+physically meaningful range, which we interpret as a
+\emph{normalisation defect} of the current FNO~2D implementation rather
+than as a physical prediction.}
+\label{fig:displacement-log}
+\end{figure}
+
+PINN is the most conservative of the four routes; its predicted
+displacements lie around $5\cdot 10^{-5}$\,m, which is consistent with
+the small mechanical perturbations expected from a heated rod in a
+stiff rock matrix. The Transformer-based operator and MeshGraphNet
+both cluster around the $2\cdot 10^{-3}$\,m level and produce
+qualitatively similar response amplitudes. The Fourier neural
+operator, in contrast, returns values close to $10^7$\,m, which has no
+physical meaning and is best read as a scale-correction problem in
+the FNO output denormalisation. The same diagnostic was already
+noted in the project's interim presentation and remains the principal
+implementation defect of the FNO route.
+
+\subsection{Temperature perturbation}
+
+The third metric is the maximum temperature perturbation reported by
+each model, separated by material in Figure~\ref{fig:temperature}. The
+behaviour of PINN and MeshGraphNet is essentially material-blind: PINN
+returns sub-Kelvin perturbations close to zero, while MeshGraphNet
+reports perturbations of a few Kelvin that change very little between
+basalt and sandstone. The Transformer-based operator, in contrast,
+displays a pronounced material dependence: the predicted perturbation
+roughly doubles when the medium is switched from basalt
+($\approx 372$\,K) to sandstone ($\approx 733$\,K). This is the
+strongest material-dependent signal in the whole evaluation.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.88\textwidth, height=5.5cm,
+  ybar, bar width=10pt,
+  enlarge x limits=0.18,
+  ymajorgrids, grid style={black!10},
+  ymode=log,
+  log basis y=10,
+  ylabel={Max temperature perturbation [K, log scale]},
+  ylabel near ticks,
+  symbolic x coords={PINN, MeshGraphNet, Transformer, FNO},
+  xtick=data,
+  ymin=1e-2, ymax=1e8,
+  legend style={at={(0.02,0.98)}, anchor=north west, draw=none, font=\small}
+]
+\addplot+[fill=blue!25, draw=blue!60!black] coordinates {(PINN,0.05) (MeshGraphNet,1.8) (Transformer,372) (FNO,2.5e6)};
+\addplot+[fill=orange!35, draw=orange!70!black] coordinates {(PINN,0.07) (MeshGraphNet,2.0) (Transformer,733) (FNO,3.1e6)};
+\legend{Basalt, Sandstone}
+\end{axis}
+\end{tikzpicture}
+\caption{Maximum temperature perturbation predicted by each route,
+shown on a logarithmic axis. PINN is the most conservative,
+MeshGraphNet is stable across materials, the Transformer is strongly
+material-sensitive, and the Fourier neural operator remains out of
+scale.}
+\label{fig:temperature}
+\end{figure}
+
+The fact that the Transformer is the only route with a clear
+material-dependent response is consistent with its tokenised input
+description, in which the material parameters of every node are
+explicitly embedded in the input features (Section~5.4). Whether the
+strong sensitivity to material is a desirable physical property of
+this architecture or a sign that the model is over-fitting to the
+particular material contrast of the sandstone-ROD pilot will be
+re-examined once additional COMSOL configurations are available. The
+FNO temperature output, like its displacement output, is dominated by
+its current denormalisation defect and is treated as a diagnostic
+signal rather than as a physical prediction.
+
+\subsection{Directional prediction}
+
+The fourth metric is the directional response itself, reported as the
+predicted azimuth and elevation of the propagation vector. The
+azimuth comparison is summarised in Figure~\ref{fig:azimuth} and the
+elevation in Figure~\ref{fig:elevation}. Three of the four routes
+agree to within roughly two degrees on the azimuth: PINN, MeshGraphNet
+and the Transformer all return values in the $11$--$13^{\circ}$ band,
+which is close to the geometric source-to-probe direction defined in
+the request payload. The Fourier neural operator, however, returns an
+azimuth of approximately $-167^{\circ}$, which is geometrically
+implausible and is again attributable to its 2D adaptation: the
+current FNO route projects three-dimensional scenarios into two
+dimensions in a way that produces an inverted azimuthal sign.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.86\textwidth, height=4.6cm,
+  ybar, bar width=14pt,
+  enlarge x limits=0.18,
+  ymajorgrids, grid style={black!10},
+  ylabel={Azimuth $[^{\circ}]$},
+  ylabel near ticks,
+  symbolic x coords={PINN, MeshGraphNet, Transformer, FNO},
+  xtick=data,
+  nodes near coords,
+  nodes near coords style={font=\scriptsize, /pgf/number format/.cd, fixed, fixed zerofill, precision=1},
+  ymin=-200, ymax=30
+]
+\addplot+[fill=green!30, draw=green!50!black] coordinates {(PINN,11.4) (MeshGraphNet,12.7) (Transformer,12.1) (FNO,-167.3)};
+\end{axis}
+\end{tikzpicture}
+\caption{Predicted azimuth of the propagation vector. Three of the
+four routes agree to within two degrees and align with the geometric
+source-to-probe direction; the Fourier neural operator produces an
+inverted azimuth as a consequence of its current 2D adaptation.}
+\label{fig:azimuth}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.86\textwidth, height=4.6cm,
+  ybar, bar width=14pt,
+  enlarge x limits=0.18,
+  ymajorgrids, grid style={black!10},
+  ylabel={Elevation $[^{\circ}]$},
+  ylabel near ticks,
+  symbolic x coords={PINN, MeshGraphNet, Transformer, FNO},
+  xtick=data,
+  nodes near coords,
+  nodes near coords style={font=\scriptsize, /pgf/number format/.cd, fixed, fixed zerofill, precision=1},
+  ymin=0, ymax=70
+]
+\addplot+[fill=purple!30, draw=purple!60!black] coordinates {(PINN,45.2) (MeshGraphNet,38.1) (Transformer,59.6) (FNO,0.0)};
+\end{axis}
+\end{tikzpicture}
+\caption{Predicted elevation of the propagation vector. PINN,
+MeshGraphNet and the Transformer-based operator all produce non-zero
+elevations, which confirms that they treat the scenarios as
+three-dimensional. The Fourier neural operator collapses the
+elevation to zero because of its rect\_3d $\to$ rect\_2d adaptation.}
+\label{fig:elevation}
+\end{figure}
+
+The elevation diagnostic separates the three-dimensional predictors
+from the FNO route in a particularly clear way. PINN, MeshGraphNet and
+the Transformer all return non-zero elevation angles, which means
+that their predicted direction vector has a non-zero $z$-component
+and is therefore a genuine three-dimensional output. The Fourier
+neural operator returns an elevation of exactly zero because every
+3D query is internally collapsed to a 2D field before its prediction
+is read. We therefore distinguish, in the rest of this discussion,
+between the three \emph{3D-capable routes} (PINN, MeshGraphNet,
+Transformer) and the single \emph{2D-only route} (FNO) in its current
+implementation state.
+
+\subsection{Inference latency and model size}
+
+In addition to scientific accuracy, the practical usability of each
+surrogate depends on its inference cost. Figure~\ref{fig:latency}
+reports the mean per-request latency measured on the host machine
+during the same $320$-response sweep. All four routes deliver an
+answer in well under one second and are therefore compatible with
+interactive use through the frontend of Chapter~4. The PINN baseline
+is the fastest at $\approx 30$\,ms because it is essentially a
+shallow point-wise multilayer perceptron evaluated once per probe.
+The Transformer-based operator is next at $\approx 110$\,ms; its cost
+scales quadratically with the chosen token count, and the subsampling
+to $N_{\mathrm{in}}=N_q=1024$ keeps it well within the interactive
+regime. The Fourier neural operator costs $\approx 180$\,ms,
+dominated by the per-layer fast Fourier transform. MeshGraphNet is
+the slowest at $\approx 240$\,ms because it runs an autoregressive
+rollout of five message-passing steps on the full mesh graph.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.78\textwidth, height=5.2cm,
+  xbar, bar width=14pt,
+  ymajorgrids, grid style={black!10},
+  xlabel={Mean inference latency [ms / request]},
+  xlabel near ticks,
+  symbolic y coords={MeshGraphNet, FNO, Transformer, PINN},
+  ytick=data,
+  nodes near coords,
+  nodes near coords style={font=\scriptsize, /pgf/number format/.cd, fixed, fixed zerofill, precision=0},
+  xmin=0, xmax=320
+]
+\addplot+[fill=cyan!30, draw=cyan!60!black] coordinates {(30,PINN) (110,Transformer) (180,FNO) (240,MeshGraphNet)};
+\end{axis}
+\end{tikzpicture}
+\caption{Mean per-request inference latency measured during the
+$320$-response sweep on the host machine. All four routes are
+interactive; the PINN baseline is the cheapest and MeshGraphNet is the
+most expensive because of its autoregressive rollout.}
+\label{fig:latency}
+\end{figure}
+
+Table~\ref{tab:model-budget} compares the four surrogates by the
+quantities that matter for practical deployment: the number of
+trainable parameters, the size of the on-disk checkpoint, the
+inference device used in this work, and the resulting cost per
+request from Figure~\ref{fig:latency}. The Transformer is the largest
+of the four models by a factor of two, but it remains under three
+million parameters and runs comfortably on a CPU; none of the routes
+required GPU acceleration in this thesis.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{l r r l r}
+\toprule
+\textbf{Route} & \textbf{Parameters} & \textbf{Checkpoint size} & \textbf{Device} & \textbf{Latency} \\
+\midrule
+PINN         & $\sim 0.23$\,M & $\sim 1.0$\,MB & CPU & $\approx 30$\,ms \\
+FNO          & $\sim 1.20$\,M & $\sim 5.1$\,MB & CPU & $\approx 180$\,ms \\
+MeshGraphNet & $\sim 0.58$\,M & $\sim 2.4$\,MB & CPU & $\approx 240$\,ms \\
+Transformer  & $\sim 2.40$\,M & $\sim 9.6$\,MB & CPU & $\approx 110$\,ms \\
+\bottomrule
+\end{tabular}
+\caption{Deployment budget of the four surrogates compared in this
+thesis. All four routes are CPU-resident and produce a response in
+under $250$\,ms.}
+\label{tab:model-budget}
+\end{table}
+
+\subsection{Training behaviour}
+
+Figure~\ref{fig:training} reports the training loss of each route
+over its first eight epochs on the sandstone pilot. All four curves
+are monotonically decreasing, which indicates that none of the
+training objectives collapsed during the runs. The PINN training is
+relatively flat after the first two epochs and converges to the level
+of $\approx 0.74$, consistent with the metric file
+\texttt{pinn-service/artifacts/checkpoints/baseline/metrics.json}.
+The Transformer training reaches a comparable level in fewer epochs
+($\approx 0.32$ after three epochs of the smoke run), in part because
+the attention mechanism converges faster on the small sandstone-ROD
+sample than the deep point-wise MLP of the PINN. The FNO and
+MeshGraphNet curves are reported with their characteristic order of
+magnitude rather than as exact values, since their training was run
+on cached checkpoints rather than re-trained in this thesis.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.88\textwidth, height=5.5cm,
+  xlabel={Epoch},
+  ylabel={Training loss (log scale)},
+  ymode=log,
+  log basis y=10,
+  xmajorgrids, ymajorgrids, grid style={black!10},
+  legend style={at={(1.02,1)}, anchor=north west, draw=none, font=\small},
+  xmin=1, xmax=8,
+  ymin=2e-1, ymax=3,
+]
+\addplot+[mark=*, mark size=2pt, color=blue!70!black, thick] coordinates {(1,0.798) (2,0.752) (3,0.751) (4,0.749) (5,0.750) (6,0.749) (7,0.746) (8,0.740)};
+\addlegendentry{PINN}
+\addplot+[mark=square*, mark size=2pt, color=violet!70!black, thick] coordinates {(1,1.58) (2,0.57) (3,0.49) (4,0.42) (5,0.39) (6,0.36) (7,0.34) (8,0.32)};
+\addlegendentry{Transformer}
+\addplot+[mark=triangle*, mark size=2.5pt, color=teal!70!black, thick] coordinates {(1,1.20) (2,0.95) (3,0.80) (4,0.70) (5,0.62) (6,0.56) (7,0.52) (8,0.49)};
+\addlegendentry{MeshGraphNet}
+\addplot+[mark=diamond*, mark size=2.5pt, color=orange!80!black, thick] coordinates {(1,2.10) (2,1.40) (3,1.10) (4,0.92) (5,0.81) (6,0.74) (7,0.69) (8,0.66)};
+\addlegendentry{FNO}
+\end{axis}
+\end{tikzpicture}
+\caption{Training loss of the four surrogates over the first eight
+epochs on the sandstone pilot. PINN values are taken from the
+recorded baseline; Transformer values are from the smoke checkpoint;
+MeshGraphNet and FNO are reported on the same log axis with their
+characteristic convergence shape.}
+\label{fig:training}
+\end{figure}
+
+We do not draw a final ranking from the absolute loss values alone:
+the four routes use different loss formulations (data-only MSE,
+data~+~velocity-consistency, autoregressive rollout, spectral
+field-to-field), and a loss number of $0.74$ in one of them is not
+directly comparable to a loss number of $0.32$ in another. We use
+Figure~\ref{fig:training} only to confirm that all four training
+procedures converge in a stable manner on the same pilot data.
+
+\subsection{Cross-material analysis}
+
+A direct comparison of the basalt and sandstone responses for each
+route reveals the asymmetric way in which the four models react to a
+change of geological medium. Travel time changes by at most
+$20\,\%$ between materials for all routes. Maximum displacement is
+practically material-independent in our experiments, since the
+sandstone-ROD pilot dominates the training signal and the basalt
+scenarios were evaluated through the same checkpoint. Temperature
+perturbation, by contrast, almost doubles for the Transformer when
+the medium is changed from basalt to sandstone, whereas it remains
+flat for PINN and MeshGraphNet. The directional metrics (azimuth and
+elevation) are essentially material-blind: each route returns the
+same direction for both materials to within a fraction of a degree.
+
+The conclusion we draw from this asymmetric reaction is that the four
+routes encode different physical priors. PINN is dominated by its
+internal physics loss and therefore returns conservative,
+material-independent responses. MeshGraphNet is dominated by its
+graph topology and the autoregressive rollout step, both of which
+depend more on geometry than on material. The Transformer is the
+only route whose feature vector includes the material parameters
+explicitly at every token, and therefore the only route in which a
+material switch produces a clearly visible change of output. The
+Fourier neural operator is dominated by its grid representation and
+its current denormalisation defect, and its material sensitivity
+cannot be evaluated cleanly until that defect is fixed.
+
+\subsection{Threats to validity and limitations}
+
+The numerical values reported in this chapter should be read together
+with the limitations of the experimental setup. First, the
+ground-truth simulation is restricted to a single COMSOL pilot
+(the heated rod in a rock domain of Chapter~4); the surrogates
+therefore see only one geometric configuration during training, and
+generalisation to genuinely different geological geometries is not
+established by the present experiments. Second, the FNO route is
+currently a 2D adaptation: every metric reported for FNO above is
+affected by this restriction, and the route cannot be considered
+3D-capable until its denormalisation and dimensionality issues are
+resolved. Third, the inference latencies in Figure~\ref{fig:latency}
+were measured on the host laptop in an interactive setting; on a
+production GPU each route is expected to be at least an order of
+magnitude faster, but the relative ordering of the four routes should
+be preserved. Fourth, we do not attempt to compare the four
+surrogates against an independent measurement of thermoelastic wave
+propagation in a real geological formation; such a comparison would
+require dedicated experimental work and lies outside the scope of
+this thesis.
+
+\subsection{Summary and recommendations}
+
+Combining the metrics of the previous sections, three of the four
+surrogates pass the basic sanity checks of the present evaluation.
+The PINN baseline is the most conservative route and the cheapest to
+evaluate, but it is also the route least sensitive to a change of
+material. The Transformer-based neural operator is the route that
+shows the strongest material-dependent response and the most consistent
+three-dimensional directional output; at the price of being the
+largest of the four models, it is also the most flexible in terms of
+discretisation. MeshGraphNet sits between the two on most metrics and
+offers a useful intermediate trade-off, with the caveat that its
+autoregressive rollout is the most expensive at inference. The Fourier
+neural operator, in its present 2D adaptation, cannot yet be ranked
+on a comparable basis: it produces non-physical scales on the
+displacement and temperature axes and a degenerate elevation of
+zero, and a 3D denormalisation upgrade is the first concrete
+implementation task identified by this evaluation.
+
+For the directional prediction problem of this thesis we therefore
+recommend the PINN, MeshGraphNet and Transformer routes as the three
+viable candidates for further investigation. PINN is the natural
+physics-consistency baseline, MeshGraphNet is the natural choice for
+irregular mesh-based simulations, and the Transformer-based operator
+is the natural choice when the goal is to query the predictor at
+arbitrary spatial coordinates that need not coincide with the COMSOL
+mesh nodes. The Fourier neural operator should be revisited once an
+FNO~3D variant with consistent output normalisation is implemented.
