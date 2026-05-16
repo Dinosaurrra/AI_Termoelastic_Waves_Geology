@@ -1,18 +1,45 @@
+\documentclass[14pt]{extarticle}
+
+% Page settings
+\usepackage[a4paper, margin=2.5cm]{geometry}
+
+% Font settings: compile with XeLaTeX
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+
+% Formatting
+\usepackage{setspace}
+\usepackage{indentfirst}
+\usepackage{enumitem}
+
+% Line spacing and paragraph settings
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+
+\begin{document}
+
+
 \section{Two-Dimensional Fourier Neural Operator for Thermoelastic Field Prediction}
 
-\subsection{Model Formulation}
+\subsection{Implementation-Oriented Model Formulation}
 
-In the present work, the Fourier Neural Operator is used as a supervised learning model for predicting thermoelastic field evolution from simulation-generated data. The model is formulated as a two-dimensional Fourier Neural Operator, which means that the spectral transformations are applied over a two-dimensional spatial grid. The physical state at each grid point is represented by several channels, while the spatial structure of the data is described by two coordinates.
+In the present work, the Fourier Neural Operator is implemented as a two-dimensional field-to-field prediction model. The implementation follows a modular PyTorch structure, where the main FNO architecture is defined as a separate neural network class, and its internal layers are implemented as reusable building blocks. The model receives a tensor of physical fields, applies lifting to a higher-dimensional latent representation, processes this representation through several Fourier blocks, and then projects the result to the required output channels.
 
-Let the computational domain be denoted by
+The computational domain is represented as a two-dimensional spatial grid:
 \[
 D \subset \mathbb{R}^{2}.
 \]
-Each point of the domain is represented as
+Each point of the domain is described by two coordinates:
 \[
-\mathbf{x} = (x,y),
+\mathbf{x} = (x,y).
 \]
-where \(x\) and \(y\) are the two spatial coordinates. Although the model operates on a two-dimensional grid, the predicted physical state contains multiple output channels. In the present formulation, the target field is written as
+Although the spatial grid is two-dimensional, the physical state at each grid point may contain several channels. In this work, the target field is represented as
 \[
 \mathbf{s}(\mathbf{x}, t)
 =
@@ -25,44 +52,514 @@ w(\mathbf{x}, t)
 \]
 where \(T(\mathbf{x}, t)\) is the temperature field, and \(u(\mathbf{x}, t)\), \(v(\mathbf{x}, t)\), and \(w(\mathbf{x}, t)\) are displacement-related field components extracted from the simulation data.
 
-The purpose of the model is to learn a mapping from known input fields to future output fields. This mapping is represented as an operator
+The model learns an operator
 \[
 \mathcal{G}_{\theta}: \mathcal{A} \rightarrow \mathcal{U},
 \]
-where \(\mathcal{A}\) is the input function space, \(\mathcal{U}\) is the output function space, and \(\theta\) denotes the trainable parameters of the model. The learned operator approximates the relation
+where \(\mathcal{A}\) is the input field space, \(\mathcal{U}\) is the output field space, and \(\theta\) denotes the trainable parameters of the neural network. The learned mapping can be written as
 \[
-\mathcal{G}_{\theta}(a) \approx \mathbf{s},
-\]
-where \(a\) is the input field and \(\mathbf{s}\) is the target thermoelastic state.
-
-\subsection{Temporal Prediction Task}
-
-For a one-step temporal prediction task, the model can be written as
-\[
-\hat{\mathbf{s}}(\mathbf{x}, t_{n+1})
+\hat{\mathbf{s}}
 =
+\mathcal{G}_{\theta}(a),
+\]
+where \(a\) is the input tensor and \(\hat{\mathbf{s}}\) is the predicted thermoelastic field.
+
+\subsection{Input and Output Tensor Format}
+
+In the used PyTorch implementation, the input tensor follows the channel-first convention:
+\[
+\mathbf{A}
+\in
+\mathbb{R}^{B \times C_{in} \times N_x \times N_y},
+\]
+where \(B\) is the batch size, \(C_{in}\) is the number of input channels, and \(N_x\), \(N_y\) are the numbers of grid points in the two spatial directions.
+
+The output tensor has the form
+\[
+\hat{\mathbf{S}}
+\in
+\mathbb{R}^{B \times C_{out} \times N_x \times N_y}.
+\]
+For the present thermoelastic prediction task,
+\[
+C_{out}=4,
+\]
+because the model predicts four output fields:
+\[
+T, \quad u, \quad v, \quad w.
+\]
+
+If several previous time steps are used as input, they can be concatenated along the channel dimension. For example, if each time step contains \(C\) physical channels and \(m\) previous time steps are used, then
+\[
+C_{in}=mC.
+\]
+In that case, the input tensor becomes
+\[
+\mathbf{A}
+\in
+\mathbb{R}^{B \times (mC) \times N_x \times N_y}.
+\]
+This format allows temporal information to be included without treating time as an additional Fourier dimension.
+
+\subsection{Main Architecture of the FNO Model}
+
+The implemented FNO model is controlled by several architectural parameters:
+\[
+\texttt{modes},
+\quad
+\texttt{num\_fourier\_layers},
+\quad
+\texttt{in\_channels},
+\quad
+\texttt{lifting\_channels},
+\quad
+\texttt{mid\_channels},
+\quad
+\texttt{projection\_channels},
+\quad
+\texttt{out\_channels}.
+\]
+
+For a two-dimensional FNO, the number of Fourier modes is represented as
+\[
+\texttt{modes} = [K_1, K_2],
+\]
+where \(K_1\) and \(K_2\) are the retained Fourier modes in the two spatial directions. The dimension of the model is determined by the length of this list:
+\[
+d = \text{len}(\texttt{modes}).
+\]
+Thus, for the current two-dimensional case,
+\[
+d = 2.
+\]
+
+The model consists of three main stages:
+\[
+\text{input}
+\rightarrow
+\text{lifting}
+\rightarrow
+\text{Fourier blocks}
+\rightarrow
+\text{projection}
+\rightarrow
+\text{output}.
+\]
+
+This can be written in operator form as
+\[
 \mathcal{G}_{\theta}
+=
+Q
+\circ
+\mathcal{B}_{L-1}
+\circ
+\cdots
+\circ
+\mathcal{B}_{1}
+\circ
+\mathcal{B}_{0}
+\circ
+P,
+\]
+where \(P\) is the lifting transformation, \(\mathcal{B}_l\) is the \(l\)-th Fourier block, \(L\) is the number of Fourier blocks, and \(Q\) is the projection transformation.
+
+\subsection{Coordinate Grid Encoding}
+
+The implementation supports optional coordinate encoding through the parameter
+\[
+\texttt{add\_grid}.
+\]
+If this option is enabled, the model appends normalized spatial coordinates to the input features. For a two-dimensional grid, this means that the coordinate-augmented input at each grid point is
+\[
+\tilde{a}(\mathbf{x})
+=
+\left[
+a(\mathbf{x}),
+x,
+y
+\right].
+\]
+
+If the original number of input channels is \(C_{in}\), then after adding the grid the effective number of channels passed to the lifting layer becomes
+\[
+C_{in} + 2.
+\]
+More generally, because the implementation is dimension-agnostic, the added number of coordinate channels is equal to \(d\), where
+\[
+d = \text{len}(\texttt{modes}).
+\]
+For the present two-dimensional case,
+\[
+d=2.
+\]
+
+Coordinate encoding is useful because it gives the neural operator explicit information about the spatial position of every grid point. This is especially important when the same physical value may have different meaning depending on its location in the computational domain.
+
+\subsection{Lifting Layer}
+
+Before applying Fourier blocks, the model transforms the input channels into a higher-dimensional latent representation. In the implementation, this is done using linear layers. The input is first permuted from channel-first format
+\[
+[B, C_{in}, N_x, N_y]
+\]
+to channel-last format
+\[
+[B, N_x, N_y, C_{in}],
+\]
+because the lifting layer is implemented using fully connected linear transformations applied at each grid point.
+
+If coordinate encoding is used, the input channel dimension becomes
+\[
+C_{in} + 2.
+\]
+The first lifting transformation is
+\[
+v^{(1)}(\mathbf{x})
+=
+P_1
 \left(
-\mathbf{s}(\mathbf{x}, t_n)
+\tilde{a}(\mathbf{x})
 \right),
 \]
-where \(\mathbf{s}(\mathbf{x}, t_n)\) is the known state at time \(t_n\), and \(\hat{\mathbf{s}}(\mathbf{x}, t_{n+1})\) is the predicted state at the next time step.
-
-If several previous time steps are used as input, the mapping becomes
+where
 \[
-\hat{\mathbf{s}}(\mathbf{x}, t_{n+1})
+P_1:
+\mathbb{R}^{C_{in}+2}
+\rightarrow
+\mathbb{R}^{C_{lift}}.
+\]
+Here, \(C_{lift}\) corresponds to the parameter \(\texttt{lifting\_channels}\).
+
+If an additional lifting layer is used, the representation is further mapped to the main hidden dimension:
+\[
+v_0(\mathbf{x})
 =
-\mathcal{G}_{\theta}
+P_2
 \left(
-\mathbf{s}(\mathbf{x}, t_{n-m+1}),
-\mathbf{s}(\mathbf{x}, t_{n-m+2}),
-\ldots,
-\mathbf{s}(\mathbf{x}, t_n)
+v^{(1)}(\mathbf{x})
 \right),
 \]
-where \(m\) is the number of input time steps.
+where
+\[
+P_2:
+\mathbb{R}^{C_{lift}}
+\rightarrow
+\mathbb{R}^{C_{mid}}.
+\]
+Here, \(C_{mid}\) corresponds to the parameter \(\texttt{mid\_channels}\).
 
-In the present implementation, the target output is represented as
+Thus, the lifting stage prepares the latent field
+\[
+v_0
+\in
+\mathbb{R}^{B \times C_{mid} \times N_x \times N_y},
+\]
+which is then processed by the sequence of Fourier blocks.
+
+\subsection{Padding Before Fourier Blocks}
+
+The implementation also supports optional padding through the parameter
+\[
+\texttt{padding}.
+\]
+Padding is applied after the lifting stage and before the sequence of Fourier blocks. In tensor form, the padded latent field can be denoted as
+\[
+v_0^{pad}
+=
+\text{Pad}(v_0).
+\]
+
+Padding may be useful when spectral operations are applied to spatial data, because it can reduce boundary-related artifacts and preserve the size of the physical domain after convolutional operations. After all Fourier blocks are applied, the padded part is removed:
+\[
+v_L
+=
+\text{Crop}(v_L^{pad}).
+\]
+
+Thus, the padding operation is not part of the physical prediction itself; it is a technical step used during the internal forward pass of the neural network.
+
+\subsection{Fourier Blocks}
+
+The main processing part of the model is a sequence of Fourier blocks:
+\[
+v_0
+\rightarrow
+v_1
+\rightarrow
+\cdots
+\rightarrow
+v_L.
+\]
+The number of such blocks is controlled by
+\[
+\texttt{num\_fourier\_layers}.
+\]
+
+Each Fourier block contains a spectral convolution branch and a local convolution branch. In the implementation, the block can be represented as
+\[
+v_{l+1}
+=
+\sigma
+\left(
+\mathcal{S}_l(v_l)
++
+\mathcal{C}_l(v_l)
+\right),
+\]
+where \(\mathcal{S}_l\) is the spectral convolution operation, \(\mathcal{C}_l\) is the local convolution operation, and \(\sigma\) is the activation function.
+
+For a two-dimensional model, the local convolution branch is implemented as a two-dimensional convolution:
+\[
+\mathcal{C}_l
+=
+\text{Conv2D}_{3 \times 3}.
+\]
+This local convolution preserves the spatial resolution because padding is used inside the convolutional layer.
+
+The spectral branch is responsible for learning transformations in Fourier space, while the local convolution branch provides additional local spatial processing in the physical domain. Their outputs are added before applying the activation function.
+
+\subsection{Spectral Convolution}
+
+The spectral convolution layer is the central operation of the Fourier Neural Operator. Let the input to the spectral convolution be
+\[
+v_l
+\in
+\mathbb{R}^{B \times C_{in}^{(l)} \times N_x \times N_y}.
+\]
+The model first applies a two-dimensional Fourier transform over the spatial dimensions:
+\[
+\hat{v}_l
+=
+\mathcal{F}(v_l).
+\]
+In implementation terms, this corresponds to applying an \(N\)-dimensional FFT over the last spatial dimensions of the tensor. For the current case, the transform is applied over the two dimensions \(N_x\) and \(N_y\).
+
+The Fourier representation is complex-valued:
+\[
+\hat{v}_l
+=
+\hat{v}_{l,\mathrm{real}}
++
+i\hat{v}_{l,\mathrm{imag}}.
+\]
+Therefore, the implementation separates the real and imaginary parts and performs complex multiplication with learned spectral weights.
+
+For the retained Fourier modes, the spectral transformation can be written as
+\[
+\hat{z}_l(k_1,k_2)
+=
+R_l(k_1,k_2)
+\hat{v}_l(k_1,k_2),
+\]
+where \(R_l(k_1,k_2)\) is a learnable complex-valued weight matrix for the frequency mode \((k_1,k_2)\).
+
+The set of retained modes is
+\[
+\mathcal{M}_K
+=
+\left\{
+(k_1,k_2)
+:
+|k_1| \leq K_1,
+|k_2| \leq K_2
+\right\}.
+\]
+Only these modes are directly transformed by learned weights. All other modes remain zero in the output Fourier tensor:
+\[
+\hat{z}_l(k_1,k_2)
+=
+0,
+\qquad
+(k_1,k_2) \notin \mathcal{M}_K.
+\]
+
+After spectral multiplication, the inverse Fourier transform is applied:
+\[
+z_l
+=
+\mathcal{F}^{-1}
+\left(
+\hat{z}_l
+\right).
+\]
+The output is converted back to the real spatial domain:
+\[
+z_l
+\in
+\mathbb{R}^{B \times C_{out}^{(l)} \times N_x \times N_y}.
+\]
+
+\subsection{Complex Multiplication in Fourier Space}
+
+The spectral weights are complex-valued. If the input Fourier coefficient is
+\[
+\hat{v}
+=
+a + ib,
+\]
+and the spectral weight is
+\[
+R
+=
+c + id,
+\]
+then their product is
+\[
+R\hat{v}
+=
+(c+id)(a+ib).
+\]
+Expanding this expression gives
+\[
+R\hat{v}
+=
+(ac-bd)
++
+i(ad+bc).
+\]
+
+Therefore, the real and imaginary parts of the output are
+\[
+\operatorname{Re}(R\hat{v})
+=
+ac-bd,
+\]
+\[
+\operatorname{Im}(R\hat{v})
+=
+ad+bc.
+\]
+This is the mathematical operation implemented inside the spectral convolution layer. In tensor form, this multiplication is applied across input channels and Fourier modes, producing output channels in the spectral domain.
+
+\subsection{Factorized Spectral Weights}
+
+The spectral convolution implementation supports several forms of spectral weight representation. The dense version stores full real and imaginary weight tensors:
+\[
+R_l
+\in
+\mathbb{C}^{C_{in}^{(l)} \times C_{out}^{(l)} \times K_1 \times K_2}.
+\]
+However, the implementation also supports low-rank tensor factorization of spectral weights, including Tucker, CP, and Tensor Train factorization.
+
+In the Tucker case, a full spectral weight tensor is represented through a smaller core tensor and factor matrices. Conceptually, this can be written as
+\[
+R_l
+\approx
+\mathcal{T}
+\times_1 A_1
+\times_2 A_2
+\cdots
+\times_n A_n,
+\]
+where \(\mathcal{T}\) is the core tensor and \(A_i\) are factor matrices. This representation reduces the number of trainable parameters and can make the spectral layer more memory-efficient.
+
+The implementation reconstructs the factorized tensor during the forward pass and then applies it to the selected Fourier modes. For the thesis description, the important point is that the spectral weights are trainable and may be stored either densely or in a compressed factorized form.
+
+\subsection{Local Convolution Branch}
+
+In addition to the spectral convolution, each Fourier block contains a local convolution branch. For the two-dimensional case, this branch is implemented as
+\[
+\mathcal{C}_l(v_l)
+=
+\text{Conv2D}_{3 \times 3}(v_l).
+\]
+
+The purpose of this branch is to process local spatial information directly in the physical domain. While the spectral branch captures global frequency-domain interactions, the local convolution branch captures neighboring spatial patterns. The output of the Fourier block is obtained by adding the spectral and local branches:
+\[
+v_{l+1}
+=
+\sigma
+\left(
+\mathcal{S}_l(v_l)
++
+\mathcal{C}_l(v_l)
+\right).
+\]
+
+Here, \(\sigma\) is the activation function selected during model initialization. In many FNO implementations, a GELU activation is used:
+\[
+\sigma = \mathrm{GELU}.
+\]
+
+\subsection{Optional MLP Layer}
+
+The layer module also contains an optional MLP component. In the two-dimensional case, this MLP is implemented using \(1 \times 1\) convolutional layers:
+\[
+\text{MLP}(v)
+=
+\text{Conv}_{1 \times 1}^{(2)}
+\left(
+\sigma
+\left(
+\text{Conv}_{1 \times 1}^{(1)}(v)
+\right)
+\right).
+\]
+
+The \(1 \times 1\) convolution does not mix neighboring spatial positions. Instead, it mixes information across channels at each grid point. This is equivalent to applying a small feed-forward neural network independently at every spatial location.
+
+If this MLP branch is enabled, the Fourier block can be written as
+\[
+v_{l+1}
+=
+\sigma
+\left(
+\mathcal{S}_l(v_l)
++
+\mathcal{C}_l(v_l)
++
+\mathcal{M}_l(v_l)
+\right),
+\]
+where \(\mathcal{M}_l\) denotes the MLP branch. In the basic model configuration, the main structure can still be understood as the combination of spectral convolution, local convolution, and activation.
+
+\subsection{Projection Layer}
+
+After the sequence of Fourier blocks, the model projects the hidden representation to the output field channels. Before projection, the tensor is permuted from channel-first format
+\[
+[B, C_{mid}, N_x, N_y]
+\]
+back to channel-last format
+\[
+[B, N_x, N_y, C_{mid}].
+\]
+
+The first projection layer maps the hidden channels to an intermediate projection dimension:
+\[
+q_1:
+\mathbb{R}^{C_{mid}}
+\rightarrow
+\mathbb{R}^{C_{proj}},
+\]
+where \(C_{proj}\) corresponds to
+\[
+\texttt{projection\_channels}.
+\]
+After applying the activation function, the final linear layer maps the representation to the required number of output channels:
+\[
+q_2:
+\mathbb{R}^{C_{proj}}
+\rightarrow
+\mathbb{R}^{C_{out}}.
+\]
+
+Thus, the predicted field at each spatial point is
+\[
+\hat{\mathbf{s}}(\mathbf{x}, t)
+=
+q_2
+\left(
+\sigma
+\left(
+q_1(v_L(\mathbf{x}))
+\right)
+\right).
+\]
+For the present task,
+\[
+C_{out}=4,
+\]
+and therefore
 \[
 \hat{\mathbf{s}}(\mathbf{x}, t)
 =
@@ -73,244 +570,61 @@ In the present implementation, the target output is represented as
 \hat{w}(\mathbf{x}, t)
 \right].
 \]
-Thus, the model predicts four physical channels at every grid point of the two-dimensional computational domain.
 
-\subsection{Input and Output Tensor Representation}
-
-The input tensor for a two-dimensional FNO has the form
+Finally, the output is returned to channel-first format:
 \[
-\mathbf{A}
+\hat{\mathbf{S}}
 \in
-\mathbb{R}^{B \times N_x \times N_y \times C_{in}},
-\]
-where \(B\) is the batch size, \(N_x\) and \(N_y\) are the numbers of grid points in the two spatial directions, and \(C_{in}\) is the number of input channels. The corresponding target tensor has the form
-\[
-\mathbf{S}
-\in
-\mathbb{R}^{B \times N_x \times N_y \times C_{out}}.
-\]
-For the current task,
-\[
-C_{out}=4,
-\]
-because the model predicts the four fields
-\[
-T, \quad u, \quad v, \quad w.
+\mathbb{R}^{B \times 4 \times N_x \times N_y}.
 \]
 
-If the input contains \(m\) previous time steps and each time step contains \(C\) physical channels, the input tensor can be constructed by concatenating the temporal information along the channel dimension:
+\subsection{Temporal Prediction Task}
+
+The model can be used for one-step temporal prediction. If the known state at time \(t_n\) is
 \[
-\mathbf{A}
-\in
-\mathbb{R}^{B \times N_x \times N_y \times (mC)}.
+\mathbf{s}(\mathbf{x}, t_n),
 \]
-This representation allows the model to use information from several previous states without treating time as an additional Fourier dimension.
-
-\subsection{Coordinate Encoding}
-
-In many implementations of FNO, spatial coordinates are appended to the input field. For the two-dimensional case, the coordinate-augmented input is written as
+then the model predicts the next state:
 \[
-\tilde{a}(\mathbf{x})
+\hat{\mathbf{s}}(\mathbf{x}, t_{n+1})
+=
+\mathcal{G}_{\theta}
+\left(
+\mathbf{s}(\mathbf{x}, t_n)
+\right).
+\]
+
+If several previous time steps are used, the input can be written as
+\[
+a(\mathbf{x}, t_n)
 =
 \left[
-a(\mathbf{x}),
-x,
-y
-\right].
+\mathbf{s}(\mathbf{x}, t_{n-m+1}),
+\mathbf{s}(\mathbf{x}, t_{n-m+2}),
+\ldots,
+\mathbf{s}(\mathbf{x}, t_n)
+\right],
 \]
-Since
+where \(m\) is the number of input time steps. The model then predicts
 \[
-\mathbf{x} = (x,y),
-\]
-the augmented input has dimension
-\[
-\tilde{a}(\mathbf{x}) \in \mathbb{R}^{d_a+2}.
-\]
-Coordinate encoding provides the model with explicit information about the location of each grid point. This is useful because the same physical value may have different meaning depending on its position in the domain.
-
-\subsection{Architecture of the Two-Dimensional FNO}
-
-The main computational block of FNO is the Fourier layer. Before applying the Fourier layers, the input is lifted to a higher-dimensional latent representation:
-\[
-v_0(\mathbf{x})
+\hat{\mathbf{s}}(\mathbf{x}, t_{n+1})
 =
-P
-\left(
-\tilde{a}(\mathbf{x})
-\right),
-\]
-where \(P\) is a learnable pointwise transformation. The lifted field is
-\[
-v_0(\mathbf{x}) \in \mathbb{R}^{d_v},
-\]
-where \(d_v\) is the hidden channel dimension.
-
-The model then applies a sequence of Fourier layers:
-\[
-v_0
-\rightarrow
-v_1
-\rightarrow
-\cdots
-\rightarrow
-v_L,
-\]
-where \(L\) is the number of Fourier layers. Each Fourier layer updates the hidden representation by combining a spectral transformation with a pointwise transformation:
-\[
-v_{l+1}(\mathbf{x})
-=
-\sigma
-\left(
-\mathcal{K}_l(v_l)(\mathbf{x})
-+
-W_l v_l(\mathbf{x})
-+
-b_l
-\right),
-\]
-where \(l\) is the layer index, \(\mathcal{K}_l\) is the Fourier-domain operator, \(W_l\) is a pointwise linear transformation, \(b_l\) is a bias term, and \(\sigma\) is a nonlinear activation function.
-
-After the last Fourier layer, the latent representation is projected to the target output channels:
-\[
-\hat{\mathbf{s}}(\mathbf{x}, t)
-=
-Q
-\left(
-v_L(\mathbf{x})
-\right),
-\]
-where \(Q\) is a learnable projection network. Since the output contains four channels, the final prediction has the form
-\[
-\hat{\mathbf{s}}(\mathbf{x}, t)
-\in
-\mathbb{R}^{4}.
-\]
-
-The complete FNO mapping can be expressed as
-\[
 \mathcal{G}_{\theta}
-=
-Q
-\circ
-\mathcal{L}_{L-1}
-\circ
-\cdots
-\circ
-\mathcal{L}_{1}
-\circ
-\mathcal{L}_{0}
-\circ
-P,
-\]
-where \(\mathcal{L}_l\) denotes the \(l\)-th Fourier layer.
-
-\subsection{Fourier Layer}
-
-The spectral part of the Fourier layer is computed using the Fourier transform. For a hidden field \(v_l(\mathbf{x})\), the Fourier transform is
-\[
-\hat{v}_l(\boldsymbol{\xi})
-=
-\mathcal{F}
 \left(
-v_l
-\right)
-(\boldsymbol{\xi}),
-\]
-where \(\boldsymbol{\xi}\) is the frequency variable. In the two-dimensional case,
-\[
-\boldsymbol{\xi} = (\xi_1,\xi_2).
-\]
-
-The Fourier coefficients are multiplied by trainable complex-valued weights:
-\[
-\hat{z}_l(\boldsymbol{\xi})
-=
-R_l(\boldsymbol{\xi})
-\hat{v}_l(\boldsymbol{\xi}),
-\]
-where \(R_l(\boldsymbol{\xi})\) is the learned spectral weight tensor.
-
-Only a finite number of Fourier modes is retained. For the two-dimensional FNO, the retained set of modes can be written as
-\[
-\mathcal{M}_K
-=
-\left\{
-(k_1,k_2)
-:
-|k_1| \leq K_1,
-|k_2| \leq K_2
-\right\},
-\]
-where \(K_1\) and \(K_2\) are the numbers of retained modes in the two spatial directions.
-
-The spectral operation is therefore
-\[
-\hat{z}_l(k_1,k_2)
-=
-\begin{cases}
-R_l(k_1,k_2)\hat{v}_l(k_1,k_2),
-&
-(k_1,k_2) \in \mathcal{M}_K,
-\\
-0,
-&
-(k_1,k_2) \notin \mathcal{M}_K.
-\end{cases}
-\]
-After this multiplication, the inverse Fourier transform is applied:
-\[
-z_l(\mathbf{x})
-=
-\mathcal{F}^{-1}
-\left(
-\hat{z}_l
-\right)
-(\mathbf{x}).
-\]
-
-The output of the spectral operation is combined with the pointwise term:
-\[
-v_{l+1}(\mathbf{x})
-=
-\sigma
-\left(
-z_l(\mathbf{x})
-+
-W_l v_l(\mathbf{x})
-+
-b_l
-\right).
-\]
-Equivalently, the Fourier layer can be written compactly as
-\[
-v_{l+1}
-=
-\sigma
-\left(
-\mathcal{F}^{-1}
-\left(
-R_l \cdot \mathcal{F}(v_l)
-\right)
-+
-W_l v_l
-+
-b_l
+a(\mathbf{x}, t_n)
 \right).
 \]
 
-For a two-dimensional Fourier layer, the trainable spectral weights can be represented as
+In tensor form, the temporal information is included by increasing the channel dimension:
 \[
-R_l
+\mathbf{A}
 \in
-\mathbb{C}^{C_{in}^{(l)} \times C_{out}^{(l)} \times K_1 \times K_2},
+\mathbb{R}^{B \times (mC) \times N_x \times N_y}.
 \]
-where \(C_{in}^{(l)}\) and \(C_{out}^{(l)}\) are the numbers of input and output hidden channels at layer \(l\). This form shows that the Fourier transformation is applied over two spatial dimensions, while the physical quantities are represented as multiple channels.
 
 \subsection{Supervised Training Objective}
 
-The model is trained in a purely supervised manner. This means that the training objective compares the predicted fields with the reference fields obtained from simulation data. The model does not explicitly enforce the governing partial differential equations during optimization.
-
-Let the prediction for sample \(j\) be
+The model is trained in a supervised manner by comparing the predicted thermoelastic fields with reference fields obtained from simulation data. Let the prediction for sample \(j\) be
 \[
 \hat{\mathbf{s}}_j
 =
@@ -320,11 +634,12 @@ and let the corresponding reference field be
 \[
 \mathbf{s}_j.
 \]
+
 The mean squared error loss is defined as
 \[
 \mathcal{L}_{MSE}
 =
-\frac{1}{N_s N C}
+\frac{1}{N_sNC}
 \sum_{j=1}^{N_s}
 \sum_{i=1}^{N}
 \sum_{c=1}^{C}
@@ -334,9 +649,9 @@ The mean squared error loss is defined as
 s_{j,i,c}
 \right)^2,
 \]
-where \(N_s\) is the number of samples, \(N\) is the number of grid points, and \(C\) is the number of output channels. In the current formulation,
+where \(N_s\) is the number of samples, \(N\) is the number of spatial grid points, and \(C\) is the number of output channels. In the present case,
 \[
-C=4.
+C = 4.
 \]
 
 The relative \(L^2\) loss is defined as
@@ -358,62 +673,44 @@ The relative \(L^2\) loss is defined as
 }.
 \]
 
-The total loss used for training can be written as
+The total loss can be written as
 \[
 \mathcal{L}
 =
-\lambda_{MSE}
-\mathcal{L}_{MSE}
+\lambda_{MSE}\mathcal{L}_{MSE}
 +
-\lambda_{rel}
-\mathcal{L}_{rel},
+\lambda_{rel}\mathcal{L}_{rel},
 \]
-where \(\lambda_{MSE}\) and \(\lambda_{rel}\) are weighting coefficients. If both terms are used with equal importance, then
-\[
-\lambda_{MSE}=1,
-\qquad
-\lambda_{rel}=1.
-\]
-
-No additional physics-informed residual term is included in this formulation. In particular, the loss does not contain a term of the form
-\[
-\mathcal{L}_{PDE}
-=
-\left\|
-\mathcal{N}
-\left(
-\hat{\mathbf{s}}
-\right)
-\right\|_2^2,
-\]
-where \(\mathcal{N}\) would denote a differential operator corresponding to the governing equations. Therefore, the physical information enters the model implicitly through the simulation-generated training data, not through explicit enforcement of the partial differential equations during training.
-
-This distinction is important for the interpretation of the model. The FNO does not solve the governing equations directly at each inference step. Instead, it learns a data-driven approximation of the input-output relation present in the simulation dataset. The learned mapping is expected to be accurate within the range of spatial patterns, material parameters, and temporal evolution represented in the training data.
+where \(\lambda_{MSE}\) and \(\lambda_{rel}\) are weighting coefficients.
 
 \subsection{Normalization of Physical Channels}
 
-Because the output channels may have different magnitudes, normalization is applied before training. For each channel \(c\), standard normalization can be written as
+Because the predicted channels have different physical meanings and may have different numerical scales, normalization is applied before training. For each channel \(c\), standard normalization is written as
 \[
 \tilde{s}_{i,c}
 =
 \frac{
-s_{i,c} - \mu_c
+s_{i,c}
+-
+\mu_c
 }{
 \sigma_c
 },
 \]
-where \(\mu_c\) is the mean value of channel \(c\), and \(\sigma_c\) is the standard deviation of channel \(c\). The inverse transformation is
+where \(\mu_c\) is the mean value of the channel and \(\sigma_c\) is its standard deviation. The inverse transformation is
 \[
 s_{i,c}
 =
-\tilde{s}_{i,c}\sigma_c + \mu_c.
+\tilde{s}_{i,c}\sigma_c
++
+\mu_c.
 \]
 
-The normalization parameters are computed using the training set and then reused for validation, testing, and inference. This prevents information from the validation or test sets from influencing the training process.
+The normalization statistics are computed on the training set and reused for validation, testing, and inference. This ensures that the model receives inputs with comparable numerical scales and that the predicted normalized values can be converted back to physical units.
 
 \subsection{Evaluation Metrics}
 
-The quality of the trained model is evaluated by comparing predicted and reference fields. The mean squared error is
+The trained model is evaluated by comparing predicted and reference fields. The mean squared error is
 \[
 MSE
 =
@@ -426,6 +723,7 @@ MSE
 s_{i,c}
 \right)^2.
 \]
+
 The mean absolute error is
 \[
 MAE
@@ -439,13 +737,16 @@ MAE
 s_{i,c}
 \right|.
 \]
+
 The relative error is
 \[
 E_{rel}
 =
 \frac{
 \left\|
-\hat{\mathbf{s}} - \mathbf{s}
+\hat{\mathbf{s}}
+-
+\mathbf{s}
 \right\|_2
 }{
 \left\|
@@ -454,50 +755,76 @@ E_{rel}
 }.
 \]
 
-For channel-wise evaluation, the relative error of channel \(c\) can be written as
+For channel-wise analysis, the relative error of channel \(c\) can be written as
 \[
 E_c
 =
 \frac{
 \left\|
-\hat{s}_{c} - s_{c}
+\hat{s}_{c}
+-
+s_{c}
 \right\|_2
 }{
 \left\|
-s_{c}
+s_c
 \right\|_2
 }.
 \]
-This metric is useful because the model predicts several physical fields, and each field may have a different scale and different prediction difficulty.
 
-For time-dependent prediction, the error can also be evaluated as a function of the prediction step:
-\[
-E(r)
-=
-\frac{
-\left\|
-\hat{\mathbf{s}}(\cdot, t_{n+r})
--
-\mathbf{s}(\cdot, t_{n+r})
-\right\|_2
-}{
-\left\|
-\mathbf{s}(\cdot, t_{n+r})
-\right\|_2
-},
-\]
-where \(r\) is the forecasting step. This expression is especially useful when the model is applied recursively for several future time steps.
+This metric is useful because the model predicts several physical fields at once, and each field may have a different range and prediction difficulty.
 
 \subsection{Hyperparameters}
 
-The most important hyperparameters of the two-dimensional FNO are the number of Fourier layers \(L\), the number of retained modes \(K_1\) and \(K_2\), the hidden channel dimension \(d_v\), the number of input time steps \(m\), the learning rate \(\eta\), and the batch size \(B\). These parameters control the model capacity, computational cost, and stability of training.
+The most important hyperparameters of the implemented two-dimensional FNO are:
+\[
+K_1, K_2,
+\quad
+L,
+\quad
+C_{mid},
+\quad
+C_{lift},
+\quad
+C_{proj},
+\quad
+B,
+\quad
+\eta,
+\]
+where \(K_1\) and \(K_2\) are the retained Fourier modes, \(L\) is the number of Fourier blocks, \(C_{mid}\) is the hidden channel dimension, \(C_{lift}\) is the lifting dimension, \(C_{proj}\) is the projection dimension, \(B\) is the batch size, and \(\eta\) is the learning rate.
 
-The number of retained modes determines how much spectral information is used by the model. If the number of modes is too small, the model may lose important spatial details. If the number of modes is too large, the model becomes more computationally expensive and may require more training data. The hidden channel dimension controls the amount of information stored in the latent representation, while the number of Fourier layers controls the depth of the operator approximation.
+The number of retained modes controls how much spectral information is used by the model. The number of Fourier blocks controls the depth of the operator approximation. The hidden channel dimension controls the capacity of the latent representation. The batch size and learning rate affect training stability and computational cost.
 
 \subsection{Summary}
 
-In summary, the FNO used in this project is a two-dimensional field-to-field prediction model. It applies Fourier transformations over the two spatial dimensions \(x\) and \(y\), while the physical state is represented through multiple channels. The model predicts four target fields,
+In summary, the implemented FNO is a two-dimensional field-to-field prediction model. The input tensor is represented in channel-first format:
 \[
-T, \quad u, \quad v, \quad w,
+[B, C_{in}, N_x, N_y],
 \]
-and is trained using supervised loss functions based on mean squared error and relative \(L^2\) error. No explicit PDE residual is included in the training objective. Thus, the model learns the thermoelastic behavior from simulation data rather than by directly enforcing the governing equations during optimization.
+and the output tensor has the form
+\[
+[B, 4, N_x, N_y].
+\]
+The model first lifts the input to a hidden representation, optionally appends coordinate grid information, applies a sequence of Fourier blocks, and then projects the latent field to four output channels:
+\[
+T, \quad u, \quad v, \quad w.
+\]
+
+Each Fourier block combines a spectral convolution branch with a local convolution branch. The spectral branch applies the Fourier transform, multiplies selected modes by learned complex-valued weights, and returns the result to the spatial domain using the inverse Fourier transform. The local convolution branch processes neighboring spatial information directly on the grid. The final prediction is trained against simulation-generated reference fields using supervised losses such as mean squared error and relative \(L^2\) error.
+
+\begin{thebibliography}{9}
+
+\bibitem{li2020fno}
+Z. Li, N. Kovachki, K. Azizzadenesheli, B. Liu, K. Bhattacharya, A. Stuart, and A. Anandkumar,
+``Fourier Neural Operator for Parametric Partial Differential Equations,''
+\textit{International Conference on Learning Representations}, 2021.
+
+\bibitem{kovachki2023neuraloperator}
+N. Kovachki, Z. Li, B. Liu, K. Azizzadenesheli, K. Bhattacharya, A. Stuart, and A. Anandkumar,
+``Neural Operator: Learning Maps Between Function Spaces,''
+\textit{Journal of Machine Learning Research}, vol. 24, no. 89, pp. 1--97, 2023.
+
+\end{thebibliography}
+
+\end{document}
