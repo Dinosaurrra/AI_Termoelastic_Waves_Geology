@@ -1,0 +1,53 @@
+\subsection{Elastic Constants and Wave Velocities}
+
+Elastic constants describe how a solid material resists deformation under applied stress. In the theory of isotropic linear elasticity, the mechanical response of a rock can be characterized by several equivalent constants, the most common of which are Young's modulus \(E\), Poisson's ratio \(\nu\), shear modulus \(G\) or \(\mu\), bulk modulus \(K\), and the first Lamé parameter \(\lambda\). These constants are not separate unrelated properties. For an isotropic elastic material, only two independent elastic constants are required; the others can be derived from them. Nevertheless, each constant has a useful physical interpretation and emphasizes a different aspect of the rock's resistance to deformation \cite{jaeger2007,mavko2009}.
+
+Young's modulus \(E\) measures the resistance of a material to axial deformation. In a simple uniaxial compression or tension test, it is defined as the ratio of axial stress to axial strain within the linear elastic range. A rock with a high Young's modulus undergoes relatively small axial strain for a given applied stress, whereas a rock with a low Young's modulus deforms more easily. In geological materials, Young's modulus is influenced by mineral composition, porosity, cementation, microcracks, weathering, and confining pressure. For example, a well-cemented crystalline or dense rock generally behaves more stiffly than a weakly cemented porous sedimentary rock, although the actual value depends strongly on the internal structure and stress state of the sample \cite{jaeger2007,mavko2009}.
+
+Poisson's ratio \(\nu\) is a dimensionless elastic constant that describes the lateral deformation response of a material under axial loading. When a rock sample is compressed in one direction, it usually expands laterally; when it is stretched, it contracts laterally. Poisson's ratio is defined as the negative ratio of transverse strain to axial strain. It is important in elasticity because it controls the relation between volume change and shape change during deformation. In rocks, Poisson's ratio depends on lithology, porosity, crack geometry, saturation, and pressure. Its value is also relevant for wave propagation because it helps determine the relation between compressional and shear wave velocities \cite{jaeger2007,aki2002}.
+
+The shear modulus \(G\), also denoted by \(\mu\), measures resistance to shear deformation or change of shape. It relates shear stress to shear strain in the linear elastic regime. A high shear modulus indicates that the material strongly resists distortion, whereas a low shear modulus indicates that it can be sheared more easily. This parameter is especially important for shear waves, because S-waves are controlled directly by the ability of the medium to support shear stress. Fluids have no static shear rigidity, which is why shear waves cannot propagate through ideal fluids \cite{aki2002,jaeger2007}.
+
+The bulk modulus \(K\) measures resistance to uniform volume change under hydrostatic compression. A material with a high bulk modulus is difficult to compress, while a material with a low bulk modulus undergoes relatively large volume change under pressure. In rock physics, the bulk modulus is important because compressional waves involve changes in volume. The first Lamé parameter \(\lambda\) is another elastic constant used frequently in the tensor form of Hooke's law. Although its direct physical interpretation is less intuitive than that of \(E\), \(G\), or \(K\), it is mathematically convenient for writing the stress--strain relation in isotropic elasticity \cite{aki2002,jaeger2007}.
+
+If Young's modulus \(E\) and Poisson's ratio \(\nu\) are known, the shear modulus, bulk modulus, and Lamé parameter can be written as
+\begin{equation}
+G = \mu = \frac{E}{2(1+\nu)},
+\end{equation}
+\begin{equation}
+K = \frac{E}{3(1-2\nu)},
+\end{equation}
+\begin{equation}
+\lambda = \frac{E\nu}{(1+\nu)(1-2\nu)}.
+\end{equation}
+Here, \(E\), \(G\), \(K\), and \(\lambda\) have the units of pressure, usually pascals \(\mathrm{Pa}\), while \(\nu\) is dimensionless. These expressions are valid for isotropic linear elastic materials. They also show why Poisson's ratio is important: as \(\nu\) approaches \(0.5\), the material approaches an incompressible limit and the bulk modulus becomes very large. For stable isotropic elastic materials, \(\nu\) must lie within physically meaningful bounds, and natural rocks usually occupy a narrower range controlled by their mineralogy, porosity, crack content, and saturation \cite{jaeger2007,mavko2009}.
+
+The same elastic constants determine the velocities of body waves in an isotropic elastic solid. The compressional wave velocity, or P-wave velocity, is
+\begin{equation}
+V_P =
+\sqrt{
+\frac{K + \frac{4}{3}G}{\rho}
+},
+\end{equation}
+where \(V_P\) is the P-wave velocity, \(K\) is the bulk modulus, \(G\) is the shear modulus, and \(\rho\) is the density of the medium. The shear wave velocity, or S-wave velocity, is
+\begin{equation}
+V_S =
+\sqrt{
+\frac{G}{\rho}
+}.
+\end{equation}
+These formulas show that wave velocity is controlled by the ratio between elastic stiffness and density. Elastic stiffness provides the restoring force that allows a disturbance to propagate, while density represents inertia, or resistance to acceleration. Therefore, wave speed increases when stiffness is high relative to density and decreases when the medium is compliant or highly fractured \cite{aki2002,mavko2009}.
+
+P-waves and S-waves differ physically. P-waves are compressional waves: particle motion occurs mainly in the direction of wave propagation, and the wave involves alternating compression and dilation of the medium. Because P-waves involve both volume change and shear resistance, their velocity depends on \(K + 4G/3\). S-waves are shear waves: particle motion is transverse to the direction of propagation, and the wave involves distortion of shape rather than volume change. Since S-waves depend directly on shear rigidity, their velocity is controlled by \(G\). For stable elastic solids, \(V_P\) is greater than \(V_S\), which is why P-waves generally arrive before S-waves in seismic observations \cite{aki2002}.
+
+The absence of shear-wave propagation in fluids follows directly from the expression for \(V_S\). In an ideal fluid, the shear modulus is zero, \(G=0\), and therefore
+\begin{equation}
+V_S = 0.
+\end{equation}
+This means that fluids cannot support shear waves, although they can transmit compressional waves because they still resist volume change through their bulk modulus. In rocks, this distinction is important because pore fluids affect P-wave and S-wave velocities differently. Saturation can increase the effective bulk response of the rock--fluid system and may raise \(V_P\), while \(V_S\) remains controlled primarily by the stiffness of the solid frame \cite{aki2002,mavko2009}.
+
+In real geological materials, the simple isotropic velocity formulas must be interpreted with caution. Porosity, cracks, mineral composition, saturation, confining pressure, temperature, and anisotropy all influence the effective elastic moduli and density. Increased porosity and compliant microcracks usually reduce the effective stiffness of the rock and lower seismic velocities. Higher confining pressure may close cracks and strengthen grain contacts, thereby increasing the effective moduli and wave speeds. Fluid saturation modifies the compressibility of the pore space and can significantly affect \(V_P\), while fractures and bedding may introduce direction-dependent wave velocities \cite{mavko2009,jaeger2007,crampin1981,thomsen1986}.
+
+Temperature also matters for elastic wave propagation in rocks. Heating can change mineral stiffness, promote thermal expansion, open or extend microcracks, and alter the stress state of the rock. As a result, elastic moduli and wave velocities may change with temperature. This is particularly relevant in thermoelastic problems, where temperature is not only a background condition but also a field that may interact with deformation and stress. Therefore, even though the formulas for \(V_P\) and \(V_S\) are derived for ideal homogeneous isotropic solids, they provide the fundamental physical link between density, elastic stiffness, and wave propagation in geological media \cite{robertson1988,turcotte2014,mavko2009}.
+
+In summary, the elastic constants \(E\), \(\nu\), \(G\), \(K\), and \(\lambda\) describe how a rock resists axial deformation, lateral deformation, shear distortion, volume change, and general isotropic elastic stress. Together with density, they determine the velocities of compressional and shear waves in the classical isotropic approximation. These relations are essential for thermoelastic wave propagation because they connect measurable rock properties with the speed and character of mechanical disturbances. The next section extends the physical description from elastic properties to thermal properties, including thermal conductivity, heat capacity, thermal diffusivity, and thermal expansion, which are required to describe the thermal part of thermoelastic behavior.

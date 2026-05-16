@@ -1,0 +1,59 @@
+\subsection{Initial and Boundary Conditions}
+
+A complete mathematical formulation requires initial and boundary conditions. Initial conditions define the state of the medium at the beginning of the observation interval, \(t=0\). For the mechanical field, the initial displacement may be prescribed as
+\begin{equation}
+\mathbf{u}(\mathbf{x},0)
+=
+\mathbf{u}_0(\mathbf{x}),
+\end{equation}
+where \(\mathbf{u}_0(\mathbf{x})\) is the initial displacement distribution. The initial velocity may be written as
+\begin{equation}
+\frac{\partial \mathbf{u}}{\partial t}(\mathbf{x},0)
+=
+\mathbf{v}_0(\mathbf{x}),
+\end{equation}
+where \(\mathbf{v}_0(\mathbf{x})\) is the initial velocity field. For the thermal field, the initial temperature distribution is given by
+\begin{equation}
+T(\mathbf{x},0)
+=
+T_{\mathrm{init}}(\mathbf{x}).
+\end{equation}
+These conditions determine the initial thermal and mechanical state from which the transient thermoelastic process begins.
+
+Boundary conditions describe how the selected domain \(\Omega\) interacts with its surroundings through the boundary \(\partial\Omega\). For the mechanical part of the problem, one may prescribe displacement on a part of the boundary \(\Gamma_u\):
+\begin{equation}
+\mathbf{u}
+=
+\bar{\mathbf{u}}
+\quad
+\text{on } \Gamma_u .
+\end{equation}
+Alternatively, one may prescribe traction on another part of the boundary \(\Gamma_t\):
+\begin{equation}
+\sigma_{ij}n_j
+=
+\bar{t}_i
+\quad
+\text{on } \Gamma_t ,
+\end{equation}
+where \(\mathbf{n}\) is the outward unit normal vector to the boundary and \(\bar{t}_i\) is the prescribed traction component.
+
+For the thermal part of the problem, temperature may be prescribed on a boundary portion \(\Gamma_T\):
+\begin{equation}
+T
+=
+\bar{T}
+\quad
+\text{on } \Gamma_T .
+\end{equation}
+Another common thermal condition is prescribed heat flux on \(\Gamma_q\):
+\begin{equation}
+-k\nabla T \cdot \mathbf{n}
+=
+\bar{q}
+\quad
+\text{on } \Gamma_q ,
+\end{equation}
+where \(\bar{q}\) is the prescribed outward heat flux.
+
+These boundary conditions represent idealized mathematical descriptions of physical constraints. A fixed-displacement boundary may represent a constrained rock surface, while a traction boundary may represent applied stress or free-surface behavior. A prescribed-temperature boundary may represent contact with a heat source or reservoir, while a heat-flux boundary may represent imposed heating, cooling, or insulation. In this thesis, the purpose is not to define a complete field-scale boundary-value problem for a particular geological site, but to identify the types of conditions required for the thermoelastic formulation.

@@ -1,0 +1,80 @@
+\subsection{Coupled Thermoelastic Behavior}
+
+Coupled thermoelasticity describes the simultaneous interaction of thermal and mechanical fields in a deformable solid. In classical elasticity, the mechanical state of a body is described through displacement, strain, and stress. In heat conduction, the thermal state is described through the temperature field. Thermoelasticity combines these two descriptions by recognizing that temperature changes can produce strain and stress, while deformation can also influence the thermal state of the material. In geological media, this coupling is important because rocks may experience mechanical loading, heat transfer, and temperature-dependent deformation at the same time \cite{nowacki1986,boley1960}.
+
+A distinction is commonly made between uncoupled and coupled thermoelastic problems. In an uncoupled formulation, the temperature field is first obtained from the heat conduction equation. The resulting temperature change is then used to calculate thermal strain and thermal stress, but the deformation of the body is not allowed to affect the temperature field. This approach is useful when the feedback from mechanical deformation to heat transfer is negligible. In coupled thermoelasticity, however, temperature, strain, stress, and motion are considered together, so that thermal and mechanical fields influence each other simultaneously \cite{jaeger2007,nowacki1986}.
+
+The basic physical chain of a thermoelastic process may be written conceptually as
+\[
+\text{temperature change}
+\rightarrow
+\text{thermal expansion or contraction}
+\rightarrow
+\text{thermal strain}
+\rightarrow
+\text{thermal stress}
+\rightarrow
+\text{deformation or wave motion}.
+\]
+This chain is useful for understanding thermoelastic wave propagation in rocks. A local temperature disturbance may create thermal strain. If the expansion or contraction is constrained by surrounding grains, layers, fractures, or in situ stress, thermal stress develops. Gradients of this stress can then contribute to elastic motion. Conversely, rapid deformation involving volume change may influence the temperature field through thermoelastic coupling \cite{boley1960,nowacki1986}.
+
+A convenient variable for describing temperature change is the temperature perturbation
+\begin{equation}
+\theta = T - T_0,
+\end{equation}
+where \(\theta\) is the temperature perturbation, \(T\) is the current temperature, and \(T_0\) is the reference temperature. The reference temperature may represent the initial thermal state of the rock. Temperature perturbation is used because thermoelastic strain and stress are controlled by changes in temperature rather than by absolute temperature alone.
+
+For an isotropic solid, the thermal strain associated with a temperature perturbation may be written as
+\begin{equation}
+\varepsilon_{\mathrm{th}} = \alpha \theta,
+\end{equation}
+where \(\varepsilon_{\mathrm{th}}\) is the thermal strain and \(\alpha\) is the coefficient of linear thermal expansion. This equation describes the strain that the material would undergo if it were free to expand or contract. In real geological media, however, free thermal deformation is often restricted by neighboring grains, cement, bedding, fractures, faults, and the surrounding stress field. Under such conditions, thermal strain contributes to the stress state of the rock \cite{jaeger2007,nowacki1986}.
+
+The stress relation for an isotropic linear thermoelastic solid may be written as
+\begin{equation}
+\sigma_{ij}
+=
+\lambda \delta_{ij}\varepsilon_{kk}
++
+2\mu \varepsilon_{ij}
+-
+\gamma \delta_{ij}\theta .
+\end{equation}
+Here, \(\sigma_{ij}\) is the stress tensor, \(\lambda\) and \(\mu\) are the Lamé elastic parameters, \(\delta_{ij}\) is the Kronecker delta, \(\varepsilon_{ij}\) is the strain tensor, \(\varepsilon_{kk}\) is the volumetric strain, \(\gamma\) is the thermoelastic coupling coefficient, and \(\theta\) is the temperature perturbation. The first two terms describe the mechanical stress produced by elastic deformation. The final term describes the thermal stress contribution caused by temperature change. This equation shows directly how the temperature field enters the mechanical stress state of the material \cite{boley1960,nowacki1986}.
+
+Mechanical motion is governed by the equation of motion. Neglecting body forces for simplicity, it can be written in index notation as
+\begin{equation}
+\rho \frac{\partial^2 u_i}{\partial t^2}
+=
+\frac{\partial \sigma_{ij}}{\partial x_j}.
+\end{equation}
+In this equation, \(\rho\) is the density of the medium, \(u_i\) is the \(i\)-th component of displacement, \(t\) is time, \(\sigma_{ij}\) is the stress tensor, and \(x_j\) is the spatial coordinate. The left-hand side represents inertia, while the right-hand side represents the effect of stress gradients. Physically, the equation states that spatial changes in stress cause acceleration of material particles. Since the stress tensor contains both mechanical and thermal contributions, temperature changes may influence motion through the thermoelastic stress term \cite{aki2002,nowacki1986}.
+
+The thermal part of the coupled problem is described by the heat equation. In the absence of thermoelastic coupling, heat conduction in a rock may be written in the form
+\begin{equation}
+\rho C_p \frac{\partial T}{\partial t}
+=
+\nabla \cdot (k \nabla T) + Q,
+\end{equation}
+where \(C_p\) is the specific heat capacity, \(\rho C_p\) is the volumetric heat capacity, \(k\) is the thermal conductivity, and \(Q\) is a heat source per unit volume. This equation describes how temperature evolves due to heat conduction and heat supply \cite{robertson1988,turcotte2014}.
+
+In coupled thermoelasticity, an additional term appears because changing volumetric strain may generate or absorb heat. A commonly used linear coupled form is
+\begin{equation}
+k \nabla^2 T
+-
+C \frac{\partial T}{\partial t}
+=
+\gamma T_0
+\frac{\partial \varepsilon_{kk}}{\partial t},
+\end{equation}
+where \(C = \rho C_p\) is the volumetric heat capacity, \(T_0\) is the reference temperature, and \(\partial \varepsilon_{kk}/\partial t\) is the rate of volumetric strain. The term
+\(\gamma T_0 \partial \varepsilon_{kk}/\partial t\)
+expresses the mechanical-to-thermal part of the coupling. It means that a change in volume deformation can act as a thermal source or sink. In terms of temperature perturbation, the same physical idea may be expressed through an equation in which the evolution of \(\theta\) is driven by heat diffusion and the rate of volumetric strain \cite{nowacki1986,boley1960}.
+
+The coupled nature of the system can now be seen clearly. The temperature perturbation \(\theta\) enters the stress relation through the thermal stress term. The stress tensor \(\sigma_{ij}\) enters the equation of motion and therefore controls acceleration and wave motion. At the same time, the rate of volumetric strain \(\partial \varepsilon_{kk}/\partial t\) enters the heat equation and affects the temperature field. Thus, the mechanical and thermal fields are not independent: temperature affects deformation through stress, and deformation affects temperature through the coupled heat equation.
+
+The importance of coupling depends on the time scale and physical conditions of the process. In slow or quasi-static cases, the feedback from deformation to temperature may be small, and an uncoupled approach may provide an acceptable approximation. In rapid transient processes, however, the coupling becomes more important. Elastic deformation may be accompanied by local heating or cooling associated with volume change, while irreversible heat conduction may contribute to the attenuation of thermoelastic waves. This is why coupled thermoelasticity is especially relevant when mechanical and thermal disturbances evolve over comparable time scales \cite{boley1960,nowacki1986}.
+
+Geological media make coupled thermoelastic behavior more complex than the ideal isotropic theory suggests. Rocks are heterogeneous, layered, porous, fractured, and often anisotropic. Their properties, such as \(\alpha\), \(k\), \(\rho\), \(\lambda\), and \(\mu\), may vary in space and may depend on temperature, pressure, saturation, and damage state. Different minerals or layers may expand differently when heated, producing internal stress contrasts. Fractures and pores may concentrate stress, alter heat flow, or partially accommodate thermal expansion. Pore fluids can modify both heat transfer and mechanical response. Therefore, thermoelastic wave propagation in rocks may become direction-dependent and spatially irregular even when the classical equations are used as the starting point \cite{jaeger2007,mavko2009,robertson1988,turcotte2014}.
+
+The classical coupled thermoelastic framework therefore provides the physical foundation for understanding how temperature, deformation, stress, and wave motion interact in geological media. Although the isotropic equations are simplified, they show the essential structure of the problem: heat conduction controls the evolution of temperature, thermal expansion converts temperature change into strain, constrained strain generates stress, stress gradients produce motion, and deformation may feed back into the thermal field. These ideas form the basis for discussing thermoelastic wave propagation in the next section.

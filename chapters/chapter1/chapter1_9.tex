@@ -1,0 +1,62 @@
+\subsection{Heat Conduction in Rocks}
+
+Heat conduction is the process by which thermal energy is transferred through a material due to a temperature gradient. In geological media, conduction is one of the main mechanisms of heat transfer within the solid rock framework. Unlike elastic wave propagation, which involves mechanical motion and stress transmission, heat conduction describes the diffusion of thermal energy from warmer regions toward cooler regions. This distinction is important for thermoelasticity because temperature variations create thermal strain and stress, but the temperature field itself evolves according to the laws of heat transfer \cite{robertson1988,turcotte2014}.
+
+In rocks, heat may be transferred by conduction, convection, and radiation, but their relative importance depends on the physical setting. Conduction occurs through the solid mineral framework and through any material filling the pore space. Convection requires fluid motion and may be important in permeable fractured or porous rocks, especially in hydrothermal and geothermal systems. Radiation can contribute at very high temperatures or across open voids, but it is usually less important than conduction in ordinary solid rock at crustal conditions. For the classical thermoelastic framework considered here, conduction is the central heat-transfer mechanism because it directly describes how a temperature field evolves inside a solid deformable body \cite{robertson1988,turcotte2014}.
+
+The basic empirical law of heat conduction is Fourier's law. In vector form it is written as
+\begin{equation}
+\mathbf{q} = -k \nabla T,
+\end{equation}
+where \(\mathbf{q}\) is the heat flux vector, \(k\) is the thermal conductivity, and \(\nabla T\) is the temperature gradient. The heat flux \(\mathbf{q}\) represents the amount of thermal energy crossing a unit area per unit time, and its SI unit is \(\mathrm{W\,m^{-2}}\). Thermal conductivity \(k\) has units of \(\mathrm{W\,m^{-1}\,K^{-1}}\). The negative sign indicates that heat flows from higher temperature toward lower temperature, that is, opposite to the direction of increasing temperature. If the temperature gradient is large, the heat flux is larger; if the gradient is small, the conductive heat flow is weaker \cite{robertson1988,turcotte2014}.
+
+The temperature gradient \(\nabla T\) is a spatial derivative of the temperature field. In three-dimensional Cartesian coordinates it may be written as
+\begin{equation}
+\nabla T =
+\left(
+\frac{\partial T}{\partial x},
+\frac{\partial T}{\partial y},
+\frac{\partial T}{\partial z}
+\right).
+\end{equation}
+This expression shows that temperature may change differently in different spatial directions. In a homogeneous isotropic material, thermal conductivity can often be represented by a single scalar value. In a layered, foliated, or fractured rock, however, heat conduction may be direction-dependent. In such cases, heat may flow more easily parallel to bedding, foliation, or fracture networks than across them. This directional dependence of thermal conductivity is one reason why geological structure can influence the evolution of thermoelastic stress \cite{robertson1988,mavko2009}.
+
+The time evolution of temperature in a conducting solid is described by the heat equation. For a rock with density \(\rho\), specific heat capacity \(C_p\), thermal conductivity \(k\), and internal or external heat source \(Q\), the heat equation can be written as
+\begin{equation}
+\rho C_p \frac{\partial T}{\partial t}
+=
+\nabla \cdot (k \nabla T) + Q.
+\end{equation}
+Here, \(\rho\) is the density of the rock, \(C_p\) is the specific heat capacity, \(T\) is temperature, \(t\) is time, and \(Q\) represents heat generation or heat supply per unit volume. The term \(\rho C_p \frac{\partial T}{\partial t}\) describes the rate at which heat is stored in the material. The term \(\nabla \cdot (k \nabla T)\) describes the divergence of conductive heat flow, that is, the net conductive heat entering or leaving a small volume of rock. The source term \(Q\) may represent processes such as radiogenic heat production, frictional heating, magmatic heating, or an imposed external thermal input, depending on the geological problem \cite{robertson1988,turcotte2014}.
+
+If the thermal conductivity \(k\) is assumed to be constant in space, the heat equation simplifies to
+\begin{equation}
+\rho C_p \frac{\partial T}{\partial t}
+=
+k \nabla^2 T + Q,
+\end{equation}
+where \(\nabla^2 T\) is the Laplacian of temperature. In Cartesian coordinates, the Laplacian is
+\begin{equation}
+\nabla^2 T
+=
+\frac{\partial^2 T}{\partial x^2}
++
+\frac{\partial^2 T}{\partial y^2}
++
+\frac{\partial^2 T}{\partial z^2}.
+\end{equation}
+The Laplacian measures the local curvature of the temperature field. Physically, it describes whether a point is warmer or cooler than its surroundings and therefore whether heat tends to flow away from or toward that point. This term is responsible for the smoothing of temperature differences over time \cite{turcotte2014}.
+
+The heat equation is often interpreted as a diffusion equation. This means that a localized temperature disturbance does not propagate like an elastic wave with a sharply defined wavefront. Instead, the disturbance spreads gradually as heat diffuses through the medium. The rate of this spreading is controlled by thermal diffusivity,
+\begin{equation}
+\alpha_T = \frac{k}{\rho C_p},
+\end{equation}
+where \(\alpha_T\) is thermal diffusivity. A material with high thermal conductivity and low volumetric heat capacity has high thermal diffusivity, so temperature differences are smoothed relatively quickly. A material with low conductivity or high volumetric heat capacity has lower thermal diffusivity, so thermal anomalies persist longer. This parameter should not be confused with the coefficient of thermal expansion \(\alpha\), which describes deformation caused by temperature change rather than heat diffusion \cite{robertson1988,turcotte2014}.
+
+The thermal behavior of rocks is strongly influenced by mineral composition, porosity, pore fluids, cracks, and fabric. Dense crystalline rocks may conduct heat differently from porous sedimentary rocks because their mineral framework and pore structure differ. Dry air-filled pores tend to reduce effective thermal conductivity, whereas water-filled pores can increase heat transfer relative to dry conditions. Fractures may either interrupt conductive pathways or enhance heat transfer when they contain moving fluids. Layering and foliation can also make heat conduction anisotropic. As a result, the effective heat conduction of a rock mass may differ from the conductivity measured on a small intact laboratory sample \cite{robertson1988,wolff1982,mavko2009}.
+
+In geological settings, heat conduction is relevant to many processes. Regional geothermal gradients reflect the transfer of heat through the crust. Magmatic intrusions, volcanic flows, geothermal reservoirs, buried radioactive materials, and engineered underground structures may all create thermal disturbances in surrounding rocks. When the temperature field changes, thermal expansion or contraction may occur. If that deformation is constrained, thermal stress develops. Therefore, heat conduction is not only a thermal process but also a necessary part of thermoelastic behavior, because it determines how temperature perturbations are distributed in space and time \cite{turcotte2014,robertson1988,boley1960}.
+
+It is useful to distinguish heat conduction from elastic wave propagation. Heat conduction is diffusive: it tends to smooth temperature differences gradually. Elastic wave propagation is mechanical: it involves time-dependent displacement, strain, stress, and particle acceleration. The characteristic velocity of elastic waves is controlled mainly by density and elastic moduli, while the spreading of heat is controlled by thermal conductivity and heat capacity. Thermoelasticity connects these two processes because the evolving temperature field produces thermal strain and stress, while deformation may also contribute to the thermal state in coupled formulations. Thus, heat conduction provides the thermal part of the physical framework needed to understand thermoelastic wave propagation in geological media \cite{nowacki1986,boley1960}.
+
+In summary, heat conduction describes how temperature evolves within rocks under the influence of thermal gradients and heat sources. Fourier's law defines the conductive heat flux, while the heat equation describes the time-dependent temperature field. In geological media, conduction is affected by mineral composition, porosity, saturation, fractures, bedding, and anisotropy. These factors control the spatial distribution of temperature and therefore influence the development of thermal strain and thermal stress. The next section builds on this foundation by considering coupled thermoelastic behavior, where temperature, deformation, stress, and motion are treated as interacting parts of the same physical system.

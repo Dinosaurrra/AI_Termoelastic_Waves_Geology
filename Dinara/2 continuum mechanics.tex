@@ -1,0 +1,138 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{left=25mm,right=25mm,top=25mm,bottom=25mm}
+
+\title{Механика сплошной среды}
+\author{ }
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Введение}
+Здесь собраны ключевые определения и формулы по \emph{механике сплошной среды}, необходимых для получения уравнений упругой динамики и дальнейшего изучения распространения механических (упругих) волн в однородных средах. Материал рассчитан на читателя, знакомого с векторным исчислением и основами дифференциальных уравнений.
+
+\section{Кинематика малых деформаций}
+Рассмотрим поле смещений $\mathbf{u}(\mathbf{x},t)$ при малых деформациях.  
+Градиент смещения:
+\[
+\nabla\mathbf{u} \quad\text{с компонентами}\quad \frac{\partial u_i}{\partial x_j}.
+\]
+
+Малый (линейный) тензор деформаций (strain):
+\[
+\varepsilon_{ij} = \frac{1}{2}\left(\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}\right).
+\]
+Это симметризованная часть градиента смещений, измеряющая локальные удлинения и сдвиги.
+
+\section{Тензор напряжений (Cauchy stress)}
+Для произвольной ориентированной поверхности с нормалью $\mathbf{n}$ действует вектор поверхностной силы (traction) $\mathbf{t}(\mathbf{n})$. Теорема Коши утверждает наличие тензора напряжений $\sigma_{ij}$ такого, что
+\[
+t_i = \sigma_{ij}\, n_j.
+\]
+В обычной механике твёрдого тела (при отсутствии пар сил) тензор напряжений симметричен:
+\[
+\sigma_{ij} = \sigma_{ji}.
+\]
+
+\section{Уравнения сохранения (баланс массы и импульса)}
+\subsection*{Баланс массы}
+Общее уравнение сохранения массы:
+\[
+\frac{\partial \rho}{\partial t} + \nabla\!\cdot(\rho \mathbf{v}) = 0,
+\]
+где $\rho(\mathbf{x},t)$ --- плотность, $\mathbf{v}=\partial\mathbf{u}/\partial t$ --- скорость материала.
+
+\subsection*{Баланс линейного импульса (Cauchy momentum equation)}
+В локальной форме:
+\[
+\rho\,\frac{\partial^2 u_i}{\partial t^2} = \frac{\partial \sigma_{ij}}{\partial x_j} + \rho f_i,
+\]
+или в векторной записи
+\[
+\rho\,\ddot{\mathbf{u}} = \nabla\!\cdot\boldsymbol{\sigma} + \rho\mathbf{f},
+\]
+где $\mathbf{f}$ --- объёмные силы (например, сила тяжести).
+
+\section{Конститутивные соотношения: линейная изотропная упругая среда}
+Для малых деформаций и изотропного материала применяется тензорный закон Гука:
+\[
+\sigma_{ij} = \lambda\,\varepsilon_{kk}\,\delta_{ij} + 2\mu\,\varepsilon_{ij},
+\]
+где $\lambda,\mu$ --- параметры Ламе, $\delta_{ij}$ --- единичный тензор, а $\varepsilon_{kk}=\mathrm{tr}\,\boldsymbol{\varepsilon}$.  
+
+Связь с модулями $E$ и коэффициентом Пуассона $\nu$:
+\[
+\mu = \frac{E}{2(1+\nu)}, \qquad
+\lambda = \frac{E\nu}{(1+\nu)(1-2\nu)}.
+\]
+
+\section{Уравнения упругой динамики}
+Подставляя закон Гука в уравнение движения и раскрывая компонентно, получаем:
+\[
+\rho\,\ddot u_i = \partial_j\big(\lambda\,\varepsilon_{kk}\delta_{ij} + 2\mu\,\varepsilon_{ij}\big) + \rho f_i.
+\]
+Используя $\varepsilon_{ij}=\tfrac12(\partial_i u_j+\partial_j u_i)$ и предполагая $\mathbf{f}=\mathbf{0}$, в векторной форме:
+\[
+\rho\,\ddot{\mathbf{u}} = (\lambda + \mu)\nabla(\nabla\!\cdot\mathbf{u}) + \mu\,\nabla^2\mathbf{u}.
+\]
+Применяя тождество $\nabla^2\mathbf{u}=\nabla(\nabla\!\cdot\mathbf{u}) - \nabla\times(\nabla\times\mathbf{u})$, альтернативная форма:
+\[
+\rho\,\ddot{\mathbf{u}} = (\lambda + 2\mu)\nabla(\nabla\!\cdot\mathbf{u}) - \mu\,\nabla\times(\nabla\times\mathbf{u}).
+\]
+
+\subsection*{Физическая интерпретация}
+Правая часть разделяется на компоненты, отвечающие за продольные (дивергентные) и поперечные (вихревые) движения. Это позволяет вывести независимые волновые уравнения для продольной и поперечной частей смещения.
+
+\section{Скорости продольной и поперечной волн}
+Разложение поля смещений на продольную (потенциальную) и поперечную (вихревую) части даёт:
+\[
+c_P = \sqrt{\frac{\lambda + 2\mu}{\rho}}, \qquad
+c_S = \sqrt{\frac{\mu}{\rho}}.
+\]
+Здесь $c_P$ --- скорость продольных (P-) волн, $c_S$ --- скорость поперечных (S-) волн. Эти выражения являются ключевыми для сейсмики и теории упругих волн.
+
+\section{Граничные условия}
+\begin{itemize}
+    \item \textbf{Свободная поверхность:} трение отсутствует, значит traction $=\boldsymbol{\sigma}\cdot\mathbf{n}=\mathbf{0}$.
+    \item \textbf{Контакт двух сред:} непрерывность нормальных и касательных компонент тракции и, как правило, непрерывность смещений (зависит от сцепления).
+    \item \textbf{Одномерный случай (плоская волна):} коэффициенты отражения/передачи вычисляются через механические импедансы $Z=\rho c$.
+\end{itemize}
+
+\section{Энергия упругой деформации}
+Плотность упругой энергии (в малой деформации, линейная упругость):
+\[
+W = \frac12 \sigma_{ij}\varepsilon_{ij} = \frac12\lambda(\varepsilon_{kk})^2 + \mu\,\varepsilon_{ij}\varepsilon_{ij}.
+\]
+Полная энергия системы включает кинетическую и потенциальную (упругую) части:
+\[
+\mathcal{E}_{\text{total}} = \int_{\Omega}\left(\tfrac12\rho\,\dot u_i\dot u_i + W\right)\,dV.
+\]
+
+\section{Краткие замечания о нелинейности и больших деформациях}
+Если деформации не малы, используется полная кинематика (деформационный градиент $\mathbf{F}=\partial\boldsymbol{\chi}/\partial\mathbf{X}$) и более сложные конститутивные модели (гиперупругость, пластичность). Для большинства сейсмических задач при малых амплитудах малые деформации и линейный закон Гука достаточны.
+
+\section*{Источники (открытые материалы)}
+\begin{enumerate}
+    \item MIT OpenCourseWare: \textit{12.005 Applications of Continuum Mechanics to Earth, Atmospheric and Planetary Sciences} (lecture notes).  
+    URL: \url{https://ocw.mit.edu/courses/12-005-applications-of-continuum-mechanics-to-earth-atmospheric-and-planetary-sciences-spring-2006/lecture-notes/}
+    \vspace{2mm}
+    \item R. Abeyaratne, \textit{Continuum Mechanics (lecture notes, Vol. II)}.  
+    PDF: \url{https://web.mit.edu/abeyaratne/Volumes/RCA_Vol_II.pdf}
+    \vspace{2mm}
+    \item University of California, Berkeley: \textit{ME185 -- Introduction to Continuum Mechanics (lecture notes)} (P. Papadopoulos).  
+    PDF: \url{https://csml.berkeley.edu/Notes/ME185.pdf}
+    \vspace{2mm}
+    \item Stanford (ME338 / biomechanics notes): \textit{Continuum Mechanics notes}.  
+    URL: \url{https://biomechanics.stanford.edu/me338/kuhl_conti1.pdf}
+    \vspace{2mm}
+    \item Texas A\&M (open textbook): \textit{Introduction to Continuum Mechanics (revised edition)}.  
+    PDF: \url{https://oaktrust.library.tamu.edu/bitstream/handle/1969.1/2501/IntroductionToContinuumMechanicsRevisedEdition.pdf?sequence=6}
+\end{enumerate}
+

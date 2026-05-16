@@ -1,0 +1,44 @@
+\subsection{Stress and Strain in Geological Materials}
+
+Stress is the internal force acting across an imagined surface within a material, expressed per unit area. At the most elementary level, normal stress may be written conceptually as
+\begin{equation}
+\sigma = \frac{F}{A},
+\end{equation}
+where $\sigma$ is the normal stress, $F$ is the force acting normal to the surface, and $A$ is the area over which that force acts. In SI units, stress is measured in pascals, $\mathrm{Pa}$, which are equivalent to $\mathrm{N\,m^{-2}}$. In geological materials, internal stresses arise from many sources, including the weight of overlying rock, tectonic loading, pore-pressure changes, excavation, and thermal expansion under constraint. Because rocks are solids, the internal force across a plane may include not only a component perpendicular to the plane but also a component parallel to it \cite{jaeger2007,cornet2007}.
+
+This leads to the distinction between normal stress and shear stress. Normal stress acts perpendicular to a surface and tends to compress or extend the material across that surface. Shear stress acts tangentially and tends to distort the material by sliding one part relative to another. The traction acting on a surface can be decomposed into normal and tangential components, and the relative magnitudes of these components depend on the orientation of the surface within the stressed body. In rocks, this orientation dependence is fundamental: bedding planes, foliation surfaces, and fracture planes may experience very different combinations of normal and shear stress even at the same point in the same rock mass \cite{jaeger2007,cornet2007}.
+
+Because the stress acting inside a solid depends on the orientation of the plane considered, the state of stress at a point cannot be described by a single scalar number. Instead, it is represented by the stress tensor. In bachelor-level language, the stress tensor is an organized way of writing all stress components associated with three orthogonal directions. The diagonal terms represent normal stresses, and the off-diagonal terms represent shear stresses. In the absence of internal moment imbalance, the stress tensor is symmetric, which reduces the number of independent components from nine to six. This tensor description is important because it allows the traction on a surface of any orientation to be found from the local state of stress \cite{aki2002,cornet2007,jaeger2007}.
+
+Strain describes deformation rather than force. If a line element of original length $L$ changes its length by an amount $\Delta L$, the normal strain is
+\begin{equation}
+\varepsilon = \frac{\Delta L}{L},
+\end{equation}
+where $\varepsilon$ is the normal strain, $\Delta L$ is the change in length, and $L$ is the original length. Strain is therefore dimensionless. Normal strain measures extension or shortening along a given direction, whereas shear strain measures change in angle between originally orthogonal directions. Stress and strain are related, but they are not the same: stress expresses the force state within the rock, while strain expresses the geometric response of the rock to that force state \cite{jaeger2007,aki2002}.
+
+The geometric basis of strain is the displacement field. In three-dimensional Cartesian coordinates, the displacement vector may be written as
+\begin{equation}
+\mathbf{u} = (u, v, w),
+\end{equation}
+where $u$, $v$, and $w$ are the displacement components in the $x$-, $y$-, and $z$-directions, respectively. This expression means that each material point in the rock may move by a certain amount in each coordinate direction. If the displacement varies from point to point, the distances and angles between neighboring points also change, and this change is interpreted as strain. Thus, strain is derived from spatial variation of displacement, not from rigid-body translation alone \cite{aki2002,cornet2007}.
+
+For small deformations, the strain tensor is written in the standard infinitesimal form
+\begin{equation}
+\varepsilon_{ij}
+=
+\frac{1}{2}
+\left(
+\frac{\partial u_i}{\partial x_j}
++
+\frac{\partial u_j}{\partial x_i}
+\right).
+\end{equation}
+Here, $\varepsilon_{ij}$ is the $(i,j)$ component of the small-strain tensor, $u_i$ is the $i$th component of the displacement vector, and $x_j$ is the $j$th spatial coordinate. The symbol $\partial$ denotes a partial derivative, which measures how one quantity changes with respect to one coordinate while the others are held fixed. The indices $i$ and $j$ each take the values $1$, $2$, and $3$, corresponding to the three coordinate directions. When $i=j$, the component $\varepsilon_{ij}$ is a normal strain component; when $i \neq j$, it is a shear strain component. The factor $\frac{1}{2}$ appears because the tensor strain measures true distortion and excludes rigid-body rotation from the deformation description \cite{aki2002,cornet2007}.
+
+This tensor expression should not be viewed as an abstract mathematical complication. It simply formalizes a physically intuitive fact: deformation in a solid depends on how displacement varies between neighboring points. If two nearby points undergo the same displacement, the body has translated but not strained. If their displacements differ, then the line joining them changes length or direction, and strain is present. In this sense, the strain tensor is the local measure of distortion in the rock. It is especially useful in geology because three-dimensional deformation is the rule rather than the exception, and different components of strain may be influenced differently by lithology, pore geometry, and structural fabric \cite{aki2002,jaeger2007}.
+
+Stress and strain are central to elastic wave propagation because waves are traveling disturbances of displacement, strain, and stress. A displacement field that changes in space produces strain; strain, through the elastic constitutive law, produces stress; and stress gradients generate particle acceleration. In conceptual terms, compressional waves are associated mainly with oscillating normal stress and normal strain, whereas shear waves are associated mainly with oscillating shear stress and shear strain. Thus, without the concepts of stress and strain, it is not possible to formulate the physical meaning of an elastic wave in a solid medium \cite{aki2002,mavko2009}.
+
+In geological materials, however, stress and strain are rarely distributed uniformly. Bedding and foliation may cause stiffness to vary with direction, so the same external loading can produce different strains depending on orientation. Pores reduce the effective load-bearing area of the solid framework, and compliant pores or microcracks can concentrate deformation even when the bulk porosity is modest. Fractures and joints are especially important because they introduce surfaces of weakness and high compliance, modifying both the local stress field and the resulting strain field. Rock-physics treatments of fractures show that joints and fractures can strongly affect the static and dynamic elastic properties of rocks, while geomechanical theory emphasizes that the mechanical description of geomaterials must consider discontinuities as well as the equivalent continuum \cite{mavko2009,cornet2007,jaeger2007}.
+
+For thermoelastic problems, this geological complexity is particularly significant. Thermal expansion or contraction modifies the stress state, but the resulting strain depends on how the rock fabric allows or constrains deformation. In a massive and relatively intact rock, thermal stress may be distributed more continuously. In a porous or fractured rock, the same thermal disturbance may be partly accommodated by crack opening, crack closure, grain-boundary slip, or strongly localized stress concentration. Therefore, the classical definitions of stress and strain remain essential, but they must always be interpreted in light of the internal structure of the geological medium \cite{jaeger2007,mavko2009,cornet2007}.

@@ -1,0 +1,138 @@
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsthm}
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\section*{Связанная термомеханическая модель с учётом продольных и поперечных волн}
+
+В данной работе используется система уравнений термоупругости, в которой 
+коэффициенты материала зависят от давления. 
+Экспериментальные данные по плотности и скоростям распространения упругих волн 
+берутся из таблицы свойств пород при высоких давлениях. 
+Эти данные позволяют выразить модули упругости и динамические характеристики среды 
+как функции давления глубины.
+
+\subsection*{1. Уравнение теплопроводности}
+
+\begin{equation}
+\rho(P)\, c_p(T)\, \frac{\partial T}{\partial t}
+=
+\nabla \cdot \left( k(T)\, \nabla T \right)
++ Q,
+\label{eq:heat}
+\end{equation}
+
+где $T$ — температура,
+$\rho(P)$ — плотность породы из экспериментальной таблицы,
+$c_p$ — теплоёмкость,
+$k$ — теплопроводность,
+$Q$ — объёмные тепловые источники.
+
+\subsection*{2. Уравнения движения}
+
+Уравнение импульса для упругой среды с учётом зависимости плотности от давления имеет вид:
+\begin{equation}
+\rho(P)\, \frac{\partial^2 u_i}{\partial t^2}
+=
+\nabla_j \sigma_{ij}
++ f_i,
+\label{eq:motion}
+\end{equation}
+
+где $u_i$ — компоненты вектора смещений,
+$f_i$ — массовые силы,
+$\sigma_{ij}$ — тензор напряжений.
+
+\subsection*{3. Линейная связь между напряжениями и деформациями}
+
+Для изотропной упругой среды:
+
+\begin{equation}
+\sigma_{ij}
+=
+\lambda(P)\, \delta_{ij}\, \varepsilon_{kk}
++
+2 G(P)\, \varepsilon_{ij},
+\label{eq:constitutive}
+\end{equation}
+
+где $\lambda(P)$ и $G(P)$ — ляме-параметры,
+зависящие от давления,
+\[
+\varepsilon_{ij}
+=
+\frac{1}{2}
+\left(
+\frac{\partial u_i}{\partial x_j}
++
+\frac{\partial u_j}{\partial x_i}
+\right)
+\]
+— тензор деформаций.
+
+\subsection*{4. Выражение модулей упругости через скорости волн}
+
+Экспериментальная таблица содержит скорости продольных (компрессионных) и поперечных волн.
+Эти величины используются для определения модулей среды.
+
+\paragraph{Поперечные волны:}
+\begin{equation}
+V_s(P)
+=
+\sqrt{\frac{G(P)}{\rho(P)}}.
+\label{eq:Vs}
+\end{equation}
+
+\paragraph{Продольные волны:}
+\begin{equation}
+V_p(P)
+=
+\sqrt{
+\frac{
+K(P) + \frac{4}{3} G(P)
+}{
+\rho(P)
+}
+}.
+\label{eq:Vp}
+\end{equation}
+
+\subsection*{5. Определение модулей $K(P)$ и $G(P)$}
+
+Из уравнений \eqref{eq:Vs}–\eqref{eq:Vp} получаем:
+
+\begin{equation}
+G(P) = \rho(P)\, V_s^2(P),
+\label{eq:G}
+\end{equation}
+
+\begin{equation}
+K(P) = \rho(P)\, V_p^2(P) - \frac{4}{3} G(P).
+\label{eq:K}
+\end{equation}
+
+\subsection*{6. Система, используемая в численном моделировании}
+
+Полная связанная система:
+
+\[
+\begin{cases}
+\rho(P)\, c_p(T)\, T_t - \nabla \cdot (k \nabla T) = Q,\\[6pt]
+\rho(P)\, u_{tt} - \nabla \cdot \sigma = f,\\[6pt]
+\sigma = C(P,T) : \varepsilon,\\[6pt]
+G(P) = \rho(P)\, V_s^2(P),\\[4pt]
+K(P) = \rho(P)\, V_p^2(P) - \dfrac{4}{3} G(P).\\
+\end{cases}
+\]
+
+Здесь функции $\rho(P)$, $V_p(P)$ и $V_s(P)$ задаются 
+экспериментальными таблицами для пород различного состава.
+Материальные параметры обновляются на каждом временном шаге,
+что обеспечивает учёт реального поведения среды при увеличении давления.

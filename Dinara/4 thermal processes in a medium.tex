@@ -1,0 +1,71 @@
+\section{Тепловые процессы в среде}
+
+Перед изучением термоупругости необходимо ввести понятия теплопереноса и температурных деформаций. Эти эффекты будут затем связаны с механикой сплошной среды.
+
+\subsection{Базовая теплопроводность}
+
+В изотропной среде плотность теплового потока определяется законом Фурье:
+\begin{equation}
+\mathbf{q} = -k \nabla T ,
+\end{equation}
+где $k$ --- коэффициент теплопроводности, $T$ --- температура.  
+
+Закон Фурье вместе с законом сохранения энергии приводит к тепловому (диффузионному) уравнению:
+\begin{equation}
+\rho c_p\, \frac{\partial T}{\partial t} = k \nabla^2 T,
+\label{eq:heat}
+\end{equation}
+где $c_p$ --- теплоёмкость при постоянном давлении.  
+
+Решения~(\ref{eq:heat}) описывают температурные поля, их распространение и затухание (тепловая диффузия) \cite{OpenStax_HE, MIT_heat}.
+
+
+\subsection{Температурные деформации}
+
+При нагревании материал стремится изменять длину. Для малых температурных приращений линейная деформация пропорциональна температуре:
+\begin{equation}
+\varepsilon_{th} = \alpha\,\Delta T ,
+\end{equation}
+где $\alpha$ --- коэффициент линейного температурного расширения.  
+
+В трёхмерном виде температурная деформация записывается тензорно:
+\begin{equation}
+\varepsilon^{th}_{ij}= \alpha \Delta T\,\delta_{ij},
+\end{equation}
+где $\delta_{ij}$ --- символ Кронекера.
+
+Температурные расширения приводят к внутренним упругим напряжениям, если расширение материала ограничено внешними условиями (например, в твёрдом теле с закреплёнными границами). Это ключевой механизм будущей термоупругой связи \cite{Feynman_vol2, Purdue_MM}.
+
+
+\section*{Цель раздела}
+
+Понять:
+\begin{itemize}
+\item как распространяется тепло,
+\item как температура формирует температурные поля,
+\item как температура вызывает упругие деформации.
+\end{itemize}
+Эти эффекты затем объединяются с уравнениями Ламе, формируя термоупругие уравнения (тепло + упругость).
+
+
+\section*{Список источников}
+
+\begin{thebibliography}{9}
+
+\bibitem{OpenStax_HE}
+OpenStax. \textit{Heat and Heat Transfer}. Physics.  
+URL: \url{https://openstax.org/books/physics/pages/14-introduction}
+
+\bibitem{MIT_heat}
+MIT OpenCourseWare. \textit{Heat Transfer and Thermal Diffusion}. Lecture notes.  
+URL: \url{https://ocw.mit.edu/courses/2-51-intermediate-heat-and-mass-transfer-fall-2008/lecture-notes/}
+
+\bibitem{Feynman_vol2}
+Feynman, R. \textit{The Feynman Lectures on Physics, Vol.2}. Thermal physics section.  
+Open online edition: \url{https://www.feynmanlectures.caltech.edu/II_toc.html}
+
+\bibitem{Purdue_MM}
+Purdue University. \textit{Thermal Effects in Materials (lecture notes)}.  
+URL: \url{https://engineering.purdue.edu/~materials/thermal_effects.pdf}
+
+\end{thebibliography}

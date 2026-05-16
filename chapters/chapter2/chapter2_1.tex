@@ -1,0 +1,84 @@
+\subsection{Problem Definition and Modelling Assumptions}
+
+The problem considered in this thesis is the thermoelastic response of a deformable geological medium subjected to thermal and mechanical disturbance. From the physical point of view, the medium is a rock or rock mass in which temperature changes, deformation, strain, stress, and wave motion are connected. The aim of the mathematical formulation is to define the main physical fields, material parameters, governing relations, and directional quantities required to describe thermoelastic wave propagation in a simplified but physically consistent form.
+
+The geological medium is represented as a continuum body occupying a spatial domain
+\begin{equation}
+\Omega \subset \mathbb{R}^{3},
+\end{equation}
+where \(\Omega\) denotes the region of the rock under consideration. A material point is described by the position vector
+\begin{equation}
+\mathbf{x} = (x,y,z),
+\end{equation}
+and the time variable is denoted by \(t\). The main fields are the temperature field \(T(\mathbf{x},t)\) and the displacement field \(\mathbf{u}(\mathbf{x},t)\). The displacement field describes the motion of material points, while the temperature field describes the thermal state of the medium. Strain and stress are then derived from these fields through the kinematic and constitutive relations of linear thermoelasticity.
+
+The mathematical formulation is introduced in three-dimensional Cartesian coordinates because real geological media are spatially three-dimensional. The displacement field is therefore represented by three components,
+\begin{equation}
+\mathbf{u}(\mathbf{x},t) =
+\begin{bmatrix}
+u(\mathbf{x},t) \\
+v(\mathbf{x},t) \\
+w(\mathbf{x},t)
+\end{bmatrix}.
+\end{equation}
+This provides the general physical framework for thermoelastic wave propagation. At the same time, this thesis does not claim to compute a complete high-fidelity three-dimensional field-scale solution. Where necessary, simplified two-dimensional sections, local cross-sections, or selected source--probe propagation directions may be used for interpretation and visualization. Thus, the governing equations are written in general three-dimensional form, while the practical analysis may focus on lower-dimensional sections or selected directional responses.
+
+Real geological media are heterogeneous, fractured, porous, and often anisotropic. However, a complete mathematical description of all pores, cracks, fractures, mineral grains, and fluid pathways is beyond the scope of this thesis. Therefore, the formulation adopts an effective continuum approximation. In this approximation, the rock is described by averaged material properties such as density, elastic moduli, thermal conductivity, heat capacity, and thermal expansion coefficient. These properties may represent sandstone, basalt, granite, or limestone as effective geological materials rather than as fully resolved microstructures \cite{jaeger2007,mavko2009}.
+
+The deformation is assumed to be small. This means that displacement gradients are sufficiently small for infinitesimal strain theory to be used. Under this assumption, the strain tensor is related to the displacement field by
+\begin{equation}
+\varepsilon_{ij}
+=
+\frac{1}{2}
+\left(
+\frac{\partial u_i}{\partial x_j}
++
+\frac{\partial u_j}{\partial x_i}
+\right),
+\end{equation}
+where \(\varepsilon_{ij}\) is the strain tensor, \(u_i\) is the \(i\)-th component of displacement, and \(x_j\) is the \(j\)-th spatial coordinate. The small-strain assumption is appropriate as a first approximation for wave propagation, where the displacement caused by a propagating disturbance is usually small compared with the size of the medium \cite{aki2002,jaeger2007}.
+
+The mechanical response is assumed to be linearly elastic and isotropic as a first approximation. In this case, stress is related to strain and temperature perturbation through the linear thermoelastic constitutive relation
+\begin{equation}
+\sigma_{ij}
+=
+\lambda \delta_{ij}\varepsilon_{kk}
++
+2\mu \varepsilon_{ij}
+-
+\gamma \delta_{ij}\theta .
+\end{equation}
+Here, \(\sigma_{ij}\) is the stress tensor, \(\lambda\) and \(\mu\) are the Lamé elastic parameters, \(\delta_{ij}\) is the Kronecker delta, \(\varepsilon_{kk}\) is the volumetric strain, \(\gamma\) is the thermoelastic coupling coefficient, and
+\begin{equation}
+\theta = T - T_0
+\end{equation}
+is the temperature perturbation relative to the reference temperature \(T_0\). This relation shows that stress is produced not only by mechanical deformation, but also by temperature change \cite{nowacki1986,boley1960}.
+
+The mechanical motion of the medium is governed by the balance of linear momentum. Neglecting body forces for simplicity, the equation of motion is written as
+\begin{equation}
+\rho
+\frac{\partial^2 u_i}{\partial t^2}
+=
+\frac{\partial \sigma_{ij}}{\partial x_j},
+\end{equation}
+where \(\rho\) is the density of the medium. The left-hand side represents inertia, while the right-hand side represents the divergence of stress. Physically, this equation states that spatial variations in stress cause acceleration of material particles. Since the stress tensor contains a thermal term, temperature perturbations can influence mechanical motion through thermal stress \cite{aki2002,nowacki1986}.
+
+The thermal field is described by heat conduction with possible thermoelastic coupling. A simplified coupled form may be written as
+\begin{equation}
+k \nabla^2 T
+-
+C
+\frac{\partial T}{\partial t}
+=
+\gamma T_0
+\frac{\partial \varepsilon_{kk}}{\partial t},
+\end{equation}
+where \(k\) is thermal conductivity, \(C=\rho C_p\) is volumetric heat capacity, \(C_p\) is specific heat capacity, and \(\partial \varepsilon_{kk}/\partial t\) is the rate of volumetric strain. This equation expresses the fact that temperature evolves through heat conduction, while volumetric deformation may contribute to the thermal field in a coupled thermoelastic process \cite{nowacki1986,boley1960}.
+
+Directional propagation is included because geological materials may have structure-dependent physical behavior. In an ideal homogeneous and isotropic medium, wave speeds and thermal diffusion are independent of direction. In real rocks, bedding, fractures, aligned pores, mineral fabrics, lithological contrasts, and stress-induced anisotropy may cause the response to vary with propagation direction. In this thesis, the mathematical formulation is written first for an effective isotropic continuum, while geological anisotropy and heterogeneity are treated as important interpretation factors and limitations of the simplified model \cite{mavko2009,aki2002}.
+
+Several assumptions define the scope of this formulation. The medium is treated as a continuum, deformation is assumed to be infinitesimal, and the mechanical response is described by linear elasticity. Material properties are represented by effective parameters within the local modelling domain. Temperature changes are treated as perturbations relative to a reference temperature. Explicit fracture mechanics, pore-fluid flow, plastic deformation, damage evolution, and full anisotropic constitutive modelling are not included. These simplifications make the mathematical structure clear and suitable for a bachelor-level formulation, while still preserving the essential physical coupling between temperature, stress, deformation, and wave motion.
+
+It is also important to clarify what this mathematical formulation does not claim. The thesis does not develop a complete deterministic numerical solution of the full coupled thermoelastic partial differential equation system. It does not present a new finite-element, finite-difference, or spectral solver for field-scale thermoelastic wave propagation. Instead, the purpose of this chapter is to define the governing variables, physical relations, assumptions, and directional quantities that provide the theoretical basis for later analysis. In this sense, the formulation establishes the physical structure of the problem rather than claiming a complete industrial-scale geophysical simulation.
+
+Thus, the problem is defined as the mathematical description of coupled temperature and displacement fields in a deformable geological continuum under simplified thermoelastic assumptions. The formulation connects temperature perturbation, thermal strain, stress, and motion, while recognizing that real geological media may introduce heterogeneity, anisotropy, fractures, saturation effects, and scale dependence. These assumptions provide the foundation for the following sections, where the spatial domain, physical fields, material parameters, governing equations, and directional propagation quantities are introduced in more detail.

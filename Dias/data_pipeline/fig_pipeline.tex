@@ -1,0 +1,119 @@
+% Главная диаграмма пайплайна генерации данных
+% Подключается в main.tex через \input{fig_pipeline}
+\begin{tikzpicture}[
+  font=\small,
+  node distance=6mm and 10mm,
+  every node/.style={align=center},
+  input/.style={
+    rectangle, rounded corners=2pt,
+    draw=orange!70!black, fill=orange!10,
+    minimum width=42mm, minimum height=10mm,
+    inner sep=4pt
+  },
+  proc/.style={
+    rectangle, rounded corners=2pt,
+    draw=blue!60!black, fill=blue!8,
+    minimum width=72mm, minimum height=11mm,
+    inner sep=4pt
+  },
+  data/.style={
+    rectangle, rounded corners=2pt,
+    draw=black!50, fill=black!5,
+    minimum width=72mm, minimum height=12mm,
+    inner sep=4pt
+  },
+  master/.style={
+    rectangle, rounded corners=2pt,
+    draw=violet!60!black, fill=violet!10,
+    minimum width=72mm, minimum height=11mm,
+    inner sep=4pt
+  },
+  loader/.style={
+    rectangle, rounded corners=2pt,
+    draw=teal!60!black, fill=teal!10,
+    minimum width=28mm, minimum height=10mm,
+    inner sep=3pt
+  },
+  model/.style={
+    rectangle, rounded corners=2pt,
+    draw=green!50!black, fill=green!12,
+    minimum width=28mm, minimum height=9mm,
+    inner sep=3pt, font=\small\bfseries
+  },
+  arr/.style={-{Latex[length=2mm,width=2mm]}, thick, draw=black!65},
+  arrthin/.style={-{Latex[length=1.6mm,width=1.6mm]}, draw=black!55}
+]
+
+% --- Stage 1: inputs ---
+\node[input] (mat)   {Таблица свойств пород\\\scriptsize{(Insar/data, гранит/базальт/...)}};
+\node[input, right=of mat] (rules) {Правила сэмплирования\\\scriptsize{слои, источник, ГУ}};
+
+% --- Stage 2: per-sample config ---
+\node[proc, below=8mm of $(mat)!0.5!(rules)$] (cfg)
+  {Конфигурация сэмпла $i$\\\scriptsize{$\{$слои, материалы, источник, ГУ$\}_i$}};
+
+\draw[arr] (mat) -- (cfg);
+\draw[arr] (rules) -- (cfg);
+
+% --- Stage 3: COMSOL ---
+\node[proc, below=of cfg] (comsol)
+  {COMSOL \texttt{Untitled.mph} + Global Parameters\\
+   \scriptsize{Parametric Sweep $\rightarrow$ N независимых решений}};
+\draw[arr] (cfg) -- (comsol);
+
+% --- Stage 4: raw export ---
+\node[data, below=of comsol] (raw)
+  {\textbf{Raw export на сэмпл} (\texttt{raw data/}):\\
+   \scriptsize{\texttt{data\_displacement.csv},
+   \texttt{data\_temperature.csv},
+   \texttt{data\_stress\_\{1,2,3\}.csv},}\\
+   \scriptsize{\texttt{data\_materials.csv}, \texttt{mesh.mphtxt}}};
+\draw[arr] (comsol) -- (raw);
+
+% --- Stage 5: preprocessing ---
+\node[proc, below=of raw] (prep)
+  {Препроцессинг \texttt{convert\_raw\_to\_graph.py}\\
+   \scriptsize{разбор CSV $\to$ узлы, рёбра, признаки, нормализация}};
+\draw[arr] (raw) -- (prep);
+
+% --- Stage 6: per-sample npy ---
+\node[data, below=of prep] (npy)
+  {\textbf{Графовое представление сэмпла} (\texttt{data not raw/}):\\
+   \scriptsize{\texttt{coords.npy} (N,3),\;
+   \texttt{edge\_index.npy} (E,2),\;
+   \texttt{edge\_attr.npy} (E,4),}\\
+   \scriptsize{\texttt{node\_features.npy} (T,N,24),\;
+   \texttt{times.npy} (T,),\;
+   \texttt{norm\_mean/std.npy}}};
+\draw[arr] (prep) -- (npy);
+
+% --- Stage 7: master ---
+\node[master, below=of npy] (master)
+  {\textbf{Мастер-датасет}\\
+   \scriptsize{\texttt{samples/sample\_XXXXX/} $\times$ N,\;
+   \texttt{materials.csv},\; \texttt{meta.json},\; \texttt{splits.json}}};
+\draw[arr] (npy) -- (master);
+
+% --- Stage 8: four loaders ---
+\node[loader, below=12mm of master, xshift=-48mm] (l1) {PINN-loader\\\scriptsize{collocation/BC/IC}};
+\node[loader, below=12mm of master, xshift=-16mm] (l2) {FNO-loader\\\scriptsize{регулярная сетка}};
+\node[loader, below=12mm of master, xshift=16mm]  (l3) {MGN-loader\\\scriptsize{узлы + рёбра, $t \to t{+}1$}};
+\node[loader, below=12mm of master, xshift=48mm]  (l4) {Transformer-loader\\\scriptsize{input/query токены}};
+
+\draw[arr] (master.south) -- ($(l1.north)+(0,2mm)$);
+\draw[arr] (master.south) -- ($(l2.north)+(0,2mm)$);
+\draw[arr] (master.south) -- ($(l3.north)+(0,2mm)$);
+\draw[arr] (master.south) -- ($(l4.north)+(0,2mm)$);
+
+% --- Stage 9: models ---
+\node[model, below=6mm of l1] (m1) {PINN};
+\node[model, below=6mm of l2] (m2) {FNO};
+\node[model, below=6mm of l3] (m3) {MeshGraphNet};
+\node[model, below=6mm of l4] (m4) {Transformer};
+
+\draw[arrthin] (l1) -- (m1);
+\draw[arrthin] (l2) -- (m2);
+\draw[arrthin] (l3) -- (m3);
+\draw[arrthin] (l4) -- (m4);
+
+\end{tikzpicture}

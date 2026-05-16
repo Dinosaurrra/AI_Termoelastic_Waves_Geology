@@ -1,0 +1,177 @@
+\section{Математические основы AI-направленного прогнозирования термоупругих волн в геологических средах}
+
+\subsection{Общие положения термоупругой волновой динамики}
+
+Распространение термоупругих волн в геологических средах описывается системой связанных уравнений термоупругости, объединяющих уравнения движения и уравнения теплопереноса. В классической линейной модели Куна–Томпсона используется система:
+
+\begin{equation}
+\rho \frac{\partial^2 u_i}{\partial t^2} = \frac{\partial \sigma_{ij}}{\partial x_j},
+\label{eq:motion}
+\end{equation}
+
+где $u_i$ — компоненты вектора смещения, $\rho$ — плотность среды, $\sigma_{ij}$ — компоненты тензора напряжений.
+
+Термоупругая связь между деформациями и напряжениями задаётся:
+
+\begin{equation}
+\sigma_{ij} = \lambda \delta_{ij} \epsilon_{kk} + 2\mu \epsilon_{ij} - \gamma \delta_{ij} T,
+\label{eq:stress}
+\end{equation}
+
+где $\lambda, \mu$ — параметры Ламе, $\epsilon_{ij}$ — тензор деформаций, $\gamma$ — коэффициент термоупругой связи, $T$ — изменение температуры.
+
+Уравнение теплопереноса с учетом термомеханической генерации записывается как:
+
+\begin{equation}
+k \nabla^2 T - C \frac{\partial T}{\partial t} = \gamma T_0 \frac{\partial \epsilon_{kk}}{\partial t},
+\label{eq:heat}
+\end{equation}
+
+где $k$ — коэффициент теплопроводности, $C$ — теплоёмкость, $T_0$ — средняя температура.
+
+Данная система уравнений является базовой для численного моделирования и построения обучающих выборок для алгоритмов машинного обучения.
+
+\subsection{Волновое уравнение в неоднородной геологической среде}
+
+Геологические среды обладают выраженной неоднородностью: слоистостью, анизотропией, вариацией температуры и плотности. В случае пространственных вариаций параметров Ламе уравнение движения  принимает вид:
+
+\begin{equation}
+\rho(x) \frac{\partial^2 u_i}{\partial t^2} =
+\frac{\partial}{\partial x_j}
+\left[
+\lambda(x) \delta_{ij} \frac{\partial u_k}{\partial x_k}
++ \mu(x) \left(
+\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}
+\right)
+\right]
+- \gamma(x) \frac{\partial T}{\partial x_i}.
+\end{equation}
+
+Анизотропия может быть учтена через тензор жесткости $C_{ijkl}$:
+
+\begin{equation}
+\sigma_{ij} = C_{ijkl} \epsilon_{kl} - \gamma_{ij} T.
+\end{equation}
+
+Моделирование таких сред требует высокопроизводительных численных методов: FDTD, спектральных методов или гибридных схем.
+
+\subsection{AI-направленная инверсия и прогнозирование}
+
+AI-направленный подход основан на интеграции моделей глубокого обучения с физически информированными системами PDE.  
+
+Типовые методы включают:
+
+\begin{itemize}
+    \item физически-информированные нейронные сети (PINN);
+    \item гибридные модели «симулятор + AI»;
+    \item операторное обучение (Fourier Neural Operator, DeepONet);
+    \item сверточные и трансформерные модели для прогноза термоупругих полей.
+\end{itemize}
+
+PINN обучается минимизируя функционал невязки дифференциальных уравнений:
+
+\begin{equation}
+\mathcal{L} = 
+\left\|
+\rho \frac{\partial^2 u_i}{\partial t^2} -
+\frac{\partial \sigma_{ij}}{\partial x_j}
+\right\|^2
++
+\left\|
+k \nabla^2 T - C \frac{\partial T}{\partial t}
+- \gamma T_0 \frac{\partial \epsilon_{kk}}{\partial t}
+\right\|^2
++
+\mathcal{L}_\text{data},
+\end{equation}
+
+что обеспечивает физическую достоверность решения даже при ограниченном количестве измерений.
+
+\subsection{Аппроксимация волнового оператора AI-моделью}
+
+Операторное обучение позволяет аппроксимировать отображение:
+
+\[
+\mathcal{G} : 
+\{ \lambda(x), \mu(x), \rho(x), T_0(x) \}
+\rightarrow
+\{ u(x,t), T(x,t) \},
+\]
+
+что эквивалентно построению быстрой ML-версии численного симулятора.  
+
+Fourier Neural Operator формально реализует преобразование:
+
+\begin{equation}
+u^{(l+1)}(x) = \sigma\left( 
+W u^{(l)}(x) + \mathcal{F}^{-1} \left[ R(k) \cdot \mathcal{F}(u^{(l)}) \right]
+\right),
+\end{equation}
+
+где $\mathcal{F}$ — преобразование Фурье, $R(k)$ — обучаемая матрица в частотной области.  
+
+Это позволяет прогнозировать волновые поля в десятки–сотни раз быстрее традиционных PDE-солверов.
+
+\subsection{Оценка точности и метрические показатели}
+
+Для оценки точности AI-предсказаний применяются:
+
+\begin{itemize}
+    \item $L_2$-норма ошибки:  
+    \[
+    E_{L_2} = \frac{\|u_{\text{AI}} - u_{\text{ref}}\|_2}{\|u_{\text{ref}}\|_2};
+    \]
+    \item структурное сходство (SSIM);
+    \item энергия расхождения волн;
+    \item временная ошибка фазового сдвига.
+\end{itemize}
+
+Подобные метрики применяются в задачах прогнозирования волнового поля в сейсмике.
+
+\subsection{Заключение}
+
+Математический аппарат термоупругих волн, интегрированный с современными AI-подходами, позволяет строить высокоточные модели прогноза поведения геологических систем. Совмещение PDE-моделирования и глубоких нейронных сетей открывает путь к быстрому моделированию и инверсии сложных подповерхностных структур.
+
+\bibliographystyle{unsrt}
+
+\begin{thebibliography}{10}
+
+\bibitem{kuhn1966thermoelasticity}
+Kuhn, W. (1966).
+\textit{Thermoelasticity Theory}. Springer.
+
+\bibitem{carcione2015wavefields}
+Carcione, J. (2015).
+\textit{Wave Fields in Real Media}. Elsevier.
+
+\bibitem{virieux1986p}
+Virieux, J. (1986).  
+P– and S–wave FDTD modeling.  
+\textit{Geophysics}.
+
+\bibitem{sun2019thermoelasticFDTD}
+Sun, Q., et al. (2019).  
+Thermoelastic wave simulation using FDTD.  
+\textit{Applied Thermal Engineering}.
+
+\bibitem{raissi2019pinn}
+Raissi, M., Perdikaris, P., Karniadakis, G. (2019).  
+Physics-Informed Neural Networks.  
+\textit{Journal of Computational Physics}.
+
+\bibitem{li2020fno}
+Li, Z., Kovachki, N., et al. (2020).  
+Fourier Neural Operator.  
+\textit{NeurIPS}.
+
+\bibitem{bennett2023transformer}
+Bennett, M. et al. (2023).  
+Transformer models for wave propagation.  
+\textit{Geophysical Journal International}.
+
+\bibitem{wang2021deeplearningseismic}
+Wang, S. (2021).  
+Deep learning for seismic modeling.  
+\textit{Reviews of Geophysics}.
+
+\end{thebibliography}

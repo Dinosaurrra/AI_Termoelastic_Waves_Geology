@@ -1,0 +1,21 @@
+Геологические среды обладают выраженной неоднородностью: слоистостью, анизотропией, вариацией температуры и плотности. В случае пространственных вариаций параметров Ламе уравнение движения  принимает вид:
+
+\begin{equation}
+\rho(x) \frac{\partial^2 u_i}{\partial t^2} =
+\frac{\partial}{\partial x_j}
+\left[
+\lambda(x) \delta_{ij} \frac{\partial u_k}{\partial x_k}
++ \mu(x) \left(
+\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}
+\right)
+\right]
+- \gamma(x) \frac{\partial T}{\partial x_i}.
+\end{equation}
+
+Анизотропия может быть учтена через тензор жесткости $C_{ijkl}$:
+
+\begin{equation}
+\sigma_{ij} = C_{ijkl} \epsilon_{kl} - \gamma_{ij} T.
+\end{equation}
+
+Моделирование таких сред требует высокопроизводительных численных методов: FDTD, спектральных методов или гибридных схем.

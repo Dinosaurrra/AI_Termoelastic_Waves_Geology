@@ -1,0 +1,50 @@
+% Как один сэмпл превращается в данные для каждой из четырёх архитектур
+\begin{tikzpicture}[
+  font=\small,
+  node distance=4mm and 8mm,
+  src/.style={
+    rectangle, rounded corners=2pt,
+    draw=violet!60!black, fill=violet!10,
+    minimum width=64mm, minimum height=12mm,
+    inner sep=4pt, align=center
+  },
+  view/.style={
+    rectangle, rounded corners=2pt,
+    draw=teal!60!black, fill=teal!8,
+    minimum width=42mm, minimum height=24mm,
+    inner sep=4pt, align=center
+  },
+  ttl/.style={font=\bfseries\small},
+  arr/.style={-{Latex[length=2mm]}, thick, draw=black!60}
+]
+
+\node[src] (s) {Сэмпл (мастер): \texttt{node\_features} (T,N,24) + \texttt{coords} + \texttt{edges} + \texttt{times}};
+
+% PINN
+\node[view, below left=12mm and 32mm of s] (pinn)
+  {\ttl PINN\\[2pt]
+   \scriptsize случайные точки\\$\{(x_i, t_i)\}$:\\
+   collocation, BC, IC,\\
+   data-loss};
+
+% FNO
+\node[view, below left=12mm and -2mm of s] (fno)
+  {\ttl FNO\\[2pt]
+   \scriptsize интерполяция\\на регулярную\\сетку\\$(N_x, N_y, N_z, N_t)$};
+
+% MGN
+\node[view, below right=12mm and -2mm of s] (mgn)
+  {\ttl MeshGraphNet\\[2pt]
+   \scriptsize узлы + рёбра,\\окно $t \to t{+}1$,\\автoрегрессионно};
+
+% Transformer
+\node[view, below right=12mm and 32mm of s] (tr)
+  {\ttl Transformer\\[2pt]
+   \scriptsize input-токены\\$(p_i, a_i, \mathrm{IC}_i)$,\\query-токены\\$(x_q, t_q)$};
+
+\draw[arr] (s.south) -- ($(pinn.north)+(0,2mm)$);
+\draw[arr] (s.south) -- ($(fno.north)+(0,2mm)$);
+\draw[arr] (s.south) -- ($(mgn.north)+(0,2mm)$);
+\draw[arr] (s.south) -- ($(tr.north)+(0,2mm)$);
+
+\end{tikzpicture}

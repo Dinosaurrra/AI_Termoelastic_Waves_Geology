@@ -1,0 +1,62 @@
+% Структура одного сэмпла: 24 канала на узел, сгруппированные по физическому смыслу
+\begin{tikzpicture}[
+  font=\small,
+  node distance=2mm and 4mm,
+  ch/.style={
+    rectangle, rounded corners=1.5pt,
+    draw=black!55, fill=white,
+    minimum width=18mm, minimum height=7mm,
+    inner sep=2pt, font=\scriptsize
+  },
+  grp/.style={
+    rectangle, rounded corners=3pt,
+    inner sep=3mm, draw=black!40, dashed
+  },
+  hdr/.style={font=\bfseries\small}
+]
+
+% Group: thermal
+\node[ch, fill=red!10]   (T)  {$T$};
+\node[ch, fill=red!10, right=of T] (k)  {$k$};
+\node[ch, fill=red!10, right=of k] (rh) {$\rho_h$};
+\node[ch, fill=red!10, right=of rh] (Cp) {$C_p$};
+
+\node[grp, fit=(T)(k)(rh)(Cp), label={[hdr]above:Тепловые поля и параметры (4)}] (gT) {};
+
+% Group: displacement + velocity
+\node[ch, fill=blue!10, below=14mm of T]    (u)  {$u$};
+\node[ch, fill=blue!10, right=of u]         (v)  {$v$};
+\node[ch, fill=blue!10, right=of v]         (w)  {$w$};
+\node[ch, fill=blue!10, right=of w]         (ut) {$u_t$};
+\node[ch, fill=blue!10, right=of ut]        (vt) {$v_t$};
+\node[ch, fill=blue!10, right=of vt]        (wt) {$w_t$};
+
+\node[grp, fit=(u)(v)(w)(ut)(vt)(wt), label={[hdr]above:Смещение и скорость (6)}] (gU) {};
+
+% Group: stress
+\node[ch, fill=violet!12, below=14mm of u] (mises) {mises};
+\node[ch, fill=violet!12, right=of mises]  (sx) {$\sigma_x$};
+\node[ch, fill=violet!12, right=of sx]     (sy) {$\sigma_y$};
+\node[ch, fill=violet!12, right=of sy]     (sz) {$\sigma_z$};
+\node[ch, fill=violet!12, right=of sz]     (sxy){$\sigma_{xy}$};
+\node[ch, fill=violet!12, right=of sxy]    (syz){$\sigma_{yz}$};
+\node[ch, fill=violet!12, right=of syz]    (sxz){$\sigma_{xz}$};
+
+\node[grp, fit=(mises)(sx)(sy)(sz)(sxy)(syz)(sxz), label={[hdr]above:Напряжения (7)}] (gS) {};
+
+% Group: strain
+\node[ch, fill=teal!12, below=14mm of mises] (eX) {$\varepsilon_X$};
+\node[ch, fill=teal!12, right=of eX]         (eY) {$\varepsilon_Y$};
+\node[ch, fill=teal!12, right=of eY]         (eZ) {$\varepsilon_Z$};
+
+\node[grp, fit=(eX)(eY)(eZ), label={[hdr]above:Деформации диагональные (3)}] (gE) {};
+
+% Group: material params
+\node[ch, fill=orange!15, right=24mm of eZ] (E)   {$E$};
+\node[ch, fill=orange!15, right=of E]       (nu)  {$\nu$};
+\node[ch, fill=orange!15, right=of nu]      (rs)  {$\rho_s$};
+\node[ch, fill=orange!15, right=of rs]      (al)  {$\alpha$};
+
+\node[grp, fit=(E)(nu)(rs)(al), label={[hdr]above:Материальные параметры (4)}] (gM) {};
+
+\end{tikzpicture}

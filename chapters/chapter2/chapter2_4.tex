@@ -1,0 +1,76 @@
+\subsection{Material Parameters of Geological Media}
+
+In the continuum formulation, each geological material is characterized by a set of effective material parameters that describe its elastic and thermal behavior. These parameters are not intended to resolve every mineral grain, pore, crack, or fracture explicitly. Instead, they represent averaged properties of a selected rock volume within the locally homogeneous and isotropic approximation introduced earlier. This approach makes it possible to describe sandstone, basalt, granite, limestone, or other rock types through a consistent set of physical quantities while preserving the main structure of the thermoelastic equations \cite{mavko2009,jaeger2007}.
+
+The first important parameter is density, denoted by \(\rho\). Density is the mass per unit volume of the rock and is measured in \(\mathrm{kg\,m^{-3}}\). In the equation of motion, density represents inertia: for the same stress gradient, a denser medium resists acceleration more strongly. Density also enters the expressions for elastic wave velocities, where wave speed is controlled by the ratio between elastic stiffness and density. Therefore, \(\rho\) is one of the main parameters connecting rock composition and structure with wave propagation behavior \cite{aki2002,mavko2009}.
+
+The elastic response of the medium is described by elastic moduli. Young's modulus \(E\) measures the resistance of the material to axial deformation under uniaxial loading. It has units of pressure, \(\mathrm{Pa}\). A rock with a higher Young's modulus undergoes smaller axial strain under the same applied stress, while a more compliant rock deforms more easily. Poisson's ratio \(\nu\) is dimensionless and describes the ratio between lateral and axial deformation. It determines how much the material expands laterally when compressed or contracts laterally when stretched. Together, \(E\) and \(\nu\) can be used to derive the other elastic constants in the isotropic linear elastic approximation \cite{jaeger2007,mavko2009}.
+
+The shear modulus, denoted by \(\mu\) or \(G\), measures resistance to shear deformation. It relates shear stress to shear strain and controls the ability of the medium to support S-waves. For an isotropic elastic material, it is related to Young's modulus and Poisson's ratio by
+\begin{equation}
+\mu = G = \frac{E}{2(1+\nu)}.
+\end{equation}
+The bulk modulus \(K\) measures resistance to uniform volumetric compression. It is especially important for compressional deformation and therefore for P-wave propagation. In terms of \(E\) and \(\nu\), it is written as
+\begin{equation}
+K = \frac{E}{3(1-2\nu)}.
+\end{equation}
+The first Lamé parameter \(\lambda\) is another elastic constant used in the tensor form of the isotropic stress--strain relation. It is defined by
+\begin{equation}
+\lambda =
+\frac{E\nu}{(1+\nu)(1-2\nu)}.
+\end{equation}
+The parameters \(\lambda\) and \(\mu\) are convenient because they enter directly into the thermoelastic constitutive equation for stress \cite{aki2002,jaeger2007}.
+
+The thermal response of the medium is described by the coefficient of linear thermal expansion \(\alpha\), thermal conductivity \(k\), and specific heat capacity \(C_p\). The coefficient \(\alpha\), measured in \(\mathrm{K^{-1}}\), describes the relative linear expansion of the rock per unit temperature change. It enters the thermal strain relation and therefore determines how temperature perturbations are converted into deformation. Thermal conductivity \(k\), measured in \(\mathrm{W\,m^{-1}\,K^{-1}}\), describes the ability of the rock to conduct heat. It controls the conductive heat flux and appears in the heat equation. Specific heat capacity \(C_p\), measured in \(\mathrm{J\,kg^{-1}\,K^{-1}}\), describes the amount of heat required to raise the temperature of a unit mass of rock by one degree \cite{robertson1988,turcotte2014}.
+
+For the heat equation, it is often useful to combine density and specific heat capacity into the volumetric heat capacity
+\begin{equation}
+C = \rho C_p,
+\end{equation}
+where \(C\) has units of \(\mathrm{J\,m^{-3}\,K^{-1}}\). This parameter expresses the heat storage capacity of a unit volume of rock. A higher volumetric heat capacity means that more heat is required to change the temperature of the same volume of material. In the coupled heat equation, \(C\) controls the time-dependent temperature response of the medium.
+
+The thermoelastic coupling coefficient \(\gamma\) connects the thermal and mechanical parts of the formulation. For an isotropic solid, it is commonly written as
+\begin{equation}
+\gamma = 3K\alpha.
+\end{equation}
+This expression shows that thermoelastic coupling depends both on the thermal expansion coefficient and on the resistance of the material to volumetric deformation. In the stress relation, \(\gamma\) multiplies the temperature perturbation and represents the thermal stress contribution. In the coupled heat equation, the same coefficient appears in the term connecting temperature evolution with the rate of volumetric strain \cite{boley1960,nowacki1986}.
+
+Although the mathematical formulation treats these quantities as effective parameters, real rock properties are not universal constants. They may depend on lithology, mineral composition, porosity, crack density, saturation, pressure, and temperature. Experimental data on rocks from Kazakhstan show that density and elastic-wave velocities change under high pressure and temperature conditions. In particular, density generally increases with pressure, and elastic-wave velocities tend to increase most strongly in the lower pressure range, where pores and microcracks close more actively. This supports the interpretation that the parameters \(\rho\), \(E\), \(\mu\), \(K\), \(k\), \(C_p\), and \(\alpha\) should be understood as effective values selected for a given physical state of the medium rather than as fixed constants independent of geological conditions \cite{kazakhRockPropertiesHighPT}.
+
+The main material parameters used in the formulation are summarized in Table~\ref{tab:material_parameters}. The table lists their symbols, meanings, units, and roles in the thermoelastic problem.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Material parameters used in the thermoelastic formulation.}
+\label{tab:material_parameters}
+\begin{tabular}{p{0.13\textwidth} p{0.25\textwidth} p{0.20\textwidth} p{0.32\textwidth}}
+\hline
+Symbol & Meaning & Unit & Role in formulation \\
+\hline
+\(\rho\) & Density & \(\mathrm{kg\,m^{-3}}\) & Inertia in the equation of motion; affects wave velocity \\
+
+\(E\) & Young's modulus & \(\mathrm{Pa}\) & Axial stiffness under tension or compression \\
+
+\(\nu\) & Poisson's ratio & Dimensionless & Lateral deformation response; controls elastic relations \\
+
+\(\mu\) or \(G\) & Shear modulus & \(\mathrm{Pa}\) & Shear stiffness; controls S-wave propagation \\
+
+\(K\) & Bulk modulus & \(\mathrm{Pa}\) & Resistance to volume change; affects P-wave propagation \\
+
+\(\lambda\) & Lamé parameter & \(\mathrm{Pa}\) & Appears in isotropic stress--strain relation \\
+
+\(\alpha\) & Linear thermal expansion coefficient & \(\mathrm{K^{-1}}\) & Converts temperature change into thermal strain \\
+
+\(k\) & Thermal conductivity & \(\mathrm{W\,m^{-1}\,K^{-1}}\) & Controls conductive heat transfer \\
+
+\(C_p\) & Specific heat capacity & \(\mathrm{J\,kg^{-1}\,K^{-1}}\) & Heat storage per unit mass \\
+
+\(C=\rho C_p\) & Volumetric heat capacity & \(\mathrm{J\,m^{-3}\,K^{-1}}\) & Heat storage per unit volume; appears in heat equation \\
+
+\(\gamma\) & Thermoelastic coupling coefficient & \(\mathrm{Pa\,K^{-1}}\) & Links temperature perturbation with thermal stress and coupled heat equation \\
+\hline
+\end{tabular}
+\end{table}
+
+Each parameter in Table~\ref{tab:material_parameters} enters directly into the governing equations of thermoelasticity. Density appears in the equation of motion, elastic moduli determine how strain produces stress, thermal conductivity and heat capacity control the evolution of temperature, and the thermal expansion and coupling coefficients link the thermal field with mechanical stress. Thus, the effective material parameters provide the bridge between the geological character of the rock and the mathematical structure of the thermoelastic wave propagation problem.

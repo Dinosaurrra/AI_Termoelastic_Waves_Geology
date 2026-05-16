@@ -1,0 +1,349 @@
+\section{Алгоритмы обучения для AI-моделей прогнозирования термоупругих волн}
+
+\subsection{Общие принципы оптимизации нейронных сетей}
+
+Обучение нейронных сетей для решения задач прогнозирования термоупругих волн представляет собой задачу минимизации функционала потерь $\mathcal{L}(\theta)$, где $\theta$ — вектор параметров модели. Основная цель — найти оптимальные значения $\theta^*$, минимизирующие ошибку предсказания:
+
+\begin{equation}
+\theta^* = \arg\min_{\theta} \mathcal{L}(\theta).
+\end{equation}
+
+Для физически-информированных моделей (PINN, FNO) функционал потерь включает несколько компонент:
+
+\begin{equation}
+\mathcal{L}(\theta) = \lambda_{\text{PDE}} \mathcal{L}_{\text{PDE}}(\theta) + \lambda_{\text{data}} \mathcal{L}_{\text{data}}(\theta) + \lambda_{\text{BC}} \mathcal{L}_{\text{BC}}(\theta) + \lambda_{\text{IC}} \mathcal{L}_{\text{IC}}(\theta),
+\end{equation}
+
+где $\lambda_{\text{PDE}}$, $\lambda_{\text{data}}$, $\lambda_{\text{BC}}$, $\lambda_{\text{IC}}$ — весовые коэффициенты для невязки PDE, данных, граничных и начальных условий соответственно.
+
+\subsection{Градиентные методы оптимизации}
+
+\subsubsection{Стохастический градиентный спуск (SGD)}
+
+Классический метод стохастического градиентного спуска обновляет параметры по формуле:
+
+\begin{equation}
+\theta_{t+1} = \theta_t - \eta \nabla_{\theta} \mathcal{L}(\theta_t),
+\end{equation}
+
+где $\eta$ — скорость обучения (learning rate), $\nabla_{\theta} \mathcal{L}$ — градиент функционала потерь.
+
+Модификация с моментом (SGD with momentum) учитывает накопленную историю градиентов:
+
+\begin{equation}
+\begin{aligned}
+v_{t+1} &= \beta v_t + (1-\beta) \nabla_{\theta} \mathcal{L}(\theta_t), \\
+\theta_{t+1} &= \theta_t - \eta v_{t+1},
+\end{aligned}
+\end{equation}
+
+где $\beta \in [0,1]$ — коэффициент момента, обычно $\beta = 0.9$.
+
+Нестерова импульсная оценка (Nesterov Momentum) использует «забегание» вперёд для вычисления градиента и может давать более плавную сходимость:
+
+\begin{equation}
+\begin{aligned}
+v_{t+1} &= \beta v_t + \nabla_{\theta} \mathcal{L}(\theta_t - \eta \beta v_t), \\
+\theta_{t+1} &= \theta_t - \eta v_{t+1}.
+\end{aligned}
+\end{equation}
+
+\subsubsection{RMSProp}
+
+RMSProp сглаживает квадраты градиентов и нормирует шаг, что снижает колебания при разных масштабах признаков:
+
+\begin{equation}
+\begin{aligned}
+s_{t+1} &= \gamma s_t + (1-\gamma) (\nabla_{\theta} \mathcal{L}(\theta_t))^2, \\
+\theta_{t+1} &= \theta_t - \frac{\eta}{\sqrt{s_{t+1}} + \epsilon} \nabla_{\theta} \mathcal{L}(\theta_t),
+\end{aligned}
+\end{equation}
+
+где $\gamma$ — коэффициент сглаживания (обычно $0.9$), $\epsilon$ — малая добавка для устойчивости.
+
+\subsubsection{Адаптивные методы: Adam и его варианты}
+
+Алгоритм Adam (Adaptive Moment Estimation) комбинирует преимущества адаптивных методов и моментов:
+
+\begin{equation}
+\begin{aligned}
+m_{t+1} &= \beta_1 m_t + (1-\beta_1) \nabla_{\theta} \mathcal{L}(\theta_t), \\
+v_{t+1} &= \beta_2 v_t + (1-\beta_2) (\nabla_{\theta} \mathcal{L}(\theta_t))^2, \\
+\hat{m}_{t+1} &= \frac{m_{t+1}}{1-\beta_1^{t+1}}, \\
+\hat{v}_{t+1} &= \frac{v_{t+1}}{1-\beta_2^{t+1}}, \\
+\theta_{t+1} &= \theta_t - \frac{\eta}{\sqrt{\hat{v}_{t+1}} + \epsilon} \hat{m}_{t+1},
+\end{aligned}
+\end{equation}
+
+где $\beta_1, \beta_2$ — коэффициенты экспоненциального скользящего среднего (обычно $\beta_1 = 0.9$, $\beta_2 = 0.999$), $\epsilon = 10^{-8}$ — малая константа для численной стабильности.
+
+AdamW — улучшенная версия Adam с раздельным весом для регуляризации:
+
+\begin{equation}
+\theta_{t+1} = \theta_t - \eta \left( \frac{\hat{m}_{t+1}}{\sqrt{\hat{v}_{t+1}} + \epsilon} + \lambda \theta_t \right),
+\end{equation}
+
+где $\lambda$ — коэффициент весового затухания (weight decay).
+
+AdaBelief уточняет вторую моменту, оценивая «неожиданность» градиента и уменьшая влияние шумовых шагов:
+
+\begin{equation}
+v_{t+1} = \beta_2 v_t + (1-\beta_2) \left( \nabla_{\theta} \mathcal{L}(\theta_t) - m_{t+1} \right)^2,
+\end{equation}
+
+после чего используется та же схема корректировки смещений и обновления параметров, что и в Adam.
+
+\subsubsection{Специализированные оптимизаторы для PINN}
+
+Для физически-информированных нейронных сетей часто применяются модифицированные оптимизаторы, учитывающие специфику многообъективной функции потерь. L-BFGS (Limited-memory Broyden–Fletcher–Goldfarb–Shanno) — квази-ньютоновский метод второго порядка, эффективный для точной минимизации:
+
+\begin{equation}
+\theta_{t+1} = \theta_t - H_t^{-1} \nabla_{\theta} \mathcal{L}(\theta_t),
+\end{equation}
+
+где $H_t$ — аппроксимация гессиана, обновляемая на основе истории градиентов.
+
+Комбинированные стратегии (например, Adam + L-BFGS) позволяют использовать быструю сходимость Adam на начальных этапах и точность L-BFGS на финальной стадии.
+
+\subsection{Стратегии выбора скорости обучения}
+
+\subsubsection{Фиксированная и адаптивная скорость обучения}
+
+Выбор оптимальной скорости обучения $\eta$ критичен для успешного обучения. Слишком большое значение приводит к нестабильности и расходимости, слишком малое — к медленной сходимости.
+
+Адаптивные стратегии автоматически корректируют скорость обучения:
+
+\begin{itemize}
+    \item \textbf{ReduceLROnPlateau}: уменьшение $\eta$ при отсутствии улучшения метрики;
+    \item \textbf{Cosine Annealing}: плавное уменьшение по косинусоидальному закону:
+    \begin{equation}
+    \eta_t = \eta_{\min} + (\eta_{\max} - \eta_{\min}) \cdot \frac{1 + \cos(\pi t / T)}{2},
+    \end{equation}
+    где $T$ — общее число итераций;
+    \item \textbf{Warm-up}: постепенное увеличение скорости обучения в начале обучения.
+\end{itemize}
+
+Циклическая скорость обучения (Cyclical LR) линейно меняет $\eta$ между границами $[\eta_{\min}, \eta_{\max}]$ в каждом цикле длиной $T_c$:
+
+\begin{equation}
+\eta_t = \eta_{\min} + (\eta_{\max} - \eta_{\min}) \cdot \max\left(0, 1 - \left| \frac{2(t \bmod T_c)}{T_c} - 1 \right| \right).
+\end{equation}
+
+\subsubsection{Learning rate finder}
+
+Эмпирический метод поиска оптимальной скорости обучения: обучение модели с экспоненциально возрастающей $\eta$ и выбор значения, соответствующего минимальной функции потерь.
+
+\subsection{Регуляризация и предотвращение переобучения}
+
+\subsubsection{L1 и L2 регуляризация}
+
+Добавление штрафных членов к функции потерь:
+
+\begin{equation}
+\mathcal{L}_{\text{reg}}(\theta) = \mathcal{L}(\theta) + \lambda_1 \|\theta\|_1 + \lambda_2 \|\theta\|_2^2,
+\end{equation}
+
+где $\lambda_1$, $\lambda_2$ — коэффициенты регуляризации.
+
+\subsubsection{Dropout и Batch Normalization}
+
+\textbf{Dropout} — случайное отключение нейронов с вероятностью $p$ во время обучения:
+
+\begin{equation}
+h_i^{\text{dropout}} = \begin{cases}
+0 & \text{с вероятностью } p, \\
+\frac{h_i}{1-p} & \text{иначе},
+\end{cases}
+\end{equation}
+
+где $h_i$ — выход $i$-го нейрона.
+
+\textbf{Batch Normalization} нормализует активации по батчу:
+
+\begin{equation}
+\hat{h}_i = \frac{h_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \quad h_i^{\text{BN}} = \gamma \hat{h}_i + \beta,
+\end{equation}
+
+где $\mu_B$, $\sigma_B^2$ — среднее и дисперсия по батчу, $\gamma$, $\beta$ — обучаемые параметры.
+
+\subsubsection{Ранняя остановка (Early Stopping)}
+
+Прекращение обучения при отсутствии улучшения на валидационной выборке в течение заданного числа эпох предотвращает переобучение.
+
+\subsubsection{Обрезка градиента (Gradient Clipping)}
+
+Для стабилизации обучения при «взрывных» градиентах ограничивают норму шага:
+
+\begin{equation}
+\nabla_{\theta} \mathcal{L}_{\text{clip}} = \nabla_{\theta} \mathcal{L} \cdot \min\left(1, \frac{c}{\|\nabla_{\theta} \mathcal{L}\|_2} \right),
+\end{equation}
+
+где $c$ — пороговое значение нормы.
+
+\subsection{Специфические техники для физически-информированных моделей}
+
+\subsubsection{Адаптивное взвешивание компонент функции потерь}
+
+В PINN-моделях компоненты функции потерь могут иметь разные масштабы, что приводит к доминированию одной компоненты. Адаптивное взвешивание динамически балансирует вклад:
+
+\begin{equation}
+\lambda_i^{(t+1)} = \lambda_i^{(t)} \cdot \exp\left(-\alpha \frac{\mathcal{L}_i^{(t)}}{\sum_j \mathcal{L}_j^{(t)}}\right),
+\end{equation}
+
+где $\alpha$ — коэффициент адаптации.
+
+Метод GradNorm выравнивает нормы градиентов по компонентам функции потерь:
+
+\begin{equation}
+\lambda_i^{(t+1)} = \lambda_i^{(t)} \left( \frac{\| g_i^{(t)} \|_2}{\bar{g}^{(t)}} \right)^{\beta}, \quad g_i^{(t)} = \nabla_{\theta} \left( \lambda_i^{(t)} \mathcal{L}_i \right),
+\end{equation}
+
+где $\bar{g}^{(t)}$ — средняя норма градиентов по всем компонентам, $\beta$ — скорость адаптации.
+
+\subsubsection{Curriculum Learning}
+
+Постепенное усложнение обучающих данных: сначала простые геометрии и однородные среды, затем сложные неоднородные структуры. Это улучшает стабильность обучения и качество решения.
+
+\subsubsection{Residual-based adaptive refinement}
+
+Адаптивный выбор точек коллокации на основе величины невязки PDE: добавление дополнительных точек в областях с высокой ошибкой улучшает точность решения.
+
+Процедура отбора: вычислить невязку $r(x)$, выбрать подмножество точек с максимальными $|r(x)|$, расширить сетку коллокаций:
+
+\begin{equation}
+\mathcal{X}_{\text{new}} = \mathcal{X}_{\text{old}} \cup \operatorname*{argmax}_{x \in \Omega} |r(x)|.
+\end{equation}
+
+\subsection{Обучение операторных моделей (FNO, DeepONet)}
+
+Для операторных моделей применяются специализированные техники:
+
+\begin{itemize}
+    \item \textbf{Multi-resolution training}: обучение на данных с разным пространственным разрешением;
+    \item \textbf{Transfer learning}: предобучение на простых задачах с последующей дообучением на сложных;
+    \item \textbf{Physics-informed loss для операторов}: включение невязки PDE в функцию потерь операторной модели.
+\end{itemize}
+
+\subsection{Стратегии разделения данных}
+
+\subsubsection{Train-Validation-Test split}
+
+Типичное разделение:
+\begin{itemize}
+    \item \textbf{Training set} (70-80\%): обучение модели;
+    \item \textbf{Validation set} (10-15\%): подбор гиперпараметров и ранняя остановка;
+    \item \textbf{Test set} (10-15\%): финальная оценка обобщающей способности.
+\end{itemize}
+
+\subsubsection{Cross-validation для временных рядов}
+
+Для задач прогнозирования волновых полей применяется временная кросс-валидация: обучение на данных до момента $t$, валидация на данных после $t$.
+
+\subsubsection{Stratified sampling}
+
+Стратифицированная выборка обеспечивает представительность различных геологических сценариев в каждой части датасета.
+
+\subsection{Метрики сходимости и критерии остановки}
+
+Критерии остановки обучения:
+
+\begin{itemize}
+    \item Достижение заданного числа эпох;
+    \item Относительное изменение функции потерь ниже порога:
+    \begin{equation}
+    \frac{|\mathcal{L}^{(t+1)} - \mathcal{L}^{(t)}|}{\mathcal{L}^{(t)}} < \epsilon;
+    \end{equation}
+    \item Достижение целевого значения метрики на валидационной выборке;
+    \item Отсутствие улучшения в течение заданного числа эпох (early stopping).
+\end{itemize}
+
+\subsection{Вычислительная эффективность}
+
+\subsubsection{Mixed Precision Training}
+
+Использование 16-битной точности (FP16) для ускорения обучения на GPU с сохранением 32-битной точности для критических операций:
+
+\begin{equation}
+\mathcal{L}_{\text{FP32}} = \text{FP32}(\mathcal{L}_{\text{FP16}}),
+\end{equation}
+
+где градиенты вычисляются в FP16, но обновление параметров происходит в FP32.
+
+\subsubsection{Gradient Accumulation}
+
+Накопление градиентов из нескольких мини-батчей перед обновлением параметров позволяет эффективно использовать большие батчи при ограниченной памяти:
+
+\begin{equation}
+\theta_{t+1} = \theta_t - \eta \frac{1}{N} \sum_{i=1}^{N} \nabla_{\theta} \mathcal{L}_i(\theta_t),
+\end{equation}
+
+где $N$ — число накопленных градиентов.
+
+\subsection{Заключение}
+
+Выбор алгоритма обучения и стратегии оптимизации критически влияет на качество и скорость обучения AI-моделей для прогнозирования термоупругих волн. Комбинация адаптивных оптимизаторов (Adam, AdamW), адаптивного взвешивания компонент функции потерь, curriculum learning и специализированных техник для физически-информированных моделей позволяет достичь высокой точности и стабильности обучения. Дальнейшие исследования направлены на разработку оптимизаторов, специально адаптированных для многообъективных задач с физическими ограничениями.
+
+\begin{thebibliography}{20}
+
+\bibitem{kingma2014adam}
+Kingma, D. P., Ba, J. (2014).  
+Adam: A Method for Stochastic Optimization.  
+\textit{arXiv preprint arXiv:1412.6980}.
+
+\bibitem{loshchilov2017decoupled}
+Loshchilov, I., Hutter, F. (2017).  
+Decoupled Weight Decay Regularization.  
+\textit{arXiv preprint arXiv:1711.05101}.
+
+\bibitem{raissi2019pinn}
+Raissi, M., Perdikaris, P., Karniadakis, G. E. (2019).  
+Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations.  
+\textit{Journal of Computational Physics}, 378, 686-707.
+
+\bibitem{wang2021learning}
+Wang, S., Teng, Y., Perdikaris, P. (2021).  
+Understanding and mitigating gradient flow pathologies in physics-informed neural networks.  
+\textit{SIAM Journal on Scientific Computing}, 43(5), A3055-A3081.
+
+\bibitem{wang2022respecting}
+Wang, S., Yu, X., Perdikaris, P. (2022).  
+When and why PINNs fail to train: A neural tangent kernel perspective.  
+\textit{Journal of Computational Physics}, 449, 110768.
+
+\bibitem{li2020fno}
+Li, Z., Kovachki, N., Azizzadenesheli, K., et al. (2020).  
+Fourier Neural Operator for Parametric Partial Differential Equations.  
+\textit{arXiv preprint arXiv:2010.08895}.
+
+\bibitem{micikevicius2017mixed}
+Micikevicius, P., Narang, S., Alben, J., et al. (2017).  
+Mixed Precision Training.  
+\textit{arXiv preprint arXiv:1710.03740}.
+
+\bibitem{smith2017cyclical}
+Smith, L. N. (2017).  
+Cyclical Learning Rates for Training Neural Networks.  
+\textit{2017 IEEE Winter Conference on Applications of Computer Vision (WACV)}, 464-472.
+
+\bibitem{srivastava2014dropout}
+Srivastava, N., Hinton, G., Krizhevsky, A., et al. (2014).  
+Dropout: A Simple Way to Prevent Neural Networks from Overfitting.  
+\textit{Journal of Machine Learning Research}, 15(1), 1929-1958.
+
+\bibitem{ioffe2015batch}
+Ioffe, S., Szegedy, C. (2015).  
+Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift.  
+\textit{International Conference on Machine Learning}, 448-456.
+
+\bibitem{chen2021physics}
+Chen, T., Chen, H. (2021).  
+Universal approximation to nonlinear operators by neural networks with arbitrary activation functions and its application to dynamical systems.  
+\textit{IEEE Transactions on Neural Networks}, 6(4), 911-917.
+
+\bibitem{karniadakis2021physics}
+Karniadakis, G. E., Kevrekidis, I. G., Lu, L., et al. (2021).  
+Physics-informed machine learning.  
+\textit{Nature Reviews Physics}, 3(6), 422-440.
+
+\end{thebibliography}
+

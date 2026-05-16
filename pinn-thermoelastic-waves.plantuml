@@ -1,0 +1,189 @@
+@startuml PINN для прогнозирования термоупругих волн в геологических средах
+
+title PINN: Прогнозирование распространения термоупругих волн\nв геологических средах
+
+package "Входные данные" {
+  class GeoParams {
+    + Плотность ρ(x,y,z)
+    + Модуль упругости E
+    + Коэффициент Пуассона ν
+    + Теплопроводность k
+    + Теплоемкость c_p
+    + Коэффициент теплового расширения α
+  }
+
+  class BoundaryConditions {
+    + Начальные условия: u(x,0), T(x,0)
+    + Граничные условия: u(∂Ω,t), T(∂Ω,t)
+    + Источники тепла Q(x,t)
+    + Механические нагрузки σ(x,t)
+  }
+
+  class Grid {
+    + Координаты (x, y, z, t)
+    + Точки коллокации
+    + Точки наблюдения
+  }
+}
+
+package "Физические уравнения" {
+  class PhysicsEquations {
+    + Уравнение движения
+    + Уравнение теплопроводности
+    + Связь напряжений и деформаций
+  }
+
+  class PhysicsConstraints {
+    + Сохранение энергии
+    + Сохранение импульса
+    + Термодинамические ограничения
+  }
+}
+
+package "Архитектура PINN" {
+  class InputLayer {
+    + Координаты (x, y, z, t)
+    + Параметры среды
+  }
+
+  class HiddenLayers {
+    + L слоев с активацией (tanh, sin, etc.)
+    + Ширина слоя: N нейронов
+    + Dropout регуляризация
+  }
+
+  class OutputLayer {
+    + Смещения: u(x,y,z,t)
+    + Температура: T(x,y,z,t)
+    + Напряжения: σ(x,y,z,t)
+  }
+
+  class AutoDiff {
+    + Вычисление производных
+    + ∂u/∂t, ∂²u/∂t²
+    + ∇u, ∇²u
+    + ∂T/∂t, ∇T, ∇²T
+  }
+}
+
+package "Функция потерь" {
+  class PhysicsLoss {
+    + L_PDE: невязка уравнений
+    + L_BC: граничные условия
+    + L_IC: начальные условия
+    + L_data: данные наблюдений
+  }
+
+  class TotalLoss {
+    + L_total = λ₁L_PDE + λ₂L_BC + λ₃L_IC + λ₄L_data
+  }
+}
+
+package "Обучение" {
+  class Optimizer {
+    + Adam / L-BFGS
+    + Learning rate scheduling
+    + Градиентный спуск
+  }
+
+  class Training {
+    + Итерации оптимизации
+    + Валидация на тестовых точках
+    + Ранняя остановка
+  }
+}
+
+package "Выходные предсказания" {
+  class WavePropagation {
+    + Волновые фронты
+    + Амплитуды смещений
+    + Скорости распространения
+  }
+
+  class TemperatureFields {
+    + Распределение температуры
+    + Тепловые потоки
+    + Термические напряжения
+  }
+
+  class StressStrain {
+    + Тензоры напряжений
+    + Деформации
+    + Зоны концентрации напряжений
+  }
+
+  class Visualization {
+    + 3D анимации волн
+    + Контурные карты
+    + Графики временных рядов
+  }
+}
+
+' Связи между компонентами
+GeoParams --> InputLayer
+BoundaryConditions --> InputLayer
+Grid --> InputLayer
+
+InputLayer --> HiddenLayers
+HiddenLayers --> OutputLayer
+OutputLayer --> AutoDiff
+
+PhysicsEquations --> AutoDiff
+PhysicsConstraints --> PhysicsLoss
+AutoDiff --> PhysicsLoss
+
+PhysicsLoss --> TotalLoss
+BoundaryConditions --> TotalLoss
+Grid --> TotalLoss
+
+TotalLoss --> Optimizer
+Optimizer --> Training
+Training --> HiddenLayers : обратное распространение
+
+OutputLayer --> WavePropagation
+OutputLayer --> TemperatureFields
+OutputLayer --> StressStrain
+WavePropagation --> Visualization
+TemperatureFields --> Visualization
+StressStrain --> Visualization
+
+note right of PhysicsEquations
+  **Уравнение движения:**
+  ρ ∂²u/∂t² = ∇·σ + f
+
+  **Уравнение теплопроводности:**
+  ρc_p ∂T/∂t = ∇·(k∇T) + Q + αT₀∇·(∂u/∂t)
+
+  **Связь напряжений и деформаций:**
+  σ = C:ε - αT₀I
+  ε = ½(∇u + ∇uᵀ)
+
+  PINN использует физические законы
+  как мягкие ограничения в процессе
+  обучения нейронной сети
+end note
+
+note right of HiddenLayers
+  Архитектура сети может включать:
+  - Residual connections
+  - Fourier features
+  - Adaptive activation functions
+end note
+
+note bottom of Training
+  Преимущества PINN:
+  - Не требует большого объема данных
+  - Учитывает физические законы
+  - Интерполирует и экстраполирует
+  - Работает с нерегулярными сетками
+end note
+
+note right of TotalLoss
+  L_total = λ₁L_PDE + λ₂L_BC +
+            λ₃L_IC + λ₄L_data
+
+  где λᵢ - весовые коэффициенты
+end note
+
+@enduml
+

@@ -1,0 +1,77 @@
+\section{Упругие (механические) волны в твёрдых телах}
+
+\subsection{Уравнения Ламе}
+
+В изотропной линейно-упругой твёрдой среде динамика малых перемещений
+$\mathbf{u}(x,t)$ описывается уравнением Ламе (или уравнением Навье):
+\begin{equation}
+\rho\,\frac{\partial^2 \mathbf{u}}{\partial t^2}
+=
+(\lambda + \mu)\nabla(\nabla\cdot\mathbf{u})
++
+\mu\,\nabla^2\mathbf{u},
+\label{eq:navier}
+\end{equation}
+где $\lambda$ и $\mu$ — параметры Ламе, $\rho$ — плотность.  
+
+Это уравнение получается как комбинация закона Гука и уравнения движения
+(закона сохранения импульса) механики сплошной среды \cite{MIT_continuum, Berkeley_ME185}.
+
+\subsection{Типы упругих волн}
+
+Из уравнения~(\ref{eq:navier}) следуют следующие волны:
+
+\paragraph{P-волны (продольные)} — смещения параллельны направлению распространения.  
+\paragraph{S-волны (поперечные)} — смещения ортогональны направлению распространения.  
+\paragraph{Поверхностные волны Релея} — волны, бегущие вдоль свободной поверхности твёрдого тела, затухающие с глубиной \cite{Achenbach, Graff}.  
+\paragraph{Волны Лява} — специфичный тип волн, возникающих в слоистых анизотропных средах (используется в геофизике).  
+
+\subsection{Скорости волн}
+
+\paragraph{Продольные:}
+\begin{equation}
+v_P = \sqrt{\frac{\lambda + 2\mu}{\rho}}.
+\end{equation}
+
+\paragraph{Поперечные:}
+\begin{equation}
+v_S = \sqrt{\frac{\mu}{\rho}}.
+\end{equation}
+
+Поскольку $\mu > 0$, следует:
+\[
+v_S < v_P.
+\]
+
+\subsection{Отражение и преломление (базовое геофизическое приближение)}
+
+При падении упругой волны на границу двух упругих сред часть энергии отражается, часть преломляется.  
+Коэффициенты отражения/передачи связаны с механическими импедансами
+\[
+Z_P = \rho\, v_P,\qquad Z_S = \rho\, v_S.
+\]
+При наклонном падении волны возможен переход энергии между типами волн (P → P, P → S, и т.д.), что лежит в основе геофизической интерпретации сейсмических записей \cite{Achenbach, Berkeley_ME185}.
+
+
+
+\section*{Список источников}
+
+\begin{thebibliography}{9}
+
+\bibitem{MIT_continuum}
+MIT OpenCourseWare. \textit{Applications of Continuum Mechanics to Earth, Atmospheric and Planetary Sciences}. Lecture notes (2006).  
+URL: \url{https://ocw.mit.edu/courses/12-005-applications-of-continuum-mechanics-to-earth-atmospheric-and-planetary-sciences-spring-2006/lecture-notes/}
+
+\bibitem{Berkeley_ME185}
+University of California, Berkeley. \textit{ME185 — Introduction to Continuum Mechanics (lecture notes)}.  
+URL: \url{https://csml.berkeley.edu/Notes/ME185.pdf}
+
+\bibitem{Achenbach}
+Achenbach, J. D. \textit{Wave Propagation in Elastic Solids}. Dover Publications (репринт).  
+PDF-версия: \url{https://archive.org/details/wavepropagationinelasticsolids}
+
+\bibitem{Graff}
+Graff, K. F. \textit{Wave Motion in Elastic Solids}. Dover Publications.  
+PDF-версия: \url{https://archive.org/details/wavemotioninelasticsolids}
+
+\end{thebibliography}

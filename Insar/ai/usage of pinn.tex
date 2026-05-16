@@ -1,0 +1,159 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{url}
+
+\usepackage{amsmath, amssymb}
+\usepackage{physics}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{setspace}
+
+\geometry{margin=2.5cm}
+\onehalfspacing
+
+\title{Physics-Informed Neural Networks (PINN)}
+\author{}
+\date{}
+
+\begin{document}
+
+\section{Physics-Informed Neural Networks для задач термоупругой волновой динамики}
+
+\subsection{Общая идея метода PINN}
+
+Physics-Informed Neural Networks (PINN) представляют собой класс нейросетевых моделей, в которых априорные физические законы вводятся непосредственно в процесс обучения через функцию потерь. 
+
+В отличие от классических методов машинного обучения, ориентированных исключительно на аппроксимацию данных, PINN позволяют решать задачи математической физики, формулируемые в виде дифференциальных уравнений в частных производных.
+
+Основная идея метода заключается в аппроксимации искомых физических полей нейросетью
+\begin{equation}
+\mathcal{N}_\theta : (x,t) \mapsto \bigl( u_i(x,t), T(x,t) \bigr),
+\end{equation}
+где $u_i$ — компоненты вектора смещений, $T$ — температурное поле, а $\theta$ — параметры нейросети.
+
+Производные по пространству и времени вычисляются с использованием автоматического дифференцирования, что позволяет включать остатки дифференциальных уравнений непосредственно в функционал потерь.
+
+\subsection{Применение PINN к системе связанных уравнений термоупругости}
+
+Рассматривается система линейной термоупругости Куна–Томсона, включающая уравнение движения
+\begin{equation}
+\rho \frac{\partial^2 u_i}{\partial t^2} = \frac{\partial \sigma_{ij}}{\partial x_j},
+\end{equation}
+определяющее динамику упругих волн, и уравнение теплопереноса
+\begin{equation}
+k \nabla^2 T - C \frac{\partial T}{\partial t} = \gamma T_0 \frac{\partial \varepsilon_{kk}}{\partial t},
+\end{equation}
+учитывающее термомеханическую генерацию тепла.
+
+Связь между напряжениями и деформациями задаётся соотношением
+\begin{equation}
+\sigma_{ij} = \lambda \delta_{ij} \varepsilon_{kk} + 2\mu \varepsilon_{ij} - \gamma \delta_{ij} T,
+\end{equation}
+где $\lambda$, $\mu$ — параметры Ламе, $\varepsilon_{ij}$ — тензор деформаций.
+
+В рамках PINN нейросеть аппроксимирует одновременно все искомые поля $u_i(x,t)$ и $T(x,t)$, а физические уравнения используются в качестве ограничений.
+
+\subsection{Формирование функции потерь}
+
+Функция потерь PINN строится как взвешенная сумма невязок дифференциальных уравнений и начально-граничных условий:
+\begin{equation}
+\mathcal{L} =
+\mathcal{L}_{\text{motion}}
++ \mathcal{L}_{\text{heat}}
++ \mathcal{L}_{\text{BC}}
++ \mathcal{L}_{\text{IC}}.
+\end{equation}
+
+Невязка уравнения движения определяется как
+\begin{equation}
+\mathcal{L}_{\text{motion}} =
+\left\|
+\rho \frac{\partial^2 u_i}{\partial t^2}
+- \frac{\partial \sigma_{ij}}{\partial x_j}
+\right\|^2,
+\end{equation}
+а невязка уравнения теплопереноса — как
+\begin{equation}
+\mathcal{L}_{\text{heat}} =
+\left\|
+k \nabla^2 T
+- C \frac{\partial T}{\partial t}
+- \gamma T_0 \frac{\partial \varepsilon_{kk}}{\partial t}
+\right\|^2.
+\end{equation}
+
+Начальные и граничные условия вводятся в виде дополнительных штрафных слагаемых, что обеспечивает физическую корректность решения.
+
+\subsection{Учет неоднородной геологической среды}
+
+Пространственная неоднородность геологической среды учитывается за счёт зависимости параметров $\rho(x)$, $\lambda(x)$, $\mu(x)$, $k(x)$ и $\gamma(x)$ от координат. Эти параметры могут быть заданы в табличной форме и интерполированы либо непосредственно поданы на вход нейросети:
+\begin{equation}
+\mathcal{N}_\theta : (x,t,\rho,\lambda,\mu,k,\gamma) \mapsto (u_i,T).
+\end{equation}
+
+Таким образом, PINN естественным образом обрабатывает вариации физических характеристик среды без необходимости перестроения вычислительной сетки.
+
+\subsection{Алгоритм решения задачи с использованием PINN}
+
+Процедура решения задачи термоупругой волновой динамики с применением PINN включает следующие этапы:
+\begin{enumerate}
+    \item Формирование обучающей выборки коллокационных точек в пространственно-временной области.
+    \item Задание нейросетевой аппроксимации искомых полей.
+    \item Автоматическое вычисление пространственно-временных производных.
+    \item Формирование функции потерь на основе физических уравнений и граничных условий.
+    \item Оптимизация параметров нейросети методом градиентного спуска.
+\end{enumerate}
+
+В результате обучения нейросеть предоставляет непрерывное приближение решения системы связанных уравнений термоупругости во всей области определения.
+
+\subsection{Преимущества метода}
+
+Применение PINN для задач термоупругих волн в геологических средах обладает рядом преимуществ:
+\begin{itemize}
+    \item строгий учет физических законов;
+    \item возможность работы с малым объемом экспериментальных данных;
+    \item отсутствие необходимости построения пространственной сетки;
+    \item удобство моделирования неоднородных и анизотропных сред.
+\end{itemize}
+
+
+\begin{thebibliography}{9}
+
+\bibitem{raissi2019}
+M.~Raissi, P.~Perdikaris, G.~E.~Karniadakis,
+\textit{Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations},
+Journal of Computational Physics, Vol.~378, 2019, pp.~686--707.\\
+DOI: \url{https://doi.org/10.1016/j.jcp.2018.10.045}\\
+arXiv: \url{https://arxiv.org/abs/1711.10561}
+
+\bibitem{karniadakis2021}
+G.~E.~Karniadakis, I.~G.~Kevrekidis, L.~Lu, P.~Perdikaris, S.~Wang, L.~Yang,
+\textit{Physics-informed machine learning},
+Nature Reviews Physics, Vol.~3, 2021, pp.~422--440.\\
+DOI: \url{https://doi.org/10.1038/s42254-021-00314-5}\\
+arXiv: \url{https://arxiv.org/abs/2104.13420}
+
+\bibitem{bui2021}
+T.~Q.~Bui, C.~Zhang,
+\textit{Physics-informed neural networks for computational mechanics},
+Engineering Analysis with Boundary Elements, Vol.~129, 2021, pp.~160--175.\\
+DOI: \url{https://doi.org/10.1016/j.enganabound.2021.03.006}
+
+\bibitem{nowacki1986}
+W.~Nowacki,
+\textit{Thermoelasticity},
+Pergamon Press, Oxford, 1986.\\
+URL: \url{https://www.sciencedirect.com/book/9780080105919/thermoelasticity}
+
+\bibitem{auld1990}
+B.~A.~Auld,
+\textit{Acoustic Fields and Waves in Solids},
+Wiley, New York, 1990.\\
+URL: \url{https://onlinelibrary.wiley.com/doi/book/10.1002/9780470172834}
+
+\end{thebibliography}
+
+\end{document}

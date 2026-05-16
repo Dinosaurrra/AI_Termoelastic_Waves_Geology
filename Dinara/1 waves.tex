@@ -1,0 +1,109 @@
+\section*{Основы теории механических волн}
+
+\subsection*{1. Что такое волна — определение и смысл}
+
+Волна — это пространственно-временное распространение возмущения в среде с переносом 
+энергии и информации, но без макроскопического переноса вещества. Волны могут представлять 
+собой колебания частиц среды (механические волны) или колебания физических полей 
+(электромагнитные волны) \cite{openstax-waves, feynman}.
+
+\subsection*{2. Математическая модель: одномерное волновое уравнение}
+
+Для одномерного упругого стержня с малыми продольными смещениями \(u(x,t)\) получаем 
+линейное волновое уравнение:
+\[
+\frac{\partial^2 u}{\partial t^2} = c^2 \frac{\partial^2 u}{\partial x^2},
+\]
+где \(c\) — скорость распространения волны. Для продольной волны:
+\[
+c = \sqrt{\frac{E}{\rho}},
+\]
+где \(E\) — модуль Юнга, \(\rho\) — плотность материала \cite{mit803}.
+
+Общее решение в бесконечной однородной среде имеет вид:
+\[
+u(x,t) = f(x - ct) + g(x + ct),
+\]
+где \(f\) и \(g\) — произвольные функции профиля правой и левой волн \cite{mit803}.
+
+\subsection*{3. Гармонические (плоские) волны}
+
+Гармоническая волна задаётся выражением:
+\[
+u(x,t) = A \cos(kx - \omega t + \phi),
+\]
+где
+\[
+k = \frac{2\pi}{\lambda}, \quad \omega = 2\pi f.
+\]
+Дисперсионное соотношение \(\omega(k)\) связывает частоту и волновое число.  
+Для недиспергирующей среды:
+\[
+\omega = ck,
+\]
+а фазовая и групповая скорости равны:
+\[
+v_{\text{ф}} = \frac{\omega}{k} = c, \quad
+v_{\text{гр}} = \frac{d\omega}{dk} = c.
+\]
+Детальное обсуждение — в \cite{openstax-waves, mit803}.
+
+\subsection*{4. Суперпозиция и стоячие волны}
+
+Линейность волнового уравнения позволяет накладывать решения. Наложение двух 
+противоположно направленных гармонических волн одинаковой частоты приводит к стоячим волнам:
+\[
+u(x,t) = 2A \sin(kx) \sin(\omega t).
+\]
+Подробный разбор — в \cite{openstax-waves, mit803}.
+
+\subsection*{5. Дисперсия, фазовая и групповая скорость}
+
+Дисперсия — это зависимость \(\omega(k)\). В диспергирующей среде разные гармоники волнового пакета движутся 
+с разными скоростями, поэтому форма пакета изменяется со временем.
+
+Фазовая скорость:
+\[
+v_p = \frac{\omega}{k},
+\]
+групповая скорость:
+\[
+v_g = \frac{d\omega}{dk}.
+\]
+Роль групповой скорости в передаче энергии подробно обсуждается в \cite{mit803}.
+
+\subsection*{6. Энергия волны}
+
+Механическая волна переносит кинетическую и потенциальную энергию. Для гармонической волны 
+плотность энергии ~ \(A^2 \omega^2\) \cite{feynman, openstax-waves}.
+
+\subsection*{7. Границы, отражение и преломление волн}
+
+При переходе волны между двумя средами часть энергии отражается, часть проходит дальше. 
+Коэффициенты отражения/передачи зависят от механических импедансов сред \cite{mit803, purdue-waves}.
+
+
+\section*{Источники}
+
+\begin{thebibliography}{9}
+
+\bibitem{openstax-waves}
+William Moebs, Samuel J. Ling, Jeff Sanny. \textit{University Physics, Volume 1 — Chapter 16 “Waves”}.  
+OpenStax, 2016.  
+Доступно онлайн: \url{https://assets.openstax.org/oscms-prodcms/media/documents/UniversityPhysicsVol1-WEB.pdf} \cite{openstax-waves}
+
+\bibitem{feynman}
+R. P. Feynman, R. B. Leighton, M. Sands. \textit{The Feynman Lectures on Physics, Vol. I}, Ch. 51 “Waves”.  
+California Institute of Technology.  
+Онлайн: \url{https://www.feynmanlectures.caltech.edu/I_51.html} \cite{feynman}
+
+\bibitem{mit803}
+MIT OpenCourseWare. \textit{8.03SC Physics III: Vibrations and Waves}.  
+Лекции + конспекты. 2016.  
+Ссылка на курс: \url{https://ocw.mit.edu/courses/8-03sc-physics-iii-vibrations-and-waves-fall-2016/} \cite{mit803}
+
+\bibitem{purdue-waves}
+Purdue University, Lecture Notes on Waves and Oscillations.  
+Доступны на сайте Physics Department Purdue (примерно \url{https://www.physics.purdue.edu/}) \cite{purdue-waves}
+
+\end{thebibliography}

@@ -1,0 +1,248 @@
+\documentclass[12pt]{article}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes,arrows.meta,fit,backgrounds,calc}
+\geometry{a4paper, margin=2.3cm}
+\captionsetup{font=small,labelfont=bf}
+
+\title{Пайплайн генерации обучающих данных\\
+для нейрооператоров прогнозирования\\
+термоупругих волн в геологических средах}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Цель}
+
+Построить единый «мастер-датасет», из которого без перегенерации можно
+обучать четыре класса моделей: \textbf{PINN}, \textbf{FNO},
+\textbf{MeshGraphNet} и \textbf{Transformer-нейрооператор}. Целевая задача~---
+аппроксимация оператора решения связанной системы термоупругости
+\[
+\mathcal{G}: \bigl(a(x),\; \mathrm{IC},\; \mathrm{BC},\; s(x,t)\bigr)
+\;\longmapsto\;
+\bigl(u(x,t),\; T(x,t),\; \sigma(x,t)\bigr),
+\]
+где $a(x)=(\rho,\lambda,\mu,\gamma,k,c_p)$~--- поля материальных параметров
+неоднородной (слоистой) среды, $s$~--- источник, $\mathrm{IC},\mathrm{BC}$~---
+начальные и граничные условия.
+
+\section{Источник данных: COMSOL Multiphysics}
+
+В качестве «решателя истины» используется COMSOL~5.4 со связкой модулей
+\textit{Solid Mechanics} и \textit{Heat Transfer in Solids} с термоупругой
+связкой (\textit{Thermal Expansion}). Такая постановка соответствует системе
+Куна\,--\,Томпсона, использованной в работе научного руководителя:
+\begin{align}
+\rho \frac{\partial^2 u_i}{\partial t^2} &= \frac{\partial \sigma_{ij}}{\partial x_j},\\
+\sigma_{ij} &= \lambda\,\delta_{ij}\varepsilon_{kk} + 2\mu\,\varepsilon_{ij}
+              - \gamma\,\delta_{ij}\,T,\\
+k\,\nabla^2 T - C\,\frac{\partial T}{\partial t}
+              &= \gamma\,T_0\,\frac{\partial \varepsilon_{kk}}{\partial t}.
+\end{align}
+COMSOL даёт численно консистентные поля $u, T, \sigma_{ij}, \varepsilon_{ij}$
+на неструктурированном тетраэдральном меше, что используется как
+ground truth для обучения нейрооператоров.
+
+\section{Параметризация задачи}
+
+В файле модели \texttt{Untitled.mph} вынесены в \emph{Global Parameters}
+все характеристики, которые варьируются от сэмпла к сэмплу:
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+\item \textbf{Среда:} число слоёв $L\in\{2,\dots,6\}$, толщины слоёв,
+      материал каждого слоя (выбирается из таблицы пород,
+      см. \texttt{Insar/data/}).
+\item \textbf{Источник:} тип (механический импульс, тепловой импульс,
+      комбинированный), позиция $x_s$, амплитуда $A$, частотный профиль
+      (Ricker wavelet с центральной частотой $f_0$).
+\item \textbf{Граничные условия:} тип на каждой грани области
+      (Dirichlet, Neumann, поглощающие).
+\end{itemize}
+Случайный генератор конфигураций \texttt{sample\_random\_medium.py}
+производит $N$ независимых конфигураций, которые передаются в
+\textit{Parametric Sweep} COMSOL.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Параметр} & \textbf{Распределение} & \textbf{Источник значений}\\
+\midrule
+число слоёв $L$ & $\mathrm{Uniform}\{2,\dots,6\}$ & ---\\
+толщины $h_\ell$ & Дирихле, $\sum h_\ell = H$ & ---\\
+материал слоя & категориально & \texttt{materials.csv}\\
+$\rho,\lambda,\mu,\gamma,k,c_p$ & по материалу & таблицы пород Insar\\
+позиция источника $x_s$ & $\mathrm{Uniform}$ в области & ---\\
+амплитуда $A$, частота $f_0$ & log-uniform & ---\\
+тип источника & $\{$mech,\,thermal,\,coupled$\}$ & ---\\
+\bottomrule
+\end{tabular}
+\caption{Случайные параметры, варьируемые между сэмплами датасета.}
+\end{table}
+
+\section{Структура одного сэмпла}
+
+Каждый узел расчётной сетки описывается \textbf{24 каналами},
+сгруппированными по физическому смыслу
+(см.~\texttt{feature\_names.npy} текущего гранитного сэмпла):
+
+\begin{figure}[h]
+\centering
+\input{fig_sample}
+\caption{24 канала состояния узла, сгруппированные по физическому смыслу:
+тепловые (4), кинематические (6), напряжения (7), деформации (3),
+материальные параметры (4).}
+\label{fig:sample}
+\end{figure}
+
+\noindent
+Эти 24 канала образуют \emph{избыточный} набор: для PDE-residual в PINN
+и для предсказания достаточно подмножества, остальное служит
+вспомогательной диагностикой и регуляризацией.
+
+\section{Препроцессинг: от COMSOL CSV к графовому представлению}
+
+Сырые экспортируемые из COMSOL файлы имеют ширину
+$3 + n_{\mathrm{ch}}\cdot N_t$ столбцов
+(координаты узла $+$ канал на каждом временном шаге).
+Скрипт \texttt{convert\_raw\_to\_graph.py} выполняет:
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item чтение \texttt{mesh.mphtxt} $\rightarrow$ массив координат
+      \texttt{coords} формы $(N,3)$;
+\item построение рёберного списка \texttt{edge\_index} формы $(E,2)$
+      по тетраэдральным симплексам, удаление дубликатов;
+\item вычисление признаков рёбер
+      $(\Delta x, \Delta y, \Delta z, \|\Delta\|)$
+      $\rightarrow$ \texttt{edge\_attr} формы $(E,4)$;
+\item слияние всех CSV по идентификатору узла и времени
+      $\rightarrow$ \texttt{node\_features} формы $(T,N,24)$;
+\item вычисление per-channel статистик
+      \texttt{norm\_mean}, \texttt{norm\_std}
+      $\rightarrow$ нормированный тензор \texttt{node\_features}
+      и сырой \texttt{node\_features\_raw}.
+\end{enumerate}
+
+В текущей реализации \emph{пилотного} гранитного сэмпла получены тензоры
+\texttt{coords}~$(1020,3)$,
+\texttt{edge\_index}~$(11422,2)$,
+\texttt{edge\_attr}~$(11422,4)$,
+\texttt{node\_features}~$(3001,1020,24)$,
+\texttt{times}~$(3001,)$,
+с шагом по времени $\Delta t = 0.01$~с на интервале $t\in[0,30]$~с.
+
+\section{Мастер-датасет: структура папок}
+
+Сводный датасет имеет следующую структуру:
+\begin{verbatim}
+thermoelastic_3d_v1/
+  samples/
+    sample_00000/
+      coords.npy           # (N, 3)
+      edge_index.npy       # (E, 2)
+      edge_attr.npy        # (E, 4)
+      node_features.npy    # (T, N, 24), нормированные
+      node_features_raw.npy
+      times.npy            # (T,)
+      norm_mean.npy        # (24,)
+      norm_std.npy         # (24,)
+      medium.json          # описание слоёв
+      source.json          # источник
+      bc.json              # граничные условия
+    sample_00001/
+    ...
+  materials.csv            # таблица пород (из Insar/data)
+  meta.json                # уравнения, единицы, диапазоны
+  splits.json              # train / val / test
+\end{verbatim}
+
+Раздельные файлы \texttt{medium.json}, \texttt{source.json},
+\texttt{bc.json} нужны, чтобы модели могли использовать конфигурацию
+сэмпла как условие (conditioning), а не «угадывать» источник из полей.
+
+\section{Адаптация под четыре модели}
+
+Из одного и того же сэмпла строятся четыре различных представления
+с помощью даталоадеров.
+
+\begin{figure}[h]
+\centering
+\input{fig_loaders}
+\caption{Преобразование одного мастер-сэмпла в формат, ожидаемый каждой из
+четырёх архитектур.}
+\label{fig:loaders}
+\end{figure}
+
+\paragraph{PINN-loader.} Возвращает три (или четыре) набора точек:
+$N_{\mathrm{col}}$ случайных точек $(x_i, t_i)$ внутри области
+для PDE-residual; $N_{\mathrm{bc}}$ точек на границе с истинными значениями;
+$N_{\mathrm{ic}}$ точек при $t=0$; опционально $N_{\mathrm{data}}$ точек
+из \texttt{node\_features} как data-loss. Параметры среды интерполируются
+с \texttt{coords} в эти точки.
+
+\paragraph{FNO-loader.} Интерполирует \texttt{node\_features} с
+неструктурированного меша на регулярную сетку
+$(N_x, N_y, N_z)$~--- это требование FFT в спектральных слоях FNO.
+Вход: тензор $(C_{\mathrm{in}}, N_x, N_y, N_z)$ из материальных параметров
+и начальных условий; выход: $(C_{\mathrm{out}}, N_x, N_y, N_z, N_t)$
+из полей $u, T, \sigma$.
+
+\paragraph{MGN-loader.} Возвращает PyTorch Geometric \texttt{Data}-объект:
+$\mathtt{x} = $ \texttt{node\_features}$[t]$,
+$\mathtt{edge\_index} = $ \texttt{edge\_index.T},
+$\mathtt{edge\_attr} = $ \texttt{edge\_attr},
+$\mathtt{y} = $ \texttt{node\_features}$[t{+}1] - $\texttt{node\_features}$[t]$
+(приращение, более устойчиво).
+
+\paragraph{Transformer-loader.} Случайно сэмплирует
+$N_{\mathrm{in}}$~входных токенов и $N_{\mathrm{q}}$~запросных токенов.
+Признаки входного токена~--- $(p_i, a_i, \mathrm{IC}_i)$, запрос~---
+координата $(x_q, t_q)$, целевое значение~--- поля $(u, T, \sigma)$ в
+этой координате. Разрешение свободное: можно тренировать на 256 точках
+и инферить на 4096.
+
+\section{Полный воркфлоу}
+
+\begin{figure}[h]
+\centering
+\input{fig_pipeline}
+\caption{Полный пайплайн: от случайной конфигурации среды до обучения
+четырёх моделей. Этапы COMSOL и препроцессинга выполняются один раз
+на сэмпл; адаптация под конкретную архитектуру~--- на лету в даталоадере.}
+\label{fig:pipeline}
+\end{figure}
+
+\section{Текущее состояние и план}
+
+\textbf{Текущее.} Реализован и проверен пилотный сэмпл~---
+гомогенный гранитный куб, $1020$~узлов, $3001$~шаг по времени
+($\Delta t = 0.01$~с), $24$~канала. Сырой экспорт~---
+\texttt{Granite seismic simulation/raw data/}; графовое представление~---
+\texttt{Granite seismic simulation/data not raw/}. Этот сэмпл играет роль
+\emph{валидационного эталона} для будущих моделей.
+
+\textbf{План.}
+\begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
+\item Параметризация \texttt{Untitled.mph} через Global Parameters
+      (материалы, слои, источник, ГУ).
+\item Запуск \textit{Parametric Sweep} на 200--500 конфигураций
+      (для дипломной работы достаточно).
+\item Прогон \texttt{convert\_raw\_to\_graph.py} в режиме батча
+      $\rightarrow$ заполнение \texttt{samples/sample\_*/}.
+\item Реализация четырёх даталоадеров и базовое обучение по очереди:
+      FNO~$\rightarrow$ MGN~$\rightarrow$ Transformer~$\rightarrow$ PINN.
+\item Сравнительная таблица метрик на тестовой выборке
+      (включая исходный гранитный сэмпл).
+\end{enumerate}
+
+\end{document}

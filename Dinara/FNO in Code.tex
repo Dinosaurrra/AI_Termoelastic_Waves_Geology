@@ -1,0 +1,145 @@
+\section{План реализации Fourier Neural Operator (FNO)}
+
+\subsection{Постановка задачи}
+
+Пусть требуется аппроксимировать нелинейный оператор
+\[
+\mathcal{G} : u(x) \rightarrow v(x),
+\]
+где $u(x)$ — входная функция (например, коэффициенты или начальные условия PDE),
+а $v(x)$ — решение уравнения.
+
+FNO обучает отображение между функциональными пространствами.
+
+\subsection{Общая архитектура}
+
+Архитектура FNO состоит из трёх этапов:
+
+\begin{enumerate}
+    \item Подъём размерности (Lift)
+    \item Несколько Fourier-блоков
+    \item Проекция в выходное пространство
+\end{enumerate}
+
+\subsection{1. Lift-слой}
+
+Вход:
+\[
+u(x) \in \mathbb{R}^{N_x \times C_{\text{in}}}
+\]
+
+Применяется точечное линейное преобразование:
+\[
+w(x) = P u(x),
+\]
+где $P$ — обучаемая матрица.
+
+Размерность:
+\[
+C_{\text{in}} \rightarrow C_{\text{width}}.
+\]
+
+\subsection{2. Fourier-слой}
+
+Один FNO-блок реализует преобразование:
+
+\[
+w_{l+1}(x) =
+\mathcal{F}^{-1} \left(
+R(k)\,\mathcal{F}(w_l(x))
+\right)
++
+W w_l(x),
+\]
+
+где:
+
+\begin{itemize}
+    \item $\mathcal{F}$ — преобразование Фурье,
+    \item $R(k)$ — обучаемые комплексные веса для первых $m$ мод,
+    \item $W$ — точечное линейное преобразование,
+    \item применяется нелинейность $\sigma$ (например GELU).
+\end{itemize}
+
+Полная формула слоя:
+
+\[
+w_{l+1}(x) =
+\sigma\left(
+\mathcal{F}^{-1} \left(
+R(k)\,\mathcal{F}(w_l)
+\right)
++
+W w_l
+\right).
+\]
+
+\subsection{Ограничение числа мод}
+
+Используются только низкие частоты:
+
+\[
+R(k) = 0, \quad |k| > m.
+\]
+
+Это обеспечивает:
+
+\begin{itemize}
+    \item устойчивость
+    \item снижение числа параметров
+    \item регуляризацию модели
+\end{itemize}
+
+\subsection{3. Проекция}
+
+После нескольких Fourier-блоков применяется:
+
+\[
+v(x) = Q w_L(x),
+\]
+
+где $Q$ — линейная проекция в выходное пространство
+\[
+C_{\text{width}} \rightarrow C_{\text{out}}.
+\]
+
+\subsection{Полная схема}
+
+\[
+u(x)
+\rightarrow
+\text{Lift}
+\rightarrow
+\text{FNO Block} \times L
+\rightarrow
+\text{Projection}
+\rightarrow
+v(x)
+\]
+
+\subsection{Алгоритм прямого прохода}
+
+\begin{enumerate}
+    \item Применить Lift-слой
+    \item Для каждого Fourier-блока:
+    \begin{enumerate}
+        \item Выполнить FFT
+        \item Умножить низкие моды на $R(k)$
+        \item Выполнить обратное FFT
+        \item Добавить линейную часть
+        \item Применить нелинейность
+    \end{enumerate}
+    \item Применить выходную проекцию
+\end{enumerate}
+
+\subsection{Функция потерь}
+
+Обычно используется среднеквадратичная ошибка:
+
+\[
+\mathcal{L}
+=
+\frac{1}{N}
+\sum_i
+\| v_{\text{pred}}(x_i) - v_{\text{true}}(x_i) \|^2.
+\]

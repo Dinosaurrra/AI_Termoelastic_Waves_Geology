@@ -1,0 +1,282 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{url}
+
+\usepackage{amsmath, amssymb}
+\usepackage{physics}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{setspace}
+\geometry{margin=2.5cm}
+
+\title{Physics-Informed Neural Networks:\\
+интуитивное и теоретическое введение}
+\author{}
+\date{}
+
+\begin{document}
+
+\section{Обозначения и соответствие переменных модели и реализации}
+
+\subsection{Независимые переменные}
+
+\begin{itemize}
+\item $x,y,z$ --- пространственные координаты точки среды.
+\item $t$ --- время.
+\item $\Omega \subset \mathbb{R}^3 \times \mathbb{R}$ --- пространственно-временная область.
+\end{itemize}
+
+В реализации используется тензор
+\[
+\texttt{xyzt} \in \mathbb{R}^{N \times 4},
+\]
+где каждая строка имеет вид $(x,y,z,t)$.
+
+\subsection{Искомые поля}
+
+Нейросеть аппроксимирует поля
+\[
+\mathcal{N}_\theta(x,y,z,t)
+=
+\big(u_x,u_y,u_z,T\big).
+\]
+
+Где:
+
+\begin{itemize}
+\item $\mathbf{u}=(u_x,u_y,u_z)$ --- вектор смещений частиц среды.
+\item $T$ --- температурное поле.
+\item $\theta$ --- параметры нейросети.
+\end{itemize}
+
+В коде:
+\begin{verbatim}
+pred = model(xyzt)
+u = pred[:, 0:3]
+T = pred[:, 3:4]
+\end{verbatim}
+
+\subsection{Параметры материала}
+
+\begin{itemize}
+\item $\rho$ --- плотность среды (кг/м$^3$).
+\item $\lambda$ --- первый параметр Ламе.
+\item $\mu$ --- модуль сдвига.
+\item $k$ --- коэффициент теплопроводности.
+\item $C$ --- объёмная теплоёмкость.
+\item $\gamma$ --- коэффициент термомеханической связи.
+\item $T_0$ --- опорная температура.
+\end{itemize}
+
+В коде:
+\begin{verbatim}
+rho = mat["rho"]
+lam = mat["lame_lambda"]
+mu  = mat["lame_mu"]
+\end{verbatim}
+
+\subsection{Тензор деформаций}
+
+\[
+\varepsilon_{ij}
+=
+\frac{1}{2}
+\left(
+\frac{\partial u_i}{\partial x_j}
++
+\frac{\partial u_j}{\partial x_i}
+\right).
+\]
+
+\begin{itemize}
+\item $\varepsilon_{ij}$ --- тензор малых деформаций.
+\item $i,j \in \{x,y,z\}$.
+\end{itemize}
+
+В коде:
+\begin{verbatim}
+eps = strain_tensor_from_xyzt(u, xyzt)
+\end{verbatim}
+
+\subsection{След тензора деформаций}
+
+\[
+\mathrm{tr}(\varepsilon)
+=
+\varepsilon_{xx}
++
+\varepsilon_{yy}
++
+\varepsilon_{zz}.
+\]
+
+В коде:
+\begin{verbatim}
+tr_eps = trace_3x3(eps)
+\end{verbatim}
+
+\subsection{Тензор напряжений}
+
+\[
+\sigma_{ij}
+=
+\lambda \delta_{ij} \mathrm{tr}(\varepsilon)
++
+2\mu \varepsilon_{ij}
+-
+\gamma \delta_{ij} T.
+\]
+
+Где:
+
+\begin{itemize}
+\item $\sigma_{ij}$ --- тензор напряжений.
+\item $\delta_{ij}$ --- символ Кронекера.
+\end{itemize}
+
+В коде:
+\begin{verbatim}
+sigma = stress_iso_thermo(eps, T, lam, mu, gamma)
+\end{verbatim}
+
+\subsection{Уравнение движения}
+
+\[
+\rho \frac{\partial^2 u_i}{\partial t^2}
+=
+\frac{\partial \sigma_{ij}}{\partial x_j}
++
+f_i(x,t).
+\]
+
+\begin{itemize}
+\item $u_{tt}$ --- ускорение частиц.
+\item $\nabla \cdot \sigma$ --- дивергенция тензора напряжений.
+\item $f_i(x,t)$ --- внешняя сила (источник).
+\end{itemize}
+
+В реализации формируется невязка:
+\[
+r_{\text{motion}}
+=
+\rho u_{tt}
+-
+\nabla \cdot \sigma
+-
+f.
+\]
+
+\subsection{Уравнение теплопереноса}
+
+\[
+k \Delta T
+-
+C \frac{\partial T}{\partial t}
+=
+\gamma T_0
+\frac{\partial}{\partial t}
+\mathrm{tr}(\varepsilon).
+\]
+
+Где:
+
+\begin{itemize}
+\item $\Delta T$ --- оператор Лапласа.
+\item $T_t$ --- производная температуры по времени.
+\end{itemize}
+
+Невязка:
+\[
+r_{\text{heat}}
+=
+k \Delta T
+-
+C T_t
+-
+\gamma T_0 \frac{\partial}{\partial t}
+\mathrm{tr}(\varepsilon).
+\]
+
+\subsection{Источник}
+
+\[
+f(x,t)
+=
+A
+\exp
+\left(
+-\frac{\|x-x_0\|^2}{2\sigma^2}
+\right)
+w(t)
+\hat d.
+\]
+
+\begin{itemize}
+\item $A$ --- амплитуда.
+\item $x_0$ --- координата источника.
+\item $\sigma$ --- пространственная ширина источника.
+\item $\hat d$ --- единичный вектор направления.
+\end{itemize}
+
+Временная часть (волна Рикера):
+
+\[
+w(t)
+=
+(1-2a^2)e^{-a^2},
+\quad
+a=\pi f_0 (t-t_0).
+\]
+
+\subsection{Поток энергии}
+
+\[
+\mathbf{v}
+=
+\frac{\partial \mathbf{u}}{\partial t}
+\]
+
+— скорость частиц.
+
+\[
+\mathbf{S}
+=
+-
+\boldsymbol{\sigma}
+\cdot
+\mathbf{v}
+\]
+
+— вектор потока механической энергии.
+
+Нормированное направление распространения:
+
+\[
+\hat{\mathbf{s}}
+=
+\frac{\mathbf{S}}{\|\mathbf{S}\|}.
+\]
+
+\subsection{Определение направления распространения энергии}
+
+После обучения вычисляется вектор потока энергии
+\begin{equation}
+\mathbf{S}
+=
+- \boldsymbol{\sigma} \cdot \mathbf{v},
+\qquad
+\mathbf{v}
+=
+\frac{\partial \mathbf{u}}{\partial t}.
+\end{equation}
+
+Нормированное направление распространения энергии:
+\begin{equation}
+\hat{\mathbf{s}}
+=
+\frac{\mathbf{S}}{\|\mathbf{S}\|}.
+\end{equation}
+
+\end{document}

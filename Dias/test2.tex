@@ -1,0 +1,120 @@
+\section{Архитектура системы на основе PINN}
+
+\subsection{Общая структура}
+
+Компоненты системы:
+
+\begin{enumerate}
+    \item Модуль предобработки данных
+    \item PINN (нейронная сеть)
+    \item Модуль обучения
+    \item Модуль постобработки
+    \item Модуль управления
+\end{enumerate}
+
+\subsection{Архитектура PINN}
+
+\subsubsection{Структура нейронной сети}
+
+PINN аппроксимирует решение:
+\begin{equation}
+\hat{u}(x, y, z, t; \theta), \quad \hat{T}(x, y, z, t; \theta)
+\end{equation}
+
+Архитектура:
+\begin{itemize}
+    \item Вход: $(x, y, z, t)$
+    \item Скрытые слои: полносвязные с активацией $\sigma$
+    \item Выход: $(u_x, u_y, u_z, T)$
+\end{itemize}
+
+\begin{equation}
+\begin{aligned}
+h_0 &= [x, y, z, t]^T \\
+h_l &= \sigma(W_l h_{l-1} + b_l), \quad l = 1, \ldots, L-1 \\
+\hat{u}, \hat{T} &= W_L h_{L-1} + b_L
+\end{aligned}
+\end{equation}
+
+\subsubsection{Функция потерь}
+
+\begin{equation}
+\mathcal{L}_{total} = \mathcal{L}_{PDE} + \lambda_{BC}\mathcal{L}_{BC} + \lambda_{IC}\mathcal{L}_{IC} + \lambda_{data}\mathcal{L}_{data}
+\end{equation}
+
+Остатки PDE:
+
+\begin{align}
+\mathcal{R}_1 &= \rho \frac{\partial^2 \hat{u}_j}{\partial t^2} - \frac{\partial \hat{\sigma}_{ij}}{\partial x_i} - f_j \\
+\mathcal{R}_2 &= \rho c_p \frac{\partial \hat{T}}{\partial t} - \frac{\partial}{\partial x_i}\left(k_{ij}\frac{\partial \hat{T}}{\partial x_j}\right) - Q - \beta_{ij}\hat{\sigma}_{ij}\frac{\partial \hat{\varepsilon}_{ij}}{\partial t} \\
+\mathcal{R}_3 &= \hat{\sigma}_{ij} - C_{ijkl}\hat{\varepsilon}_{kl} + \beta_{ij}(\hat{T} - T_0)
+\end{align}
+
+\begin{equation}
+\mathcal{L}_{PDE} = \frac{1}{N_{PDE}} \sum_{i=1}^{N_{PDE}} \left[ \mathcal{R}_1^2 + \mathcal{R}_2^2 + \mathcal{R}_3^2 \right]
+\end{equation}
+
+\begin{equation}
+\mathcal{L}_{BC} = \frac{1}{N_{BC}} \sum_{i=1}^{N_{BC}} \left[ \|\hat{u} - u_{BC}\|^2 + \|\hat{T} - T_{BC}\|^2 + \|\hat{\sigma} \cdot n - \sigma_{BC}\|^2 \right]
+\end{equation}
+
+\begin{equation}
+\mathcal{L}_{IC} = \frac{1}{N_{IC}} \sum_{i=1}^{N_{IC}} \left[ \|\hat{u}(t=0) - u_0\|^2 + \|\frac{\partial \hat{u}}{\partial t}(t=0) - \dot{u}_0\|^2 + \|\hat{T}(t=0) - T_0\|^2 \right]
+\end{equation}
+
+\subsection{Модуль предобработки}
+
+\begin{itemize}
+    \item Нормализация координат: $[-1, 1]$
+    \item Интерполяция параметров среды
+    \item Генерация коллокационных точек (LHS или адаптивно)
+    \item Подготовка граничных условий
+\end{itemize}
+
+\subsection{Модуль обучения}
+
+Оптимизация: Adam $\to$ L-BFGS
+
+\begin{equation}
+\theta_{k+1} = \theta_k - \alpha_k \nabla_\theta \mathcal{L}_{total}(\theta_k)
+\end{equation}
+
+Градиенты вычисляются через автоматическое дифференцирование.  
+
+Адаптивное взвешивание:
+
+\begin{equation}
+\lambda_k(t) = \lambda_k^0 \cdot \exp\left(-\alpha_k \cdot \frac{\mathcal{L}_k(t)}{\mathcal{L}_{PDE}(t)}\right)
+\end{equation}
+
+\section{Особенности реализации для геологических сред}
+
+\subsection{Учет неоднородности}
+
+\begin{enumerate}
+    \item Параметризация свойств:
+    \begin{equation}
+    \rho(x, y, z), \quad C_{ijkl}(x, y, z), \quad k_{ij}(x, y, z)
+    \end{equation}
+    \item Многослойная архитектура: отдельные подсети для различных геологических слоев
+    \item Условные PINN: параметры среды как дополнительные входы
+\end{enumerate}
+
+\subsection{Обработка граничных условий}
+
+Жесткие граничные условия:
+\begin{equation}
+\hat{u}_{hard} = g(x) + h(x) \cdot \hat{u}_{net}(x, t; \theta)
+\end{equation}
+где $g(x)$ удовлетворяет граничным условиям, $h(x) = 0$ на границе.  
+
+Мягкие граничные условия включаются в функцию потерь.
+
+\subsection{Масштабирование времени}
+
+\begin{itemize}
+    \item Разделение временного интервала на подынтервалы
+    \item Обучение последовательности сетей
+    \item Рекуррентные архитектуры (LSTM, GRU)
+\end{itemize}
+

@@ -1,0 +1,355 @@
+\section{Уравнение движения в механике сплошной среды}
+
+Уравнение движения (баланса линейного импульса) в механике сплошной среды
+(уравнение Ньютона для бесконечно малого объёма среды) имеет вид:
+\begin{equation}
+\rho \frac{\partial^2 u_i}{\partial t^2}
+=
+\frac{\partial \sigma_{ij}}{\partial x_j}.
+\end{equation}
+
+Здесь:
+\begin{itemize}
+    \item $\rho$ — плотность среды,
+    \item $u_i(x_j,t)$ — $i$-я компонента вектора смещения,
+    \item $\sigma_{ij}$ — тензор напряжений Коши,
+    \item $x_j = (x_1,x_2,x_3)$ — пространственные координаты.
+\end{itemize}
+
+Левая часть уравнения описывает \textbf{инерцию} (плотность, умноженная на ускорение частиц среды),
+правая часть — \textbf{дивергенцию тензора напряжений}, то есть внутренние силы.
+
+\subsection{Смысл индексов}
+
+\subsubsection{Индекс $i$}
+
+\begin{itemize}
+    \item свободный индекс,
+    \item определяет направление уравнения,
+    \item уравнение записывается для каждой компоненты:
+\end{itemize}
+\[
+i = 1,2,3.
+\]
+
+\subsubsection{Индекс $j$}
+
+\begin{itemize}
+    \item повторяющийся индекс,
+    \item по соглашению Эйнштейна происходит суммирование.
+\end{itemize}
+
+\[
+\frac{\partial \sigma_{ij}}{\partial x_j}
+=
+\sum_{j=1}^{3}
+\frac{\partial \sigma_{ij}}{\partial x_j}.
+\]
+
+Это выражение и есть \textbf{дивергенция тензора напряжений}.
+
+\subsection{Запись по компонентам}
+
+\subsubsection{Уравнение для $i=1$ (ось $x_1$)}
+
+\begin{equation}
+\rho \frac{\partial^2 u_1}{\partial t^2}
+=
+\frac{\partial \sigma_{11}}{\partial x_1}
++
+\frac{\partial \sigma_{12}}{\partial x_2}
++
+\frac{\partial \sigma_{13}}{\partial x_3}.
+\end{equation}
+
+\subsubsection{Уравнение для $i=2$ (ось $x_2$)}
+
+\begin{equation}
+\rho \frac{\partial^2 u_2}{\partial t^2}
+=
+\frac{\partial \sigma_{21}}{\partial x_1}
++
+\frac{\partial \sigma_{22}}{\partial x_2}
++
+\frac{\partial \sigma_{23}}{\partial x_3}.
+\end{equation}
+
+\subsubsection{Уравнение для $i=3$ (ось $x_3$)}
+
+\begin{equation}
+\rho \frac{\partial^2 u_3}{\partial t^2}
+=
+\frac{\partial \sigma_{31}}{\partial x_1}
++
+\frac{\partial \sigma_{32}}{\partial x_2}
++
+\frac{\partial \sigma_{33}}{\partial x_3}.
+\end{equation}
+
+Это система из трёх уравнений второго порядка по времени для компонент вектора смещений
+\[
+\mathbf{u} = (u_1,u_2,u_3).
+\]
+
+Каждое уравнение:
+\begin{itemize}
+    \item описывает движение вдоль соответствующей оси,
+    \item учитывает все компоненты напряжений, действующие на элемент среды.
+\end{itemize}
+
+\subsection{Одномерный случай}
+
+Если движение происходит только вдоль оси $x_1$:
+\[
+u_1 = u(x_1,t), \qquad u_2 = u_3 = 0,
+\]
+то система упрощается до
+\begin{equation}
+\rho \frac{\partial^2 u}{\partial t^2}
+=
+\frac{\partial \sigma_{11}}{\partial x_1},
+\end{equation}
+что соответствует обычному одномерному волновому уравнению.
+
+
+\section{Термоупругое уравнение движения}
+
+С учётом термоупругой связи уравнение движения записывается в виде:
+\begin{equation}
+\rho(x)\frac{\partial^2 u_i}{\partial t^2}
+=
+\frac{\partial}{\partial x_j}
+\left[
+\lambda(x)\delta_{ij}\frac{\partial u_k}{\partial x_k}
++
+\mu(x)\left(
+\frac{\partial u_i}{\partial x_j}
++
+\frac{\partial u_j}{\partial x_i}
+\right)
+\right]
+-
+\gamma(x)\frac{\partial T}{\partial x_i}.
+\end{equation}
+
+\subsection{Индексы и суммирование}
+
+\begin{itemize}
+    \item $i = 1,2,3$ — индекс направления смещения (свободный),
+    \item $j = 1,2,3$ — индекс пространственной производной (суммируемый),
+    \item $k = 1,2,3$ — индекс суммирования (объёмная деформация).
+\end{itemize}
+
+\subsection{Неизвестные функции}
+
+\begin{itemize}
+    \item $u_i(x,t)$ — $i$-я компонента вектора смещения,
+    \begin{itemize}
+        \item физический смысл: перемещение частиц среды,
+        \item размерность: $\mathrm{m}$,
+    \end{itemize}
+    \item $T(x,t)$ — температурное поле (отклонение от начальной температуры),
+    \begin{itemize}
+        \item размерность: $\mathrm{K}$.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Упругие параметры}
+
+\begin{itemize}
+    \item $\lambda(x)$ — первая константа Ламе,
+    \begin{itemize}
+        \item характеризует объёмное сжатие,
+        \item связана с продольными (P) волнами,
+        \item размерность: $\mathrm{Pa}$,
+    \end{itemize}
+    \item $\mu(x)$ — вторая константа Ламе (модуль сдвига),
+    \begin{itemize}
+        \item характеризует сопротивление сдвигу,
+        \item определяет распространение поперечных (S) волн,
+        \item размерность: $\mathrm{Pa}$.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Тензорные объекты}
+
+Символ Кронкера:
+\[
+\delta_{ij}
+=
+\begin{cases}
+1, & i=j, \\
+0, & i \neq j.
+\end{cases}
+\]
+
+\begin{itemize}
+    \item выделяет диагональные компоненты,
+    \item отражает изотропность среды.
+\end{itemize}
+
+\subsection{Термоупругая связь}
+
+$\gamma(x)$ — коэффициент термоупругой связи, характеризующий влияние температурного градиента на механические напряжения.
+
+
+\section*{Трёхмерная система уравнений термоупругости}
+
+Рассмотрим декартову систему координат
+\[
+x_1 = x,\quad x_2 = y,\quad x_3 = z,
+\]
+и вектор перемещений
+\[
+\mathbf{u} = (u_1,u_2,u_3) = (u_x,u_y,u_z).
+\]
+
+Исходное уравнение движения термоупругой среды имеет вид:
+\[
+\rho \frac{\partial^2 u_i}{\partial t^2}
+=
+\frac{\partial}{\partial x_j}
+\left[
+\lambda \delta_{ij} \frac{\partial u_k}{\partial x_k}
++
+\mu
+\left(
+\frac{\partial u_i}{\partial x_j}
++
+\frac{\partial u_j}{\partial x_i}
+\right)
+\right]
+-
+\gamma \frac{\partial T}{\partial x_i}.
+\]
+
+\subsection*{Компонента $i=1$ (ось $x$)}
+
+\begin{align}
+\rho \frac{\partial^2 u_1}{\partial t^2}
+&=
+\frac{\partial}{\partial x}
+\left[
+\lambda
+\left(
+\frac{\partial u_1}{\partial x}
++
+\frac{\partial u_2}{\partial y}
++
+\frac{\partial u_3}{\partial z}
+\right)
++
+2\mu \frac{\partial u_1}{\partial x}
+\right]
+\nonumber\\
+&\quad+
+\frac{\partial}{\partial y}
+\left[
+\mu
+\left(
+\frac{\partial u_1}{\partial y}
++
+\frac{\partial u_2}{\partial x}
+\right)
+\right]
++
+\frac{\partial}{\partial z}
+\left[
+\mu
+\left(
+\frac{\partial u_1}{\partial z}
++
+\frac{\partial u_3}{\partial x}
+\right)
+\right]
+-
+\gamma \frac{\partial T}{\partial x}.
+\end{align}
+
+\subsection*{Компонента $i=2$ (ось $y$)}
+
+\begin{align}
+\rho \frac{\partial^2 u_2}{\partial t^2}
+&=
+\frac{\partial}{\partial x}
+\left[
+\mu
+\left(
+\frac{\partial u_2}{\partial x}
++
+\frac{\partial u_1}{\partial y}
+\right)
+\right]
+\nonumber\\
+&\quad+
+\frac{\partial}{\partial y}
+\left[
+\lambda
+\left(
+\frac{\partial u_1}{\partial x}
++
+\frac{\partial u_2}{\partial y}
++
+\frac{\partial u_3}{\partial z}
+\right)
++
+2\mu \frac{\partial u_2}{\partial y}
+\right]
+\nonumber\\
+&\quad+
+\frac{\partial}{\partial z}
+\left[
+\mu
+\left(
+\frac{\partial u_2}{\partial z}
++
+\frac{\partial u_3}{\partial y}
+\right)
+\right]
+-
+\gamma \frac{\partial T}{\partial y}.
+\end{align}
+
+\subsection*{Компонента $i=3$ (ось $z$)}
+
+\begin{align}
+\rho \frac{\partial^2 u_3}{\partial t^2}
+&=
+\frac{\partial}{\partial x}
+\left[
+\mu
+\left(
+\frac{\partial u_3}{\partial x}
++
+\frac{\partial u_1}{\partial z}
+\right)
+\right]
++
+\frac{\partial}{\partial y}
+\left[
+\mu
+\left(
+\frac{\partial u_3}{\partial y}
++
+\frac{\partial u_2}{\partial z}
+\right)
+\right]
+\nonumber\\
+&\quad+
+\frac{\partial}{\partial z}
+\left[
+\lambda
+\left(
+\frac{\partial u_1}{\partial x}
++
+\frac{\partial u_2}{\partial y}
++
+\frac{\partial u_3}{\partial z}
+\right)
++
+2\mu \frac{\partial u_3}{\partial z}
+\right]
+-
+\gamma \frac{\partial T}{\partial z}.
+\end{align}
+
