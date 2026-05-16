@@ -81,11 +81,11 @@ The output tensor has the form
 \]
 For the present thermoelastic prediction task,
 \[
-C_{out}=4,
+C_{out}=3,
 \]
-because the model predicts four output fields:
+because the model predicts three output fields:
 \[
-T, \quad u, \quad v, \quad w.
+T, \quad u, \quad v.
 \]
 
 If several previous time steps are used as input, they can be concatenated along the channel dimension. For example, if each time step contains \(C\) physical channels and \(m\) previous time steps are used, then
@@ -803,11 +803,11 @@ In summary, the implemented FNO is a two-dimensional field-to-field prediction m
 \]
 and the output tensor has the form
 \[
-[B, 4, N_x, N_y].
+[B, 3, N_x, N_y].
 \]
-The model first lifts the input to a hidden representation, optionally appends coordinate grid information, applies a sequence of Fourier blocks, and then projects the latent field to four output channels:
+The model first lifts the input to a hidden representation, optionally appends coordinate grid information, applies a sequence of Fourier blocks, and then projects the latent field to three output channels:
 \[
-T, \quad u, \quad v, \quad w.
+T, \quad u, \quad v.
 \]
 
 Each Fourier block combines a spectral convolution branch with a local convolution branch. The spectral branch applies the Fourier transform, multiplies selected modes by learned complex-valued weights, and returns the result to the spatial domain using the inverse Fourier transform. The local convolution branch processes neighboring spatial information directly on the grid. The final prediction is trained against simulation-generated reference fields using supervised losses such as mean squared error and relative \(L^2\) error.

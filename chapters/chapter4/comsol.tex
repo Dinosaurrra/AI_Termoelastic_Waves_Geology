@@ -316,7 +316,7 @@ u = 0
 This condition prevents rigid body motion of the entire computational domain. A free surface boundary can be written as
 
 \[
-\sigman = 0
+\sigma\,n = 0
 \quad
 \text{on}
 \quad
@@ -453,23 +453,18 @@ s_i(t)
 T_i(t),
 u_i(t),
 v_i(t),
-w_i(t),
 \dot{u}_i(t),
 \dot{v}_i(t),
-\dot{w}_i(t),
 \sigma_{x,i}(t),
 \sigma_{y,i}(t),
-\sigma_{z,i}(t),
-\sigma_{xy,i}(t),
-\sigma_{yz,i}(t),
-\sigma_{xz,i}(t)
+\sigma_{xy,i}(t)
 \right].
 \]
 
 Here, \(i\) denotes a mesh node. This formulation is suitable for machine learning because every simulation produces a sequence of states with the same physical meaning.
 \subsubsection{Exported simulation fields}
 
-The COMSOL simulation exports the physical fields required for training and validating AI models. The exported variables include thermal variables, mechanical variables, and material parameters. The thermal variables include temperature \(T\), thermal conductivity \(k\), density \(\rho\), and heat capacity \(C_p\). The mechanical variables include displacement components \(u\), \(v\), \(w\), velocity components \(u_t\), \(v_t\), \(w_t\), von Mises stress \(\sigma_{\mathrm{vM}}\), stress tensor components \(\sigma_x\), \(\sigma_y\), \(\sigma_z\), \(\sigma_{xy}\), \(\sigma_{yz}\), \(\sigma_{xz}\), and strain components \(\varepsilon_x\), \(\varepsilon_y\), \(\varepsilon_z\). The material parameters include Young's modulus \(E\), Poisson's ratio \(\nu\), solid density \(\rho_s\), and thermal expansion coefficient \(\alpha\).
+The COMSOL simulation exports the physical fields required for training and validating AI models. Because the formulation in this thesis is two-dimensional under the plane-strain assumption, only the in-plane components are retained for the dataset. The exported variables include thermal variables, mechanical variables, and material parameters. The thermal variables include temperature \(T\), thermal conductivity \(k\), density \(\rho\), and heat capacity \(C_p\). The mechanical variables include in-plane displacement components \(u\) and \(v\), in-plane velocity components \(u_t\) and \(v_t\), von Mises stress \(\sigma_{\mathrm{vM}}\), in-plane stress tensor components \(\sigma_x\), \(\sigma_y\), \(\sigma_{xy}\), and in-plane strain components \(\varepsilon_x\), \(\varepsilon_y\), \(\varepsilon_{xy}\). The material parameters include Young's modulus \(E\), Poisson's ratio \(\nu\), solid density \(\rho_s\), and thermal expansion coefficient \(\alpha\).
 
 \begin{table}[h]
 \centering
@@ -481,10 +476,10 @@ Group & Variables & Description \\
 \hline
 Thermal field & \(T\) & Temperature distribution \\
 Thermal properties & \(k\), \(\rho\), \(C_p\) & Heat transfer material parameters \\
-Displacement & \(u\), \(v\), \(w\) & Mechanical displacement components \\
-Velocity & \(u_t\), \(v_t\), \(w_t\) & Time derivatives of displacement components \\
-Stress & \(\sigma_{\mathrm{vM}}\), \(\sigma_x\), \(\sigma_y\), \(\sigma_z\), \(\sigma_{xy}\), \(\sigma_{yz}\), \(\sigma_{xz}\) & Stress field components \\
-Strain & \(\varepsilon_x\), \(\varepsilon_y\), \(\varepsilon_z\) & Strain field components \\
+Displacement & \(u\), \(v\) & In-plane mechanical displacement components \\
+Velocity & \(u_t\), \(v_t\) & Time derivatives of in-plane displacement components \\
+Stress & \(\sigma_{\mathrm{vM}}\), \(\sigma_x\), \(\sigma_y\), \(\sigma_{xy}\) & In-plane stress field components \\
+Strain & \(\varepsilon_x\), \(\varepsilon_y\), \(\varepsilon_{xy}\) & In-plane strain field components \\
 Material properties & \(E\), \(\nu\), \(\rho_s\), \(\alpha\) & Elastic and thermoelastic parameters \\
 \hline
 \end{tabular}

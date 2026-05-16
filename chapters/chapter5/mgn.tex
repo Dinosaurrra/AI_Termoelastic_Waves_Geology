@@ -621,26 +621,24 @@ u
 =
 \begin{bmatrix}
 u \\
-v \\
-w
+v
 \end{bmatrix}
 \]
 
-where \(u\) is the displacement vector, and \(u\), \(v\), and \(w\) are displacement components along the three spatial directions.
+where \(u\) is the displacement vector, and \(u\) and \(v\) are the in-plane displacement components.
 
-The stress tensor can be written as
+Under the plane-strain assumption used in this thesis, the stress tensor reduces to its in-plane components and can be written as
 
 \[
 \sigma
 =
 \begin{bmatrix}
-\sigma_x & \sigma_{xy} & \sigma_{xz} \\
-\sigma_{xy} & \sigma_y & \sigma_{yz} \\
-\sigma_{xz} & \sigma_{yz} & \sigma_z
+\sigma_x & \sigma_{xy} \\
+\sigma_{xy} & \sigma_y
 \end{bmatrix}
 \]
 
-where \(\sigma\) is the stress tensor, \(\sigma_x\), \(\sigma_y\), and \(\sigma_z\) are normal stress components, and \(\sigma_{xy}\), \(\sigma_{xz}\), and \(\sigma_{yz}\) are shear stress components.
+where \(\sigma\) is the stress tensor, \(\sigma_x\) and \(\sigma_y\) are the in-plane normal stress components, and \(\sigma_{xy}\) is the in-plane shear stress component.
 
 The strain tensor is related to displacement gradients. In the small-strain approximation, it is defined as
 
