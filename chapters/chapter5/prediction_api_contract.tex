@@ -1,0 +1,93 @@
+\subsection{Prediction API Contract}
+
+The practical comparison of several predictive model services requires a unified input-output contract. Without such a contract, each model route would expose its own ad hoc request structure, making scientific comparison difficult and implementation fragile. In the present thesis, the API contract serves as the operational link between the thermoelastic variables introduced in Chapter~2 and the prediction task formulation introduced in Chapter~3. It ensures that different model services receive the same physical scenario description, that responses can be normalized into a common format, and that the resulting outputs can be compared in a single experimental workflow.
+
+At the request level, the backend schema groups the prediction inputs into several logically distinct parts. The first group is model selection, represented by the field \texttt{model}. This field identifies the route to be used, such as \texttt{pinn}, \texttt{fno}, \texttt{meshgraphnet}, or an experimental Transformer-style route. The second group is material identification, represented in the current backend by a medium identifier such as \texttt{medium\_id}. Rather than requiring the user to enter every physical constant manually for each experiment, the system can resolve the material from the geological catalog and enrich the prediction request with the corresponding preset properties. This design keeps the public interface compact while preserving a physical interpretation of the selected medium.
+
+The material-related part of the contract is conceptually grounded in the parameters already defined in Chapter~2. These include the material name or medium type together with effective quantities such as density \(\rho\), Young's modulus \(E\), Poisson's ratio \(\nu\), shear modulus \(\mu\), bulk modulus \(K\), Lam\'e parameter \(\lambda\), thermal expansion coefficient \(\alpha\), thermal conductivity \(k\), specific heat capacity \(C_p\), volumetric heat capacity \(C=\rho C_p\), thermoelastic coupling coefficient \(\gamma=3K\alpha\), and, where available, wave velocities \(V_p\) and \(V_s\) and porosity. In the current repository, the public backend request does not require all of these values to be typed explicitly. Instead, the catalog stores a practical subset, including \(\rho\), porosity, \(V_p\), \(V_s\), thermal conductivity, heat capacity, and thermal expansion, while other effective quantities may be derived internally or supplied through model-specific datasets. For the thesis, this should be described as a physically motivated material contract rather than as a claim that every route consumes the entire constitutive parameter set in identical form.
+
+The next input group describes the thermoelastic scenario. In the current backend schema this role is played by the \texttt{scenario} object, which includes at least \texttt{temperature\_c}, \texttt{pressure\_mpa}, and \texttt{time\_ms}. These parameters encode the thermal and mechanical state under which the prediction is requested. The source object adds the excitation description through fields such as source type, source coordinates, amplitude, frequency, and a direction vector. The probe object specifies the observation point. Together, these fields provide the practical representation of the source--probe geometry introduced theoretically in Chapter~2.
+
+The directional part of the contract follows directly from the mathematical formulation. If the source position is denoted by \(\mathbf{x}_s\) and the probe position by \(\mathbf{x}_p\), then the propagation vector is
+\begin{equation}
+\mathbf{d}
+=
+\mathbf{x}_p - \mathbf{x}_s,
+\end{equation}
+and the corresponding unit direction vector is
+\begin{equation}
+\hat{\mathbf{d}}
+=
+\frac{\mathbf{d}}{\|\mathbf{d}\|}.
+\end{equation}
+From this vector, directional quantities such as propagation distance, azimuth, and elevation can be computed. In three-dimensional notation, if \(\mathbf{d}=(d_x,d_y,d_z)\), then the azimuth is given by
+\begin{equation}
+\phi = \operatorname{atan2}(d_y,d_x),
+\end{equation}
+and the elevation is given by
+\begin{equation}
+\psi =
+\operatorname{atan2}
+\left(
+d_z,\sqrt{d_x^2+d_y^2}
+\right).
+\end{equation}
+The backend request schema additionally validates the user-provided source direction to ensure that it is finite and nonzero before normalization. This is important because the source direction may later be compared with the source--probe direction or combined with geometry-aware post-processing in model-specific inference pipelines.
+
+Another required input group is the domain description. In the current backend, this is represented by the \texttt{domain} object with subfields such as \texttt{type}, \texttt{size}, \texttt{resolution}, and boundary conditions. At the theoretical level, Chapter~2 is formulated in general three-dimensional form, so a general contract may allow both \texttt{rect\_2d} and \texttt{rect\_3d}. However, the practical thesis experiments are prototype experiments and are primarily based on \texttt{rect\_2d} domains. The backend validator explicitly requires \texttt{lz = 0} and \texttt{nz = 1} when \texttt{domain.type = rect\_2d}. This is a useful implementation detail because it encodes the practical scope directly in the API contract: the general request shape remains compatible with future three-dimensional extensions, but the current experiments operate on planar cross-sections or selected directional paths.
+
+The output side of the contract is designed to provide one normalized summary format across different services. According to the backend response schema and repository model card, the normalized prediction response contains a selected model identifier, a medium summary, directional prediction quantities, field-summary quantities, and technical metadata. The directional summary includes a direction vector, azimuth, elevation, response magnitude, wave type, and predicted travel time. The field summary includes at least maximum displacement and maximum temperature perturbation. The metadata block includes items such as model version, latency, and request identifier. These outputs correspond naturally to the comparative prediction goal of the thesis because they summarize directional thermoelastic behavior without requiring every model route to expose the same internal field representation.
+
+It is important to distinguish between primary public outputs and internal physical diagnostics. In the current API, stress and strain are not the main direct outputs of the normalized response. This is consistent with the practical role of the system, which compares directional summary quantities and field-level indicators rather than exposing a full continuum-mechanics state tensor in every response. Nevertheless, stress and strain remain physically meaningful variables from Chapter~2. In the PINN route they are used internally for residual computation, and in principle they can also be derived as diagnostics from predicted displacement and temperature fields when sufficiently rich spatial information is available. For the thesis, it is therefore correct to say that the present API is centered on temperature-related and displacement-related response quantities, while stress and strain are treated primarily as internal or derived quantities rather than standard public outputs for all model services.
+
+The following illustrative structure shows the spirit of the unified request contract in a compact form:
+
+\begin{verbatim}
+{
+  "model": "pinn",
+  "medium_id": "basalt",
+  "scenario": {
+    "temperature_c": 100,
+    "pressure_mpa": 10,
+    "time_ms": 5
+  },
+  "domain": {
+    "type": "rect_2d",
+    "size": {"lx": 1.0, "ly": 1.0, "lz": 0.0},
+    "resolution": {"nx": 128, "ny": 128, "nz": 1}
+  },
+  "source": {
+    "type": "thermal_pulse",
+    "x": 0.2, "y": 0.5, "z": 0.0,
+    "amplitude": 1.0,
+    "frequency_hz": 50,
+    "direction": [1.0, 0.0, 0.0]
+  },
+  "probe": {"x": 0.8, "y": 0.5, "z": 0.0}
+}
+\end{verbatim}
+
+An illustrative normalized or experiment-summary response may be written as follows:
+
+\begin{verbatim}
+{
+  "model": "pinn",
+  "status": "ok",
+  "travel_time_ms_pred": 1.25,
+  "max_displacement": 0.00012,
+  "max_temperature_perturbation": 15.3,
+  "magnitude": 0.82,
+  "azimuth_deg": 0.0,
+  "elevation_deg": 0.0,
+  "effective_domain_type": "rect_2d",
+  "fallback_used": false
+}
+\end{verbatim}
+
+These examples are illustrative rather than normative, but they show the intended logic of the contract. The scientific fields are grouped separately from technical execution metadata. This is especially important in a prototype comparison system. For honest reporting, experimental summary tables should preserve not only the scientific outputs, but also route-level technical indicators such as execution status, fallback usage, and error messages when present. Such fields do not make the prediction more physical, but they are essential for reproducibility and for distinguishing learned predictions from placeholder or degraded execution paths.
+
+The unified contract also clarifies how the models should be compared. All routes should be evaluated on the same 2D input cases, with the same material preset, source--probe geometry, and scenario parameters. Their outputs should then be stored in a common summary table or experiment log so that travel time, direction, displacement-related response, and thermal response can be compared consistently. This is methodologically important because the contract standardizes the observable prediction task even when the internal model architectures differ substantially.
+
+At the same time, the contract does not imply physical equivalence of the models. A common interface is not the same as a common solver. The PINN is the only explicitly physics-informed component in the present comparison because it includes thermoelastic residuals derived from the governing equations. The FNO, MeshGraphNet, and Transformer-style services use physically meaningful inputs and outputs, but they do not enforce the governing thermoelastic PDE system in the same way. The API contract therefore supports comparative experimentation under one physically motivated input-output framework, while preserving the important distinction between physics-informed and primarily data-driven routes.
+
+The limitations of this contract follow naturally from the limitations of the prototype itself. The contract standardizes communication and comparison, but it does not guarantee validated field realism. The public outputs are comparative prototype predictions, not engineering-grade measurements. Material presets in the current repository are starter values. Some services may operate in fallback mode under missing-artifact conditions. The practical experiments are predominantly \texttt{rect\_2d} and should not be described as full three-dimensional field simulations. For these reasons, the API contract should be presented in the thesis as a disciplined experimental interface that supports fair comparison and reproducible software behavior, while remaining subordinate to the more general physical formulation of Chapter~2.
