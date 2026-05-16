@@ -81,11 +81,11 @@ The output tensor has the form
 \]
 For the present thermoelastic prediction task,
 \[
-C_{out}=4,
+C_{out}=3,
 \]
 because the model predicts four output fields:
 \[
-T, \quad u, \quad v, \quad w.
+T, \quad u, \quad v.
 \]
 
 If several previous time steps are used as input, they can be concatenated along the channel dimension. For example, if each time step contains \(C\) physical channels and \(m\) previous time steps are used, then
