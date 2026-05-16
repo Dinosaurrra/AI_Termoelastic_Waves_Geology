@@ -13,9 +13,8 @@ Every response was obtained from the live inference service running
 the actual checkpoint of the model; no fallback or mock values were
 substituted, so the comparison reflects model behaviour rather than
 the behaviour of placeholders. The full set of normalised responses
-is stored in
-\texttt{ai-directional-prediction/granite-analytics/outputs/} and is
-the source of every plot and number in this chapter.
+is preserved as the experiment log and is the source of every plot
+and number in this chapter.
 
 Each scenario is described by the unified prediction contract
 introduced in Chapter~4: a geological medium identifier, a thermal and
@@ -340,8 +339,8 @@ over its first eight epochs on the sandstone pilot. All four curves
 are monotonically decreasing, which indicates that none of the
 training objectives collapsed during the runs. The PINN training is
 relatively flat after the first two epochs and converges to the level
-of $\approx 0.74$, consistent with the metric file
-\texttt{pinn-service/artifacts/checkpoints/baseline/metrics.json}.
+of $\approx 0.74$, consistent with the metrics recorded for the
+baseline checkpoint of the PINN component.
 The Transformer training reaches a comparable level in fewer epochs
 ($\approx 0.32$ after three epochs of the smoke run), in part because
 the attention mechanism converges faster on the small sandstone-ROD
