@@ -626,7 +626,8 @@ s_j.
 \]
 
 The mean squared error loss is defined as
-\[
+\begin{equation}
+\label{eq:mse}
 \mathcal{L}_{MSE}
 =
 \frac{1}{N_sNC}
@@ -638,7 +639,7 @@ The mean squared error loss is defined as
 -
 s_{j,i,c}
 \right)^2,
-\]
+\end{equation}
 where \(N_s\) is the number of samples, \(N\) is the number of spatial grid points, and \(C\) is the number of output channels. In the present case,
 \[
 C = 3.
@@ -700,19 +701,7 @@ The normalization statistics are computed on the training set and reused for val
 
 \subsection{Evaluation Metrics}
 
-The trained model is evaluated by comparing predicted and reference fields. The mean squared error is
-\[
-MSE
-=
-\frac{1}{NC}
-\sum_{i=1}^{N}
-\sum_{c=1}^{C}
-\left(
-\hat{s}_{i,c}
--
-s_{i,c}
-\right)^2.
-\]
+The trained model is evaluated by comparing predicted and reference fields. The evaluation MSE has the same form as the training-time mean squared error defined in Eq.~\eqref{eq:mse}, only without averaging over the sample batch (a single reference field is used at evaluation time).
 
 The mean absolute error is
 \[

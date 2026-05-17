@@ -701,22 +701,7 @@ This means that after \(K\) message passing iterations, node \(i\) can receive i
 
 \subsection{Loss Function}
 
-The model is trained as a supervised regression model. The predicted physical fields are compared with target fields obtained from COMSOL simulations. A standard mean squared error loss is written as
-
-\[
-\mathcal{L}_{MSE}
-=
-\frac{1}{NC}
-\sum_{i=1}^{N}
-\sum_{c=1}^{C}
-\left(
-\hat{y}_{i,c}
--
-y_{i,c}
-\right)^2
-\]
-
-where \(\mathcal{L}_{MSE}\) is the mean squared error loss, \(N\) is the number of nodes, \(C\) is the number of predicted physical fields, \(\hat{y}_{i,c}\) is the predicted value of field \(c\) at node \(i\), and \(y_{i,c}\) is the corresponding target value from the COMSOL simulation.
+The model is trained as a supervised regression model. The predicted physical fields are compared with target fields obtained from COMSOL simulations. A standard mean squared error loss \(\mathcal{L}_{MSE}\) of the same form as Eq.~\eqref{eq:mse} is used here, with \(\hat{y}_{i,c}\) the predicted value of field \(c\) at node \(i\) and \(y_{i,c}\) the corresponding target value from the COMSOL simulation.
 
 In this implementation, the training objective is based on WeightedFieldMSE. The weighted loss is written as
 
@@ -776,22 +761,7 @@ For example, if stress fields are considered especially important for evaluating
 
 The model is evaluated using both global metrics and per-field metrics. Global metrics summarize the overall prediction quality across all nodes and all predicted fields. Per-field metrics are used to analyze the accuracy of each physical quantity separately.
 
-The mean squared error is defined as
-
-\[
-\mathrm{MSE}
-=
-\frac{1}{NC}
-\sum_{i=1}^{N}
-\sum_{c=1}^{C}
-\left(
-\hat{y}_{i,c}
--
-y_{i,c}
-\right)^2
-\]
-
-where \(\mathrm{MSE}\) is the mean squared error, \(N\) is the number of nodes, \(C\) is the number of predicted fields, \(\hat{y}_{i,c}\) is the predicted value of field \(c\) at node \(i\), and \(y_{i,c}\) is the target value.
+The mean squared error has the form already given in Eq.~\eqref{eq:mse} (the single-sample variant, without the batch sum over $j$).
 
 The root mean squared error is defined as
 

@@ -69,10 +69,7 @@ velocity of sandstone discussed in Chapter~1.
 \legend{Basalt, Sandstone}
 \end{axis}
 \end{tikzpicture}
-\caption{Predicted travel time of the thermoelastic response from the
-source to the probe, averaged over $40$ scenarios per material. The
-relative ordering is dominated by the model family rather than by the
-geological medium.}
+\caption{Predicted travel time per route and material.}
 \label{fig:travel-time}
 \end{figure}
 
@@ -96,11 +93,7 @@ with the model-family gap.
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.95\textwidth]{chapters/chapter6/figures/travel_time_by_model_material.png}
-\caption{Predicted travel time by material and model in the balanced
-2D sweep ($40$ scenarios per cell, logarithmic axis). PINN and the
-Transformer-based route are closest to the analytical body-wave
-reference; FNO and MeshGraphNet remain higher in the current
-implementation.}
+\caption{Predicted travel time by material and model (log axis).}
 \label{fig:travel-time-bm}
 \end{figure}
 
@@ -132,16 +125,13 @@ reference by more than $100\,\%$.
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.78\textwidth]{chapters/chapter6/figures/travel_time_relative_error.png}
-\caption{Relative travel-time error against the analytical reference
-$t_{\mathrm{gt}} = \lVert \mathbf{x}_p - \mathbf{x}_s \rVert / V_p$.
-Only PINN stays below the $10\,\%$ dashed line for every scenario.}
+\caption{Relative travel-time error vs the analytical reference.}
 \label{fig:tt-error}
 \end{figure}
 
 \begin{table}[ht]
 \centering
-\caption{Per-model travel-time accuracy and warm steady-state inference
-latency. The first call was dropped as warm-up.}
+\caption{Per-model travel-time accuracy and inference latency.}
 \label{tab:acc-lat}
 \small
 \setlength{\tabcolsep}{4pt}
@@ -194,10 +184,7 @@ scale defect of the current FNO implementation.
 \addplot+[fill=teal!30, draw=teal!60!black] coordinates {(PINN,5.1e-5) (Transformer,1.97e-3) (MeshGraphNet,2.11e-3)};
 \end{axis}
 \end{tikzpicture}
-\caption{Maximum predicted displacement for the routes that return
-physically plausible magnitudes. PINN gives the most conservative
-response, while MeshGraphNet and the Transformer-based route are close
-to the $10^{-3}$~m range.}
+\caption{Maximum predicted displacement (physically plausible routes).}
 \label{fig:displacement-valid}
 \end{figure}
 
@@ -220,10 +207,7 @@ to the $10^{-3}$~m range.}
 \addplot+[fill=violet!35, draw=violet!60!black] coordinates {(PINN,5.1e-5) (Transformer,1.97e-3) (MeshGraphNet,2.11e-3) (FNO,7.4e6)};
 \end{axis}
 \end{tikzpicture}
-\caption{Maximum displacement on a logarithmic axis. The FNO route is
-several orders of magnitude above the physically meaningful range, so
-this output is treated as a normalisation or denormalisation defect
-rather than as a physical prediction.}
+\caption{Maximum displacement on a logarithmic axis (all four routes).}
 \label{fig:displacement-log}
 \end{figure}
 
@@ -266,10 +250,7 @@ to approximately $733$~K for sandstone.
 \legend{Basalt, Sandstone}
 \end{axis}
 \end{tikzpicture}
-\caption{Maximum temperature perturbation predicted by each route,
-shown on a logarithmic axis. PINN is conservative, MeshGraphNet is
-stable across materials, the Transformer-based route is strongly
-material-sensitive, and FNO remains out of scale.}
+\caption{Maximum temperature perturbation (logarithmic axis).}
 \label{fig:temperature}
 \end{figure}
 
@@ -315,10 +296,7 @@ an output sign or denormalisation defect.
 \addplot+[fill=green!30, draw=green!50!black] coordinates {(PINN,11.4) (MeshGraphNet,12.7) (Transformer,12.1) (FNO,-167.3)};
 \end{axis}
 \end{tikzpicture}
-\caption{Predicted azimuth of the propagation vector in the
-2D formulation. PINN, MeshGraphNet, and the Transformer-based route
-align with the geometric source-to-probe direction, while FNO produces
-a sign-inverted direction.}
+\caption{Predicted azimuth of the propagation vector.}
 \label{fig:azimuth}
 \end{figure}
 
@@ -340,11 +318,7 @@ prototype.
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.85\textwidth]{chapters/chapter6/figures/inference_latency_by_model.png}
-\caption{Per-call inference latency measured during a warm steady-state
-probe ($\geq 19$ calls per model, first call dropped as warm-up). The
-boxes span the interquartile range with the median line. The medians
-are summarised together with the travel-time accuracy in
-Table~\ref{tab:acc-lat}.}
+\caption{Per-call inference latency by model (warm steady state).}
 \label{fig:latency}
 \end{figure}
 
@@ -388,19 +362,20 @@ losses because the routes use different training objectives.
 
 \begin{figure}[ht]
 \centering
+\resizebox{0.78\textwidth}{!}{%
 \begin{tikzpicture}
 \begin{axis}[
-  width=0.88\textwidth, height=5.5cm,
+  width=0.78\textwidth, height=5.2cm,
   xlabel={Epoch},
   ylabel={Training loss (log scale)},
   ymode=log,
   log basis y=10,
   xmajorgrids, ymajorgrids, grid style={black!10},
   legend style={
-    at={(0.5,-0.22)},
+    at={(0.5,-0.25)},
     anchor=north,
     draw=none,
-    font=\small,
+    font=\footnotesize,
     legend columns=4
   },
   xmin=1, xmax=8,
@@ -418,13 +393,16 @@ losses because the routes use different training objectives.
 \addplot+[mark=diamond*, mark size=2.5pt, color=orange!80!black, thick] coordinates {(1,2.10) (2,1.40) (3,1.10) (4,0.92) (5,0.81) (6,0.74) (7,0.69) (8,0.66)};
 \addlegendentry{FNO}
 \end{axis}
-\end{tikzpicture}
-\caption{Training-loss traces of the four surrogate routes over the
-first eight epochs on the sandstone pilot. The curves are shown on a
-shared logarithmic axis, but their absolute values are not directly
-comparable because the routes use different objectives.}
+\end{tikzpicture}%
+}
+\caption{Training-loss traces over the first eight epochs.}
 \label{fig:training}
 \end{figure}
+
+The training-loss traces of the four surrogate routes over the first
+eight epochs on the sandstone pilot are shown on a shared logarithmic
+axis; their absolute values are not directly comparable because the
+routes use different objectives.
 
 The absolute loss values do not define a final ranking of the models.
 PINN uses a physics-informed objective, FNO uses a spectral
@@ -472,26 +450,21 @@ return values that differ by several orders of magnitude.
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{chapters/chapter6/figures/model_timeseries_granite.png}
-\caption{Granite. PINN is the only route whose displacement traces show
-a smooth time-dependent drift; the other routes remain nearly flat over
-the tested time window.}
+\caption{Granite: model predictions vs observation time.}
 \label{fig:timeseries-granite}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{chapters/chapter6/figures/model_timeseries_sandstone.png}
-\caption{Sandstone. The qualitative pattern is the same as in
-Figure~\ref{fig:timeseries-granite}: PINN varies smoothly with time,
-whereas the operator-style routes remain close to fixed-horizon outputs.}
+\caption{Sandstone: model predictions vs observation time.}
 \label{fig:timeseries-sandstone}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{chapters/chapter6/figures/model_timeseries_limestone.png}
-\caption{Limestone. The same time-sweep layout is used as in
-Figures~\ref{fig:timeseries-granite} and~\ref{fig:timeseries-sandstone}.}
+\caption{Limestone: model predictions vs observation time.}
 \label{fig:timeseries-limestone}
 \end{figure}
 
