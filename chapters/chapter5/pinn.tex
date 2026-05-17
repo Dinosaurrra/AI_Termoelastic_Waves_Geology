@@ -59,19 +59,19 @@ $\{(x_i, y_i, t_i)\}$ drawn from the training scenarios:
 + \lambda_{\mathrm{th}}\,\mathcal{L}_{\mathrm{thermal}}.
 \end{equation}
 
-\textbf{Supervised loss} $\mathcal{L}_{\mathrm{sup}}$ is the standard
+Supervised loss $\mathcal{L}_{\mathrm{sup}}$ is the standard
 mean-squared error between the predicted $(T,u,v)$ and the
 ground-truth values exported from COMSOL at the corresponding
 $(x_i,y_i,t_i)$.
 
-\textbf{Velocity consistency} $\mathcal{L}_{\mathrm{vel}}$ enforces
+Velocity consistency $\mathcal{L}_{\mathrm{vel}}$ enforces
 that the displacement time derivative obtained by automatic
 differentiation matches the velocity field that COMSOL reported as
 $u_t,v_t$ in the same probe samples. This term prevents the network
 from drifting toward spatially correct but temporally inconsistent
 displacement fields.
 
-\textbf{Elastic-wave residual} $\mathcal{L}_{\mathrm{elastic}}$
+Elastic-wave residual $\mathcal{L}_{\mathrm{elastic}}$
 evaluates the residual of the linear-momentum balance
 \begin{equation}
 \rho\,\partial_t^2 u
@@ -91,7 +91,7 @@ coupling coefficient. All derivatives entering this residual are
 obtained via automatic differentiation of the network output with
 respect to its inputs.
 
-\textbf{Coupled-thermal residual} $\mathcal{L}_{\mathrm{thermal}}$
+Coupled-thermal residual $\mathcal{L}_{\mathrm{thermal}}$
 evaluates the residual of the heat equation extended by the
 thermoelastic coupling source:
 \begin{equation}

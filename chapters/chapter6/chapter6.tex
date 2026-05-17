@@ -336,8 +336,8 @@ routes remain lightweight enough for an interactive research prototype.
 \setlength{\tabcolsep}{5pt}
 \begin{tabular}{lrrlr}
 \toprule
-\textbf{Route} & \textbf{Parameters} & \textbf{Checkpoint size} & \textbf{Device} & \textbf{Median latency} \\
-               &                     &                          &                 & \textbf{[ms]} \\
+Route & Parameters & Checkpoint size & Device & Median latency \\
+               &                     &                          &                 & [ms] \\
 \midrule
 PINN         & $\sim 0.23$~M & $\sim 1.0$~MB & CPU & 2.6 \\
 FNO          & $\sim 1.20$~M & $\sim 5.1$~MB & CPU & 2.4 \\
@@ -475,17 +475,17 @@ the point-wise PINN. The other routes behave more like fixed-horizon
 operators in the current implementation.
 
 \begin{itemize}
-\item \textbf{FNO} maps \texttt{observation.time\_s} to a discrete
+\item FNO maps \texttt{observation.time\_s} to a discrete
 \texttt{time\_index} before assembling the input field. If several
 requested times map to the same index, the probe value remains unchanged
 across that part of the sweep.
 
-\item \textbf{MeshGraphNet} performs a fixed rollout from the initial
+\item MeshGraphNet performs a fixed rollout from the initial
 state. In the current route, \texttt{observation.time\_s} does not
 control the number of message-passing rollout steps, so the returned
 state is almost unchanged across the tested time range.
 
-\item \textbf{Transformer} also behaves as a fixed-horizon predictor in
+\item Transformer also behaves as a fixed-horizon predictor in
 this implementation. It returns a fast prediction, but the requested
 observation time is not yet used as a continuous per-call duration.
 \end{itemize}

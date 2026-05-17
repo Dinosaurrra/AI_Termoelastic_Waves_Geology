@@ -4,9 +4,9 @@
 
 The coupled thermoelastic system written down in Chapter~2 defines a
 deterministic mapping
-\[
+\begin{equation}
 \mathcal{G}: (a,\,\mathrm{IC},\,\mathrm{BC},\,s) \;\longmapsto\; \big(T(x,t),\,u(x,t),\,\sigma(x,t)\big),
-\]
+\end{equation}
 where the input collects the material parameter field
 \(a(x) = (\rho,\lambda,\mu,\gamma,k,C_p)\), the initial and
 boundary conditions, and the source description. A neural surrogate
@@ -34,7 +34,7 @@ sampling. For these reasons we adopt a Transformer-based neural
 operator as one of the four surrogate families compared in this
 thesis.
 
-\{Tokenisation of the thermoelastic state}
+\subsubsection{Tokenisation of the thermoelastic state}
 
 The first step is to encode the physical state of the medium as a
 sequence of \emph{tokens}. For every retained mesh node
@@ -89,14 +89,14 @@ construction discretisation-invariant.
 \node[below=2mm of i2] (idots) {\(\vdots\)};
 \node[itok, below=2mm of idots] (iN) {\(a_{N_{\mathrm{in}}} = (x_{N_{\mathrm{in}}},\;\ldots)\)};
 
-\node[draw=black!50, dashed, fit=(i1) (iN), inner sep=4mm, label=above:{\textbf{Input set} (mesh nodes, ground-truth state at \(t=0\))}] (inset) {};
+\node[draw=black!50, dashed, fit=(i1) (iN), inner sep=4mm, label=above:{Input set (mesh nodes, ground-truth state at \(t=0\))}] (inset) {};
 
 \node[qtok, right=18mm of i1.east] (q1) {\(q_1 = (x_q^{(1)})\)};
 \node[qtok, below=of q1] (q2) {\(q_2 = (x_q^{(2)})\)};
 \node[below=2mm of q2] (qdots) {\(\vdots\)};
 \node[qtok, below=2mm of qdots] (qN) {\(q_{N_q} = (x_q^{(N_q)})\)};
 
-\node[draw=black!50, dashed, fit=(q1) (qN), inner sep=4mm, label=above:{\textbf{Query set} (arbitrary points)}] (qset) {};
+\node[draw=black!50, dashed, fit=(q1) (qN), inner sep=4mm, label=above:{Query set (arbitrary points)}] (qset) {};
 
 \end{tikzpicture}
 \caption{Tokenisation of the thermoelastic state used by the
@@ -428,14 +428,14 @@ work.
 \small
 \begin{tabular}{l l l}
 \toprule
-\textbf{Architecture} & \textbf{Attention cost} & \textbf{Key idea} \\
+Architecture & Attention cost & Key idea \\
 \midrule
 Vanilla Transformer \cite{vaswani2017} & \(\mathcal{O}(N^2 d_m)\) & Softmax dot-product on sequences \\
 OFormer \cite{liNeuralOperator2023} & \(\mathcal{O}(N_{\mathrm{in}} N_q d_m)\) & Cross-attention from input set to query set \\
 Galerkin Transformer \cite{caoChooseTransformer2021} & \(\mathcal{O}(N d_m^2)\) & Softmax replaced by Galerkin-style linear attention \\
 Transolver \cite{wuTransolver2024} & \(\mathcal{O}(N M d_m)\) & Latent physics-aware slots with \(M\!\ll\!N\) \\
 \midrule
-\textbf{This work} & \(\mathcal{O}(N_{\mathrm{in}} N_q d_m)\) & OFormer baseline, \(N_{\mathrm{in}}\!=\!N_q\!=\!1024\) subsampling \\
+This work & \(\mathcal{O}(N_{\mathrm{in}} N_q d_m)\) & OFormer baseline, \(N_{\mathrm{in}}\!=\!N_q\!=\!1024\) subsampling \\
 \bottomrule
 \end{tabular}
 \caption{Position of the Transformer-based neural operator used in this

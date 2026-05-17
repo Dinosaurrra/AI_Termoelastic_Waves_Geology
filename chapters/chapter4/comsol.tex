@@ -21,20 +21,20 @@ The simulated experiment represents a two-dimensional geological medium with a h
 
 The computational domain is denoted as
 
-\[
+\begin{equation}
 \Omega =
 \Omega_{\mathrm{rock}}
 \cup
 \Omega_{\mathrm{rod}} .
-\]
+\end{equation}
 
 Here, \(\Omega\) is the full computational domain, \(\Omega_{\mathrm{rock}}\) is the rock region, and \(\Omega_{\mathrm{rod}}\) is the heated rod region. These two domains are assigned different thermal and mechanical material properties in COMSOL.
 
 The initial temperature of the rock is denoted by \(T_0\), while the initial temperature of the rod is denoted by \(T_{\mathrm{rod}}\). The main thermal excitation condition is
 
-\[
+\begin{equation}
 T_{\mathrm{rod}} > T_0 .
-\]
+\end{equation}
 
 In this expression, \(T_{\mathrm{rod}}\) is the initial temperature of the metallic rod, and \(T_0\) is the initial temperature of the surrounding rock. This temperature contrast creates heat conduction from the rod into the geological medium. Because the temperature distribution becomes spatially non-uniform, different parts of the rock expand by different amounts. This produces strain, stress, and displacement fields.
 
@@ -46,28 +46,28 @@ The main physics interfaces used in the model were:
 
 The COMSOL simulation was constructed using several physics interfaces and model components. Each of them had a specific role in describing the coupled thermoelastic behavior of the geological medium.
 
-\textbf{Solid Mechanics.}
+Solid Mechanics.
 The Solid Mechanics interface was used to calculate the mechanical response of the rock domain. It computed displacement, velocity, strain, stress, and the propagation of mechanical disturbances caused by thermal expansion. This interface was necessary because heating of the rod creates deformation in the surrounding geological medium.
 
-\textbf{Linear Elastic Material.}
+Linear Elastic Material.
 The Linear Elastic Material model defined the mechanical behavior of the rock. It described the medium as an elastic solid using material parameters such as Young's modulus, Poisson's ratio, density, and the thermal expansion coefficient. These parameters determined how strongly the rock deformed under thermoelastic loading.
 
-\textbf{Free Boundary.}
+Free Boundary.
 The Free Boundary condition was applied to selected external boundaries of the geometry. It allowed these boundaries to deform without externally applied mechanical traction. This condition was used to reproduce a natural mechanical response of the medium instead of artificially fixing all outer surfaces.
 
-\textbf{Heat Transfer in Solids.}
+Heat Transfer in Solids.
 The Heat Transfer in Solids interface was used to model transient heat conduction in the simulation domain. It calculated how heat propagated from the heated rod into the surrounding rock over time. This module provided the temperature field required for the thermoelastic coupling.
 
-\textbf{Thermal Insulation.}
+Thermal Insulation.
 The Thermal Insulation condition was applied to selected external boundaries. It prevented heat flux through these surfaces and limited heat exchange with the external environment. This made it possible to control the thermal behavior of the model and focus on heat propagation inside the simulated rock domain.
 
-\textbf{Thermal Expansion.}
+Thermal Expansion.
 The Thermal Expansion feature was used to couple the thermal and mechanical parts of the simulation. It transformed temperature changes into thermal strain. As a result, the temperature field obtained from the heat transfer analysis produced mechanical deformation in the solid mechanics model.
 
-\textbf{Temperature Coupling.}
+Temperature Coupling.
 The Temperature Coupling feature transferred the computed temperature field from the Heat Transfer in Solids interface to the Solid Mechanics interface. This ensured that the mechanical response of the rock was calculated using the actual transient temperature distribution inside the model.
 
-\textbf{Time Dependent Study.}
+Time Dependent Study.
 The Time Dependent Study was used to solve the coupled thermoelastic problem over a sequence of time steps. It produced time-dependent fields of temperature, displacement, stress, and strain. These results were later exported and used for synthetic dataset generation.
 
 This model structure is important because the final dataset is not generated from independent physical fields. Temperature, displacement, stress, and strain are obtained from the same coupled solution, which makes the exported data physically consistent.
@@ -86,29 +86,29 @@ A cylindrical rod was placed inside the rock block and used as the localized hea
 
 At the beginning of the simulation, the rock was initialized at room temperature:
 
-\[
+\begin{equation}
 T_0 = 293.15~\mathrm{K}.
-\]
+\end{equation}
 
 The reference temperature for thermal expansion was also set to the same value:
 
-\[
+\begin{equation}
 T_{\mathrm{ref}} = 293.15~\mathrm{K}.
-\]
+\end{equation}
 
 This means that the rock was considered thermally undeformed at the initial state. In other words, before the heated rod affected the medium, no thermal strain was assumed to exist in the rock.
 
 The rod temperature was set much higher than the initial rock temperature:
 
-\[
+\begin{equation}
 T_{\mathrm{rod},0} = 1500~\mathrm{K}.
-\]
+\end{equation}
 
 As a result, a strong temperature contrast appeared between the rod and the surrounding geological medium. The temperature difference between the heated rod and the initial rock state was
 
-\[
+\begin{equation}
 \Delta T = 1500 - 293.15 = 1206.85~\mathrm{K}.
-\]
+\end{equation}
 
 This large temperature contrast created an intensive thermal gradient near the rod--rock contact region. Heat started to propagate from the rod into the surrounding medium. Since the temperature field was not uniform, different parts of the rock expanded by different amounts. This non-uniform expansion generated thermal strain and stress in the material.
 
@@ -122,7 +122,7 @@ The main parameters of the experiment are presented in Table~\ref{tab:heated_rod
 \label{tab:heated_rod_experiment_parameters}
 \begin{tabular}{p{0.35\textwidth} p{0.25\textwidth} p{0.25\textwidth}}
 \hline
-\textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
+Parameter & Symbol & Value \\
 \hline
 Main rock block size & \(L\) & \(1~\mathrm{m}\) \\
 Rod radius & \(r_{\mathrm{rod}}\) & \(0.04~\mathrm{m}\) \\
@@ -138,11 +138,11 @@ Initial temperature contrast & \(\Delta T\) & \(1206.85~\mathrm{K}\) \\
 
 The thermal part of the simulation is based on transient heat conduction. The governing equation can be written as
 
-\[
+\begin{equation}
 \rho C_p \frac{\partial T}{\partial t}
 =
 \nabla \cdot \left( k \nabla T \right) + Q .
-\]
+\end{equation}
 
 Here, \(T\) is temperature, \(t\) is time, \(\rho\) is material density, \(C_p\) is heat capacity at constant pressure, \(k\) is thermal conductivity, and \(Q\) is a volumetric heat source. The term on the left describes thermal energy accumulation, while the term \(\nabla \cdot (k \nabla T)\) describes heat conduction inside the solid material.
 
@@ -150,7 +150,7 @@ The mechanical response is computed by the Solid Mechanics interface. The displa
 
 Thermoelastic coupling is introduced through thermal strain:
 
-\[
+\begin{equation}
 \boldsymbol{\varepsilon}_{\mathrm{th}}
 =
 \alpha
@@ -158,26 +158,26 @@ Thermoelastic coupling is introduced through thermal strain:
 T - T_{\mathrm{ref}}
 \right)
 \mathbf{I}.
-\]
+\end{equation}
 
 In this formula, \(\boldsymbol{\varepsilon}_{\mathrm{th}}\) is thermal strain, \(\alpha\) is the coefficient of thermal expansion, \(T\) is the current temperature, \(T_{\mathrm{ref}}\) is the reference temperature, and \(\mathbf{I}\) is the identity tensor. The formula means that a temperature increase produces expansion of the material. This thermal expansion changes the stress and displacement fields.
 
 The dynamic mechanical response is described in COMSOL by the balance of linear momentum:
 
-\[
+\begin{equation}
 \rho_s
 \frac{\partial^2 \mathbf{u}}{\partial t^2}
 =
 \nabla \cdot \boldsymbol{\sigma}
 +
 \mathbf{f}.
-\]
+\end{equation}
 
 Here, \(\rho_s\) is the structural density, \(\mathbf{u}\) is the displacement vector, \({\sigma}\) is the stress tensor, and \(\mathbf{f}\) is the body force vector. This equation states that stress gradients and external forces produce acceleration of the medium. In the present experiment, the main source of mechanical response is not an external impact, but thermal expansion caused by the heated rod.
 
 The coupling chain of the simulation can therefore be summarized as follows:
 
-\[
+\begin{equation}
 T
 \rightarrow
 \boldsymbol{\varepsilon}_{\mathrm{th}}
@@ -185,7 +185,7 @@ T
 \boldsymbol{\sigma}
 \rightarrow
 \mathbf{u}.
-\]
+\end{equation}
 
 This expression shows the main physical logic of the experiment: the temperature field creates thermal strain, thermal strain modifies the stress field, and the stress field produces displacement and wave-like mechanical response.
 
@@ -193,33 +193,33 @@ This expression shows the main physical logic of the experiment: the temperature
 
 The initial conditions define the temperature contrast between the heated rod and the surrounding rock. The rock domain is initialized with temperature \(T_0\), while the rod domain is initialized with a higher temperature \(T_{\mathrm{rod}}\):
 
-\[
+\begin{equation}
 T(\mathbf{x},0) = T_0,
 \qquad
 \mathbf{x} \in \Omega_{\mathrm{rock}},
-\]
+\end{equation}
 
-\[
+\begin{equation}
 T(\mathbf{x},0) = T_{\mathrm{rod}},
 \qquad
 \mathbf{x} \in \Omega_{\mathrm{rod}}.
-\]
+\end{equation}
 
 Here, \(\mathbf{x}\) denotes a spatial point in the computational domain, \(T(\mathbf{x},0)\) is the initial temperature at this point, \(T_0\) is the initial rock temperature, and \(T_{\mathrm{rod}}\) is the initial rod temperature.
 
 For the external thermal boundaries, thermal insulation was applied. This condition can be written as
 
-\[
+\begin{equation}
 -\mathbf{n} \cdot \mathbf{q} = 0 .
-\]
+\end{equation}
 
 In this expression, \(\mathbf{n}\) is the outward normal vector to the boundary, and \(\mathbf{q}\) is the heat flux vector. The condition means that no heat leaves the model through the insulated boundary. This allows the simulation to focus on heat propagation inside the rock domain.
 
 For the mechanical part, free boundary conditions were used on selected boundaries. A free mechanical boundary means that no external traction is applied:
 
-\[
+\begin{equation}
 \boldsymbol{\sigma}\mathbf{n} = 0 .
-\]
+\end{equation}
 
 Here, \({\sigma}\) is the stress tensor and \(\mathbf{n}\) is the outward boundary normal. This condition allows the boundary to deform naturally under the internal thermoelastic response.
 
@@ -233,7 +233,7 @@ The material parameters define how heat propagates through the medium and how th
 \label{tab:comsol_material_parameters}
 \begin{tabular}{p{0.26\textwidth} p{0.16\textwidth} p{0.48\textwidth}}
 \hline
-\textbf{Parameter} & \textbf{Symbol} & \textbf{Physical meaning} \\
+Parameter & Symbol & Physical meaning \\
 \hline
 Density & \(\rho\), \(\rho_s\) & Controls thermal storage and mechanical inertia. In COMSOL, density can be exported separately for heat transfer and solid mechanics. \\
 \hline
@@ -258,11 +258,11 @@ The coupled thermoelastic problem was solved using the finite element method. In
 
 The simulation was performed as a time-dependent study. The simulated time interval is represented as
 
-\[
+\begin{equation}
 t_n = n \Delta t,
 \qquad
 n = 0,1,\ldots,N_t .
-\]
+\end{equation}
 
 Here, \(t_n\) is the time value at step \(n\), \(\Delta t\) is the time step, and \(N_t\) is the total number of simulated time steps. At every time step, COMSOL computes the temperature field, displacement field, velocity field, stress tensor components, strain components, and material-related quantities.
 
@@ -282,7 +282,7 @@ The actual exported groups are shown in Table~\ref{tab:comsol_export_groups}.
 \label{tab:comsol_export_groups}
 \begin{tabular}{p{0.23\textwidth} p{0.36\textwidth} p{0.31\textwidth}}
 \hline
-\textbf{Export label} & \textbf{Exported expressions} & \textbf{Description} \\
+Export label & Exported expressions & Description \\
 \hline
 \texttt{data\_temperature} & 
 \texttt{T}, \texttt{x}, \texttt{y}, \texttt{z}, \texttt{ht.k\_iso}, \texttt{ht.rho}, \texttt{ht.Cp} &
@@ -325,23 +325,23 @@ The processing pipeline consisted of the following steps. First, the exported CS
 
 For one time step, the processed data can be represented as a feature matrix
 
-\[
+\begin{equation}
 \mathbf{X}_n \in \mathbb{R}^{N_p \times F}.
-\]
+\end{equation}
 
 In this expression, \(\mathbf{X}_n\) is the feature matrix at time step \(n\), \(N_p\) is the number of spatial points or mesh nodes, and \(F\) is the number of exported physical features. Each row corresponds to one spatial point, and each column corresponds to one physical variable.
 
 For the full time-dependent simulation, the dataset is represented as a tensor
 
-\[
+\begin{equation}
 \mathbf{X} \in \mathbb{R}^{N_t \times N_p \times F}.
-\]
+\end{equation}
 
 Here, \(N_t\) is the number of time steps, \(N_p\) is the number of spatial points, and \(F\) is the number of physical channels. This representation preserves the temporal evolution of the thermoelastic process.
 
 Feature normalization was applied after merging the exported fields. For each feature channel, the normalized value is computed as
 
-\[
+\begin{equation}
 \widetilde{X}_{n,i,f}
 =
 \frac{
@@ -349,7 +349,7 @@ X_{n,i,f} - \mu_f
 }{
 \sigma_f + \varepsilon
 }.
-\]
+\end{equation}
 
 Here, \(X_{n,i,f}\) is the original value at time step \(n\), spatial point \(i\), and feature channel \(f\). The value \(\mu_f\) is the mean of feature \(f\), \(\sigma_f\) is the standard deviation of feature \(f\), and \(\varepsilon\) is a small numerical constant used to avoid division by zero. This normalization is required because the exported variables have different physical units and numerical scales. For example, temperature, displacement, stress, strain, density, and Young's modulus differ by several orders of magnitude.
 
