@@ -24,8 +24,8 @@ The mesh was exported separately as a COMSOL text mesh file with the extension \
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{figures/raw_comsol_csv_header.png}
-    \caption{Example of a raw COMSOL CSV export containing metadata rows, spatial coordinates, physical field names, units, and time-dependent columns.}
+    \includegraphics[width=0.95\textwidth]{chapters/chapter4/raw_dataset_folder.png}
+    \caption{Folder with all initial raw files of dataset.}
     \label{fig:raw_comsol_csv_header}
 \end{figure}
 
@@ -34,9 +34,14 @@ Each CSV file contains COMSOL metadata rows and a numerical table. Metadata rows
 X,\quad Y,\quad Z.
 \]
 The remaining columns contain physical fields written in the COMSOL format
-\[
-\texttt{field\_name (unit) @ t=value}.
-\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{chapters/chapter4/example_of_dataset.png}
+    \caption{Example of a raw COMSOL CSV export.}
+    \label{fig:raw_comsol_csv_header}
+\end{figure}
+
 This naming convention allows the preprocessing script to extract three pieces of information from each column: the physical variable, its unit of measurement, and the simulation time.
 
 During CSV cleaning, service rows were skipped, the real header row was detected, and only supported physical exports were parsed. Non-numerical entries were converted where possible, while invalid or missing values were handled before tensor construction. This was necessary because the exported variables have different physical meanings and numerical scales: temperature is measured in kelvin, displacement in meters, stress in pascals, strain is dimensionless, and material parameters may have much larger magnitudes.
@@ -105,6 +110,14 @@ The output of the preprocessing stage was a set of processed artifacts stored in
 \[
 \texttt{datasets/<dataset\_id>/processed/}.
 \]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{chapters/chapter4/processed_dataset_folder.png}
+    \caption{Folder including all processed from dataset files.}
+    \label{fig:raw_comsol_csv_header}
+\end{figure}
+
 The most important artifacts are summarized in Table~\ref{tab:processed_dataset_artifacts}.
 
 \begin{table}[H]
