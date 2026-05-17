@@ -268,21 +268,32 @@ Here, \(t_n\) is the time value at step \(n\), \(\Delta t\) is the time step, an
 
 The result of the simulation is therefore not a single static solution. It is a time-dependent sequence of physical states that describes how heat and mechanical disturbances evolve inside the geological medium.
 
-\subsection{Exported COMSOL Data}
+\subsection{COMSOL Data Export and Dataset Processing}
 
-The raw dataset was exported from COMSOL as a set of CSV files. Each export used the dataset \textit{Study 1/Solution 1 (sol1)} with time selection set to \textit{All}. This means that the exported tables contain data for the full time-dependent solution, not only for one selected time step.
+The raw dataset was exported from COMSOL as a set of CSV files. Each export used the dataset \textit{Study 1/Solution 1 (sol1)} with time selection set to \textit{All}. Therefore, the exported tables contain the full time-dependent solution rather than a single selected time step. The mesh was exported separately as a COMSOL Multiphysics text file with the extension \texttt{.mphtxt}. This file preserves the spatial discretization of the numerical model and can later be used to reconstruct the mesh-based graph representation.
 
-The mesh was exported separately as a COMSOL Multiphysics text file with the extension \texttt{.mphtxt}. This file stores the mesh structure of the simulation and is used to preserve the spatial discretization of the model.
+The exported files were stored in the raw dataset directory:
+\[
+\texttt{datasets/<dataset\_id>/raw/}.
+\]
+The raw directory contains CSV files with physical fields, the exported mesh file, and a scenario configuration file. An example of the raw dataset structure is shown in Figure~\ref{fig:raw_dataset_folder}.
 
-The actual exported groups are shown in Table~\ref{tab:comsol_export_groups}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{chapters/chapter4/raw_dataset_folder.png}
+    \caption{Raw dataset structure exported from COMSOL, including physical field CSV files, mesh data, and scenario configuration.}
+    \label{fig:raw_dataset_folder}
+\end{figure}
+
+The exported COMSOL groups are summarized in Table~\ref{tab:comsol_export_groups}. The files are separated according to their physical meaning: temperature-related quantities, displacement and velocity fields, material parameters, stress components, strain components, and mesh information.
 
 \begin{table}[H]
 \centering
 \caption{Exported COMSOL data groups used for dataset construction.}
 \label{tab:comsol_export_groups}
-\begin{tabular}{p{0.23\textwidth} p{0.36\textwidth} p{0.31\textwidth}}
+\begin{tabular}{p{0.24\textwidth} p{0.34\textwidth} p{0.32\textwidth}}
 \hline
-Export label & Exported expressions & Description \\
+\textbf{Export label} & \textbf{Exported expressions} & \textbf{Description} \\
 \hline
 \texttt{data\_temperature} & 
 \texttt{T}, \texttt{x}, \texttt{y}, \texttt{z}, \texttt{ht.k\_iso}, \texttt{ht.rho}, \texttt{ht.Cp} &
@@ -304,8 +315,8 @@ Von Mises stress and normal stress components. \\
 \texttt{solid.sxy}, \texttt{solid.syz}, \texttt{solid.sxz} &
 Shear stress components. \\
 \hline
-\texttt{data\_stress\_3} &
-\texttt{solid.eX}, \texttt{solid.eY}, \texttt{solid.eZ} &
+\texttt{data\_strain} &
+\texttt{solid.eX}, \texttt{solid.eY}, \texttt{solid.eZ}, \texttt{solid.eXY}, \texttt{solid.eYZ}, \texttt{solid.eXZ} &
 Strain tensor components exported from Solid Mechanics. \\
 \hline
 \texttt{mesh\_rod\_experiment} &
@@ -315,45 +326,218 @@ Finite element mesh of the rod experiment. \\
 \end{tabular}
 \end{table}
 
-This export structure separates the dataset into physically meaningful groups. Temperature-related quantities, displacement variables, material parameters, stress components, strain components, and mesh information are stored separately at the COMSOL export stage and then combined during preprocessing.
+Each CSV file contains COMSOL metadata rows and a numerical table. The metadata rows begin with the symbol \(\texttt{\%}\) and describe the model name, COMSOL version, date of export, spatial dimension, number of nodes, and exported expressions. The actual data table starts from the row containing the spatial coordinates
+\[
+X,\quad Y,\quad Z.
+\]
+The remaining columns contain physical variables written in the COMSOL format
+\[
+\texttt{field\_name (unit) @ t=value}.
+\]
+This naming convention stores three important pieces of information in each column name: the physical variable, its unit of measurement, and the simulation time. An example of such a raw COMSOL export is shown in Figure~\ref{fig:raw_comsol_csv_example}.
 
-\subsection{Dataset Processing}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{chapters/chapter4/example_of_dataset.png}
+    \caption{Example of a raw COMSOL CSV export containing metadata rows, spatial coordinates, physical field names, units, and time-dependent columns.}
+    \label{fig:raw_comsol_csv_example}
+\end{figure}
 
-After export, the CSV files were converted into a structured numerical dataset. The purpose of this step was to transform COMSOL tables into a consistent format suitable for computational analysis and later training of predictive models.
+After export, the raw numerical files were converted into a unified machine-learning dataset. This step was necessary because COMSOL tables are solver-oriented: physical fields are stored in wide CSV format, metadata rows are mixed with numerical values, and different quantities are split across separate files. Neural surrogate models require a cleaner representation with aligned spatial points, synchronized time steps, normalized physical channels, and a clear separation between dynamic and static information.
 
-The processing pipeline consisted of the following steps. First, the exported CSV files were read separately according to their physical groups. Second, variable names were standardized so that COMSOL expressions such as \texttt{ht.k\_iso}, \texttt{solid.mises}, and \texttt{te1.alpha\_iso} could be used consistently in code. Third, the data were aligned by time step and spatial location. Fourth, thermal, displacement, material, stress, and strain fields were merged into a single feature representation. Finally, the processed dataset was checked for missing values, inconsistent time steps, and incorrect coordinate alignment.
+The preprocessing stage was designed as a common data preparation step for all neural models considered in this work. Graph-based models can use the mesh connectivity and edge attributes, operator-learning models can use the spatio-temporal field tensor, and coordinate-based models can sample points in space and time. This allows different architectures to be compared using the same physical dataset rather than separate preprocessing assumptions.
 
-For one time step, the processed data can be represented as a feature matrix
+During CSV cleaning, COMSOL service rows were skipped, the true header row was detected, and only supported physical exports were parsed. Non-numerical entries were converted where possible, while invalid or missing values were handled before tensor construction. This was required because the exported variables have different units and numerical scales: temperature is measured in kelvin, displacement in meters, stress in pascals, strain is dimensionless, and material parameters may have substantially larger magnitudes.
 
-\begin{equation}
-\mathbf{X}_n \in \mathbb{R}^{N_p \times F}.
-\end{equation}
-
-In this expression, \(\mathbf{X}_n\) is the feature matrix at time step \(n\), \(N_p\) is the number of spatial points or mesh nodes, and \(F\) is the number of exported physical features. Each row corresponds to one spatial point, and each column corresponds to one physical variable.
-
-For the full time-dependent simulation, the dataset is represented as a tensor
-
-\begin{equation}
-\mathbf{X} \in \mathbb{R}^{N_t \times N_p \times F}.
-\end{equation}
-
-Here, \(N_t\) is the number of time steps, \(N_p\) is the number of spatial points, and \(F\) is the number of physical channels. This representation preserves the temporal evolution of the thermoelastic process.
-
-Feature normalization was applied after merging the exported fields. For each feature channel, the normalized value is computed as
-
-\begin{equation}
-\widetilde{X}_{n,i,f}
+A separate coordinate-alignment step was required because different COMSOL exports may contain different point sets or the same points in a different order. Therefore, the files cannot be merged reliably by row index. A reference coordinate array was selected, and the remaining fields were mapped to this reference using nearest-neighbor matching in coordinate space:
+\[
+j(i)
 =
-\frac{
-X_{n,i,f} - \mu_f
-}{
-\sigma_f + \varepsilon
-}.
-\end{equation}
+\arg\min_j
+\left\|
+\mathbf{r}^{\mathrm{ref}}_i
+-
+\mathbf{r}^{\mathrm{src}}_j
+\right\|_2 .
+\]
+Here, \(\mathbf{r}^{\mathrm{ref}}_i\) is the \(i\)-th coordinate in the reference node set, and \(\mathbf{r}^{\mathrm{src}}_j\) is a coordinate from another exported file. This step produced a single aligned node set shared by all physical fields.
 
-Here, \(X_{n,i,f}\) is the original value at time step \(n\), spatial point \(i\), and feature channel \(f\). The value \(\mu_f\) is the mean of feature \(f\), \(\sigma_f\) is the standard deviation of feature \(f\), and \(\varepsilon\) is a small numerical constant used to avoid division by zero. This normalization is required because the exported variables have different physical units and numerical scales. For example, temperature, displacement, stress, strain, density, and Young's modulus differ by several orders of magnitude.
+After alignment, the data were separated into dynamic and static features. Dynamic features describe the time-dependent state of the thermoelastic process. These include temperature, displacement components, velocity components, stress components, and strain components. Static features describe quantities that do not change during one simulation, such as spatial coordinates, material parameters, source-region indicators, distance to the source, and scenario-level parameters. Material properties are not treated as prediction targets; they are used as conditioning information for the models.
 
-The mesh file \texttt{mesh\_rod\_experiment.mphtxt} was used to preserve the spatial structure of the simulation. The CSV files contain the exported field values, while the mesh file describes the finite element discretization used by COMSOL. Together, these files define both the numerical values of the physical fields and their spatial organization.
+The dynamic part of the dataset was assembled into a spatio-temporal tensor
+\[
+\mathbf{S}
+\in
+\mathbb{R}^{N_t \times N_p \times F_d},
+\]
+where \(N_t\) is the number of time steps, \(N_p\) is the number of spatial points or mesh nodes, and \(F_d\) is the number of dynamic physical channels. For one time step \(n\), the state of the simulated medium is represented as
+\[
+\mathbf{S}_n
+\in
+\mathbb{R}^{N_p \times F_d}.
+\]
+The static part was stored as
+\[
+\mathbf{A}
+\in
+\mathbb{R}^{N_p \times F_s},
+\]
+where \(F_s\) is the number of static node or scenario features.
+
+Normalization was applied separately to dynamic and static features. For each feature channel, the mean and standard deviation were computed and saved for later denormalization. The normalized value was calculated as
+\[
+\widetilde{x}
+=
+\frac{x-\mu}{\sigma+\varepsilon},
+\]
+where \(x\) is the original feature value, \(\mu\) is the mean value of the corresponding channel, \(\sigma\) is its standard deviation, and \(\varepsilon\) is a small constant used for numerical stability. Separate normalization statistics are important because dynamic physical fields and static material parameters have different distributions and units.
+
+For graph-based models, the aligned coordinates were additionally converted into a graph representation. If the exported \(\texttt{.mphtxt}\) file was available and compatible with the aligned node set, mesh connectivity was used to construct graph edges. If the mesh connectivity could not be used, a nearest-neighbor graph was constructed from the node coordinates. For an edge from node \(i\) to node \(j\), the edge attribute vector was defined as
+\[
+\mathbf{e}_{ij}
+=
+\left[
+x_j-x_i,\,
+y_j-y_i,\,
+z_j-z_i,\,
+\left\|
+\mathbf{r}_j-\mathbf{r}_i
+\right\|_2
+\right].
+\]
+The first three components describe the relative spatial offset between neighboring nodes, while the last component stores the Euclidean distance.
+
+Training pairs were generated from the processed time sequence. Depending on the model type, the processed dataset can be used as full-field states, coordinate-time samples, temporal sequences, or graph trajectories. For one-step transition learning, the target can be represented as the state increment
+\[
+\Delta \mathbf{S}_n
+=
+\mathbf{S}_{n+1}
+-
+\mathbf{S}_n .
+\]
+This delta representation is useful for transient thermoelastic dynamics because the model learns the local change of the physical state between consecutive time steps rather than predicting the complete field independently at every step.
+
+The complete preprocessing workflow is summarized in Figure~\ref{fig:dataset_preprocessing_pipeline}.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+    font=\small,
+    process/.style={
+        draw,
+        rectangle,
+        rounded corners,
+        align=center,
+        minimum height=1.0cm,
+        text width=2.8cm
+    },
+    artifact/.style={
+        draw,
+        rectangle,
+        rounded corners,
+        align=center,
+        minimum height=1.0cm,
+        text width=3.0cm,
+        double
+    },
+    arrow/.style={
+        -{Latex[length=2.5mm]},
+        thick
+    },
+    dashedarrow/.style={
+        -{Latex[length=2.5mm]},
+        thick,
+        dashed
+    }
+]
+
+\node[process] (raw) {Raw COMSOL\\exports};
+\node[process, right=0.8cm of raw] (cleaning) {CSV parsing\\and cleaning};
+\node[process, right=0.8cm of cleaning] (alignment) {Coordinate\\alignment};
+\node[process, right=0.8cm of alignment] (features) {Dynamic/static\\feature separation};
+\node[process, right=0.8cm of features] (tensor) {State tensor\\construction};
+\node[process, right=0.8cm of tensor] (normalization) {Feature\\normalization};
+
+\node[artifact, below=1.2cm of normalization] (artifacts) {Model-ready\\processed artifacts};
+\node[process, right=0.8cm of artifacts] (models) {Neural surrogate\\models};
+
+\node[process, below=1.2cm of alignment] (graph) {Graph\\construction};
+\node[artifact, right=0.8cm of graph] (graphartifacts) {Graph artifacts\\and trajectories};
+\node[process, right=0.8cm of graphartifacts] (graphmodels) {Graph-based\\models};
+
+\draw[arrow] (raw) -- (cleaning);
+\draw[arrow] (cleaning) -- (alignment);
+\draw[arrow] (alignment) -- (features);
+\draw[arrow] (features) -- (tensor);
+\draw[arrow] (tensor) -- (normalization);
+\draw[arrow] (normalization) -- (artifacts);
+\draw[arrow] (artifacts) -- (models);
+
+\draw[dashedarrow] (alignment) -- (graph);
+\draw[arrow] (graph) -- (graphartifacts);
+\draw[arrow] (graphartifacts) -- (graphmodels);
+
+\end{tikzpicture}
+}
+\caption{Dataset preprocessing pipeline from raw COMSOL exports to model-ready representations for neural surrogate models. The dashed branch denotes the additional graph construction step used by graph-based architectures.}
+\label{fig:dataset_preprocessing_pipeline}
+\end{figure}
+
+The output of the preprocessing stage was stored in
+\[
+\texttt{datasets/<dataset\_id>/processed/}.
+\]
+An example of the processed dataset structure is shown in Figure~\ref{fig:processed_dataset_folder}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{chapters/chapter4/processed_dataset_folder.png}
+    \caption{Processed dataset artifacts generated after parsing, coordinate alignment, normalization, graph construction, and trajectory preparation.}
+    \label{fig:processed_dataset_folder}
+\end{figure}
+
+The most important processed artifacts are summarized in Table~\ref{tab:processed_dataset_artifacts}.
+
+\begin{table}[H]
+\centering
+\caption{Processed dataset artifacts produced from COMSOL exports.}
+\label{tab:processed_dataset_artifacts}
+\begin{tabular}{p{0.32\textwidth} p{0.58\textwidth}}
+\hline
+\textbf{Artifact} & \textbf{Purpose} \\
+\hline
+\texttt{coords.npy} &
+Aligned spatial coordinates of the computational points or mesh nodes. \\
+\hline
+\texttt{dynamic.npy} &
+Time-dependent physical fields stored as a spatio-temporal tensor. \\
+\hline
+\texttt{static.npy} &
+Static node, material, and scenario features. \\
+\hline
+\texttt{time.npy} &
+Simulation time values corresponding to the dynamic states. \\
+\hline
+\texttt{normalization.json} &
+Normalization statistics required for scaling and denormalization. \\
+\hline
+\texttt{metadata.json} &
+Dataset metadata, including feature names, dimensions, time-step information, and processing configuration. \\
+\hline
+\texttt{graph.pt} &
+Graph representation used by graph-based models: edge index, edge attributes, coordinates, and static node features. \\
+\hline
+\texttt{trajectories.pt} &
+Prepared transition samples or trajectory fragments for models that learn temporal state evolution. \\
+\hline
+\texttt{preview.csv} &
+Diagnostic summary used to inspect feature ranges and verify the correctness of preprocessing. \\
+\hline
+\end{tabular}
+\end{table}
+
+Thus, the preprocessing stage converts heterogeneous COMSOL outputs into a common numerical dataset that can be reused by different neural surrogate models. This design is important for fair comparison: the models differ in architecture and input representation, but they are trained and evaluated from the same cleaned, aligned, and normalized thermoelastic simulation data.
 
 \subsection{Visualization and Validation of the Simulation}
 
