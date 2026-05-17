@@ -4,15 +4,13 @@
 Every derived quantity used in the v2 contract --- temperature
 perturbation $\theta$, propagation vector $d = x_p - x_s$, distance,
 unit direction, azimuth, displacement magnitude, Lam\'e parameters
---- is computed by a single module
-\path{backend/app/domain/services/derived\_quantities.py}.
-Keeping all formulas in one file is intentional: the contract document
-points at this module as the single source of truth, and unit tests in
-\path{backend/tests/test_derived\_quantities.py} pin every formula to a
-known reference value. The module is pure Python with no FastAPI or
-Pydantic dependencies.
+--- is computed by a single Python module that acts as the
+authoritative source of truth for these formulas in the prototype.
+The module is pure Python (no FastAPI or Pydantic dependencies), and
+each formula is pinned to a reference value by a unit test in the
+backend test suite.
 
-\begin{lstlisting}[language=Python,caption={Excerpt of \texttt{derived\_quantities.py}}]
+\begin{lstlisting}[language=Python,caption={Derived-quantities module (excerpt)}]
 REFERENCE_TEMPERATURE_K = 273.15
 SOURCE_TEMPERATURE_K = 1500.0
 DOMAIN_SIZE_M = 1.0

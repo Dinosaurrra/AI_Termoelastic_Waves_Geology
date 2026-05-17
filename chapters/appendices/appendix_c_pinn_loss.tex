@@ -6,8 +6,8 @@ components: a supervised loss, a velocity-consistency loss, an
 elastic-wave residual, and a coupled-thermal residual. The composite
 loss \eqref{eq:mse} weights them with task-specific coefficients. The
 listing below shows the residual assembly using PyTorch automatic
-differentiation; this is the kernel of \path{pinn-service/src/
-pinn\_service/losses.py}.
+differentiation; this kernel of the PINN training module is what
+distinguishes the PINN's objective from a pure supervised MSE.
 
 \begin{lstlisting}[language=Python,caption={Composite PINN loss assembly (residuals computed via autograd)}]
 def composite_loss(model, batch, material, weights):

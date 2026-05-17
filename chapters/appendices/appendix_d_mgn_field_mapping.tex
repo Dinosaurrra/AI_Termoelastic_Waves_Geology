@@ -2,15 +2,14 @@
 \addcontentsline{toc}{section}{Appendix D. MGN field mapping}
 
 The MeshGraphNet checkpoint shipped with the project is trained
-against the canonical 20-field thermoelastic state of the
-\texttt{sandstone\_comsol\_real} dataset. Loading the same checkpoint
-against the 2D \texttt{*\_rod\_2d} datasets used in this thesis
-requires a per-field rewrite that places the PINN-exported
-\texttt{stress\_normal}, \texttt{stress\_shear}, \texttt{strain},
-\texttt{displacement}, \texttt{velocity}, and \texttt{temperature}
-columns in the exact order the network expects. The listing below
-shows the mapping kernel of
-\path{mgn-service/scripts/build\_2d\_mgn\_datasets.py}.
+against the canonical 20-field thermoelastic state of the original
+3D sandstone reference dataset. Loading the same checkpoint against
+the per-rock 2D datasets used in this thesis requires a per-field
+rewrite that places the PINN-exported \texttt{stress\_normal},
+\texttt{stress\_shear}, \texttt{strain}, \texttt{displacement},
+\texttt{velocity}, and \texttt{temperature} columns in the exact
+order the network expects. The listing below is the mapping kernel
+of the 2D dataset builder.
 
 \begin{lstlisting}[language=Python,caption={20-field assembly for the 2D MGN dataset}]
 DYNAMIC_FIELD_NAMES = [

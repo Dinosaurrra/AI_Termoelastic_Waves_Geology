@@ -3,8 +3,7 @@
 
 The travel-time accuracy column of Table~\ref{tab:acc-lat} and the
 inference latency boxplot of Figure~\ref{fig:latency} were both
-produced by
-\path{ai-directional-prediction/scripts/measure\_accuracy\_and\_latency.py}.
+produced by the accuracy/latency measurement script described below.
 The script compares each model's predicted travel time against the
 analytical body-wave reference and then re-issues twenty cached
 requests to measure per-call latency.
