@@ -56,6 +56,40 @@
 \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
 
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+% --- Source-code listings for the appendices ---
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{kw}{HTML}{1F4E79}
+\definecolor{str}{HTML}{708050}
+\definecolor{cm}{HTML}{777777}
+\definecolor{bg}{HTML}{F7F7F2}
+\lstdefinestyle{thesiscode}{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{bg},
+  keywordstyle=\color{kw}\bfseries,
+  stringstyle=\color{str},
+  commentstyle=\color{cm}\itshape,
+  numbers=left,
+  numberstyle=\tiny\color{cm},
+  numbersep=6pt,
+  frame=single,
+  rulecolor=\color{cm!40},
+  framesep=4pt,
+  tabsize=4,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=fullflexible,
+  keepspaces=true,
+  upquote=true,
+  literate=
+    {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+    {θ}{{$\theta$}}1 {γ}{{$\gamma$}}1 {ρ}{{$\rho$}}1 {α}{{$\alpha$}}1
+    {ν}{{$\nu$}}1 {μ}{{$\mu$}}1 {λ}{{$\lambda$}}1 {σ}{{$\sigma$}}1
+}
+\lstset{style=thesiscode}
+
 \begin{document}
 
 % Custom title pages. The file tiles.tex must NOT contain
@@ -114,5 +148,10 @@
 
 % References.
 \input{sources.tex}
+
+\clearpage
+
+% Appendices (switches numbering to A/B/C and pulls each one).
+\input{chapters/appendices/appendices.tex}
 
 \end{document}

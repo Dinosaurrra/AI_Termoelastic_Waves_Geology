@@ -1,0 +1,73 @@
+\section{API contract v2: Pydantic request schemas}
+\addcontentsline{toc}{section}{Appendix A. API contract v2 schemas}
+
+This appendix shows the Pydantic v2 schemas that implement the client-
+facing v2 request contract described in Chapter~5. The schemas live in
+\path{backend/app/schemas/prediction.py}; only the v2 subset is
+reproduced here. The full file also contains the unchanged v1 schemas
+that remain valid through schema-version dispatch.
+
+\begin{lstlisting}[language=Python,caption={V2 request schemas — \texttt{backend/app/schemas/prediction.py}}]
+class Point2DSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    x_m: float = Field(..., ge=0.0, le=DOMAIN_SIZE_M, allow_inf_nan=False)
+    y_m: float = Field(..., ge=0.0, le=DOMAIN_SIZE_M, allow_inf_nan=False)
+
+
+class Geometry2DSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    dimension: Literal[2]
+    source: Point2DSchema
+    probe: Point2DSchema
+
+    @model_validator(mode="after")
+    def reject_coincident(self) -> "Geometry2DSchema":
+        if (self.source.x_m == self.probe.x_m
+                and self.source.y_m == self.probe.y_m):
+            raise ValueError(
+                "source and probe coincide; v2 requires distinct points."
+            )
+        return self
+
+
+class ObservationV2Schema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    time_s: float = Field(..., gt=0.0, le=60.0, allow_inf_nan=False)
+
+
+class ScenarioPrototypeV2Schema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    thermal_source_type: Literal["point"] = "point"
+    mechanical_constraint: Literal["free", "fixed", "roller"] = "free"
+    boundary_condition_type: Literal["prototype_simplified"] = (
+        "prototype_simplified"
+    )
+
+
+class PredictionRequestV2Schema(BaseModel):
+    """Public v2 request. Four user-facing groups; locked invariants
+    (reference temperature, source temperature, frequency, domain size)
+    are filled server-side. extra='forbid' rejects v1 hangovers."""
+
+    model_config = ConfigDict(extra="forbid", use_enum_values=False)
+
+    schema_version: Literal["2.0"]
+    model: ModelType
+    medium_id: str = Field(..., min_length=2, max_length=120)
+    geometry: Geometry2DSchema
+    observation: ObservationV2Schema
+    scenario: ScenarioPrototypeV2Schema = Field(
+        default_factory=ScenarioPrototypeV2Schema
+    )
+\end{lstlisting}
+
+The four \texttt{Literal[...]} fields combined with \texttt{extra="forbid"}
+implement the rejection rules of Chapter~5: any client field for
+\texttt{thermal\_state}, \texttt{frequency\_hz}, or \texttt{domain.size}
+is refused with a \texttt{schema\_validation\_failed} error. The
+co-incidence check in \texttt{Geometry2DSchema} prevents division by
+zero in the propagation-vector derivation of Appendix~B.

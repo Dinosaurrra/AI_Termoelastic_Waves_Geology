@@ -1,0 +1,66 @@
+\section{Accuracy and latency measurement}
+\addcontentsline{toc}{section}{Appendix E. Accuracy + latency script}
+
+The travel-time accuracy column of Table~\ref{tab:acc-lat} and the
+inference latency boxplot of Figure~\ref{fig:latency} were both
+produced by
+\path{ai-directional-prediction/scripts/measure\_accuracy\_and\_latency.py}.
+The script compares each model's predicted travel time against the
+analytical body-wave reference and then re-issues twenty cached
+requests to measure per-call latency.
+
+\begin{lstlisting}[language=Python,caption={Accuracy/latency measurement (excerpt)}]
+def compute_analytical_travel_time(df, vp_kms):
+    df = df.copy()
+    df["catalog_id"] = df["material"].map(MATERIAL_TO_CATALOG_ID)
+    df["vp_kms"] = df["catalog_id"].map(vp_kms)
+    df["distance_m"] = np.sqrt(
+        (df["probe_x"] - df["source_x"]) ** 2
+        + (df["probe_y"] - df["source_y"]) ** 2
+    )
+    df["travel_time_ms_gt"] = (
+        df["distance_m"] / (df["vp_kms"] * 1000.0) * 1000.0
+    )
+    df["abs_error_ms"] = (
+        df["travel_time_ms_pred"] - df["travel_time_ms_gt"]
+    ).abs()
+    df["rel_error"] = df["abs_error_ms"] / df["travel_time_ms_gt"]
+    return df
+
+
+def measure_latency(n_reps: int = 20):
+    """Issue n_reps copies of each scenario through every service,
+    recording per-call wall time (first call dropped as warm-up)."""
+    rows = []
+    with open(REQUESTS_JSONL) as f:
+        rows = [json.loads(line) for line in f]
+    by_case = {r["case_id"]: r["payload"]
+               for r in rows if r["model"] == "pinn"}
+    sample_cases = sorted(by_case)[:n_reps]
+
+    records = []
+    for model in MODELS:
+        url = SERVICE_URL[model]
+        for case_id in sample_cases:
+            payload = by_case[case_id]
+            t0 = time.perf_counter()
+            try:
+                resp = requests.post(url, json=payload, timeout=30.0)
+                latency = time.perf_counter() - t0
+                ok = resp.status_code == 200
+            except Exception:
+                latency = time.perf_counter() - t0
+                ok = False
+            records.append({"model": model, "case_id": case_id,
+                            "latency_s": latency, "ok": ok})
+    return pd.DataFrame(records)
+\end{lstlisting}
+
+The accuracy step relies on a closed-form reference: for an isotropic
+medium the P-wave travel time is exactly $\lVert x_p - x_s \rVert /
+V_p$, with $V_p$ supplied by the catalogue of Section~5.5. The
+latency step drops the first call per model to exclude PyTorch
+interpreter warm-up; the remaining nineteen calls produce the boxes
+of Figure~\ref{fig:latency}. Together the two steps make the
+PINN--vs--operator-learning comparison of Table~\ref{tab:acc-lat}
+reproducible from the live demo stack.

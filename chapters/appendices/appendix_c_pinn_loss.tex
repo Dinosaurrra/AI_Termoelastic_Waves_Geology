@@ -1,0 +1,77 @@
+\section{PINN composite loss assembly}
+\addcontentsline{toc}{section}{Appendix C. PINN composite loss}
+
+The PINN training objective described in Chapter~5 has four
+components: a supervised loss, a velocity-consistency loss, an
+elastic-wave residual, and a coupled-thermal residual. The composite
+loss \eqref{eq:mse} weights them with task-specific coefficients. The
+listing below shows the residual assembly using PyTorch automatic
+differentiation; this is the kernel of \path{pinn-service/src/
+pinn\_service/losses.py}.
+
+\begin{lstlisting}[language=Python,caption={Composite PINN loss assembly (residuals computed via autograd)}]
+def composite_loss(model, batch, material, weights):
+    """Return the weighted sum of the four PINN losses."""
+    x, y, t = batch["coords"]
+    x.requires_grad_(True); y.requires_grad_(True); t.requires_grad_(True)
+
+    # Forward pass: f_theta(x, y, t, material) -> (T, u, v)
+    T, u, v = model(x, y, t, material)
+
+    # 1. Supervised mean-squared error against COMSOL exports.
+    L_sup = mse(T, batch["T_true"]) \
+          + mse(u, batch["u_true"]) \
+          + mse(v, batch["v_true"])
+
+    # 2. Velocity consistency: d/dt of displacement must match recorded
+    # velocity samples u_t, v_t.
+    u_t = grad(u.sum(), t, create_graph=True)[0]
+    v_t = grad(v.sum(), t, create_graph=True)[0]
+    L_vel = mse(u_t, batch["u_t_true"]) + mse(v_t, batch["v_t_true"])
+
+    # 3. Elastic-wave residual: rho * d^2 u/dt^2 - div sigma = 0.
+    eps_xx = grad(u.sum(), x, create_graph=True)[0]
+    eps_yy = grad(v.sum(), y, create_graph=True)[0]
+    eps_xy = 0.5 * (grad(u.sum(), y, create_graph=True)[0]
+                  + grad(v.sum(), x, create_graph=True)[0])
+    theta = T - material.T_ref
+    lam, mu, gamma = material.lame_lambda, material.shear, material.gamma
+    sigma_xx = lam * (eps_xx + eps_yy) + 2 * mu * eps_xx - gamma * theta
+    sigma_yy = lam * (eps_xx + eps_yy) + 2 * mu * eps_yy - gamma * theta
+    sigma_xy = 2 * mu * eps_xy
+    div_sigma_x = grad(sigma_xx.sum(), x, create_graph=True)[0] \
+                + grad(sigma_xy.sum(), y, create_graph=True)[0]
+    div_sigma_y = grad(sigma_xy.sum(), x, create_graph=True)[0] \
+                + grad(sigma_yy.sum(), y, create_graph=True)[0]
+    u_tt = grad(u_t.sum(), t, create_graph=True)[0]
+    v_tt = grad(v_t.sum(), t, create_graph=True)[0]
+    rho = material.rho
+    L_el = mse(rho * u_tt - div_sigma_x, 0.0) \
+         + mse(rho * v_tt - div_sigma_y, 0.0)
+
+    # 4. Coupled-thermal residual:
+    # rho Cp dT/dt - k Laplacian(T) + gamma T0 d/dt(div u) = 0.
+    T_t = grad(T.sum(), t, create_graph=True)[0]
+    T_xx = grad(grad(T.sum(), x, create_graph=True)[0].sum(),
+                x, create_graph=True)[0]
+    T_yy = grad(grad(T.sum(), y, create_graph=True)[0].sum(),
+                y, create_graph=True)[0]
+    div_u_t = grad((eps_xx + eps_yy).sum(), t, create_graph=True)[0]
+    k_th = material.thermal_conductivity
+    Cp = material.heat_capacity
+    T0 = material.T_ref
+    L_th = mse(rho * Cp * T_t - k_th * (T_xx + T_yy) + gamma * T0 * div_u_t,
+               0.0)
+
+    return (weights.sup * L_sup + weights.vel * L_vel
+          + weights.el * L_el + weights.th * L_th)
+\end{lstlisting}
+
+Every spatial and temporal derivative used in the elastic-wave and
+heat-equation residuals is produced by \texttt{torch.autograd.grad}
+with \texttt{create\_graph=True}, so the residual gradients propagate
+back into the network parameters during the optimiser step. The
+$\gamma T_0\, \partial_t(\nabla\!\cdot\!u)$ term is the coupling
+source identified in Section~2.5; it is what distinguishes the
+PINN's training objective from the data-only MSE used by the other
+three routes.

@@ -1,0 +1,14 @@
+% Wrapper that switches numbering to A/B/C and pulls in each appendix.
+\appendix
+\renewcommand{\thesection}{\Alph{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+
+\input{chapters/appendices/appendix_a_v2_schemas.tex}
+\clearpage
+\input{chapters/appendices/appendix_b_derived_quantities.tex}
+\clearpage
+\input{chapters/appendices/appendix_c_pinn_loss.tex}
+\clearpage
+\input{chapters/appendices/appendix_d_mgn_field_mapping.tex}
+\clearpage
+\input{chapters/appendices/appendix_e_accuracy_latency.tex}

@@ -1,0 +1,97 @@
+\section{Derived geometric and elastic quantities}
+\addcontentsline{toc}{section}{Appendix B. Derived quantities}
+
+Every derived quantity used in the v2 contract --- temperature
+perturbation $\theta$, propagation vector $d = x_p - x_s$, distance,
+unit direction, azimuth, displacement magnitude, Lam\'e parameters
+--- is computed by a single module
+\path{backend/app/domain/services/derived\_quantities.py}.
+Keeping all formulas in one file is intentional: the contract document
+points at this module as the single source of truth, and unit tests in
+\path{backend/tests/test_derived\_quantities.py} pin every formula to a
+known reference value. The module is pure Python with no FastAPI or
+Pydantic dependencies.
+
+\begin{lstlisting}[language=Python,caption={Excerpt of \texttt{derived\_quantities.py}}]
+REFERENCE_TEMPERATURE_K = 273.15
+SOURCE_TEMPERATURE_K = 1500.0
+DOMAIN_SIZE_M = 1.0
+
+
+def compute_theta_k(
+    source_temperature_k: float = SOURCE_TEMPERATURE_K,
+    reference_temperature_k: float = REFERENCE_TEMPERATURE_K,
+) -> float:
+    """Temperature perturbation theta = T_source - T_ref (kelvin)."""
+    return float(source_temperature_k) - float(reference_temperature_k)
+
+
+def compute_distance_m(source, probe):
+    dx = probe[0] - source[0]
+    dy = probe[1] - source[1]
+    return math.hypot(dx, dy)
+
+
+def compute_azimuth_deg(source, probe):
+    """Propagation azimuth in degrees, atan2 convention, xy-plane."""
+    dx, dy = probe[0] - source[0], probe[1] - source[1]
+    return math.degrees(math.atan2(dy, dx))
+
+
+def compute_displacement_magnitude_m(u_m, v_m):
+    return math.hypot(u_m, v_m)
+
+
+def derive_elastic_constants(
+    young_modulus_pa, poisson_ratio,
+    rho_kg_m3=None, vp_m_s=None, vs_m_s=None,
+    heat_capacity_j_kgk=None,
+):
+    """Prefers (E, nu); falls back to (rho, Vp, Vs) under
+    isotropic-elasticity assumptions."""
+    if young_modulus_pa is not None and poisson_ratio is not None:
+        E, nu = float(young_modulus_pa), float(poisson_ratio)
+        if nu == 0.5:
+            raise ValueError("Poisson ratio nu = 0.5 is degenerate.")
+        shear = E / (2.0 * (1.0 + nu))
+        bulk = E / (3.0 * (1.0 - 2.0 * nu))
+        lame_lambda = E * nu / ((1.0 + nu) * (1.0 - 2.0 * nu))
+    elif rho_kg_m3 is not None and vp_m_s is not None and vs_m_s is not None:
+        rho, vp, vs = float(rho_kg_m3), float(vp_m_s), float(vs_m_s)
+        shear = rho * vs * vs
+        bulk = rho * (vp * vp - (4.0 / 3.0) * vs * vs)
+        lame_lambda = bulk - (2.0 / 3.0) * shear
+    else:
+        raise ValueError("provide (E, nu) or (rho, Vp, Vs).")
+    return DerivedElasticConstants(
+        shear_modulus_pa=shear,
+        bulk_modulus_pa=bulk,
+        lame_lambda_pa=lame_lambda,
+        volumetric_heat_capacity_j_m3k=(
+            float(rho_kg_m3) * float(heat_capacity_j_kgk)
+            if rho_kg_m3 is not None and heat_capacity_j_kgk is not None
+            else None
+        ),
+    )
+
+
+def verify_catalog_elastic_consistency(
+    young_modulus_pa, derived_shear_pa, derived_bulk_pa,
+    *, relative_tolerance=0.01,
+):
+    """Sanity check: E should match 9 K mu / (3 K + mu) within 1%."""
+    denom = 3.0 * derived_bulk_pa + derived_shear_pa
+    if denom <= 0:
+        return False
+    e_implied = 9.0 * derived_bulk_pa * derived_shear_pa / denom
+    return abs(e_implied - young_modulus_pa) / abs(young_modulus_pa) \
+        < relative_tolerance
+\end{lstlisting}
+
+The closed-form fallback paths in \texttt{derive\_elastic\_constants}
+match the analytical formulas of Section~2.6: $\mu = \rho V_s^{2}$,
+$K = \rho(V_p^{2} - \tfrac{4}{3} V_s^{2})$, and $\lambda = K -
+\tfrac{2}{3}\mu$. The startup-time check
+\texttt{verify\_catalog\_elastic\_consistency} guards the v2 catalog
+against drift between the stored $E$ and the
+$(\rho, V_p, V_s)$ triple that was used to derive it.
