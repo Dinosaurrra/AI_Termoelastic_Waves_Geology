@@ -1,30 +1,3 @@
-\documentclass[14pt]{extarticle}
-
-% Page settings
-\usepackage[a4paper, margin=2.5cm]{geometry}
-
-% Font settings: compile with XeLaTeX
-\usepackage{fontspec}
-\setmainfont{Times New Roman}
-
-% Math packages
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{bm}
-
-% Formatting
-\usepackage{setspace}
-\usepackage{indentfirst}
-\usepackage{enumitem}
-
-% Line spacing and paragraph settings
-\onehalfspacing
-\setlength{\parindent}{1.25cm}
-\setlength{\parskip}{0pt}
-
-\begin{document}
-
-
 \section{Two-Dimensional Fourier Neural Operator for Thermoelastic Field Prediction}
 
 \subsection{Implementation-Oriented Model Formulation}
@@ -810,19 +783,3 @@ T, \quad u, \quad v.
 \]
 
 Each Fourier block combines a spectral convolution branch with a local convolution branch. The spectral branch applies the Fourier transform, multiplies selected modes by learned complex-valued weights, and returns the result to the spatial domain using the inverse Fourier transform. The local convolution branch processes neighboring spatial information directly on the grid. The final prediction is trained against simulation-generated reference fields using supervised losses such as mean squared error and relative \(L^2\) error.
-
-\begin{thebibliography}{9}
-
-\bibitem{li2020fno}
-Z. Li, N. Kovachki, K. Azizzadenesheli, B. Liu, K. Bhattacharya, A. Stuart, and A. Anandkumar,
-``Fourier Neural Operator for Parametric Partial Differential Equations,''
-\textit{International Conference on Learning Representations}, 2021.
-
-\bibitem{kovachki2023neuraloperator}
-N. Kovachki, Z. Li, B. Liu, K. Azizzadenesheli, K. Bhattacharya, A. Stuart, and A. Anandkumar,
-``Neural Operator: Learning Maps Between Function Spaces,''
-\textit{Journal of Machine Learning Research}, vol. 24, no. 89, pp. 1--97, 2023.
-
-\end{thebibliography}
-
-\end{document}

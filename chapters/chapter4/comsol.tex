@@ -10,7 +10,7 @@ in the process of searching for programs, the programs Ansys, Nvidia Omniverse, 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.85\textwidth]{chapters/chapter4/interface.png}
+\includegraphics[width=0.85\textwidth]{chapters/chapter4/comsol_interface.png}
 \caption{COMSOL Multiphysics interface used for creating the thermoelastic simulation.}
 \label{fig:comsol_interface}
 \end{figure}
@@ -38,45 +38,37 @@ T_{\mathrm{rod}} > T_0 .
 
 In this expression, \(T_{\mathrm{rod}}\) is the initial temperature of the metallic rod, and \(T_0\) is the initial temperature of the surrounding rock. This temperature contrast creates heat conduction from the rod into the geological medium. Because the temperature distribution becomes spatially non-uniform, different parts of the rock expand by different amounts. This produces strain, stress, and displacement fields.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.85\textwidth]{chapters/chapter4/object.png}
-\caption{Geometry of the rock domain with the inserted heated rod.}
-\label{fig:comsol_geometry}
-\end{figure}
-
 \subsection{COMSOL Model Structure}
 
 The simulation was created as a coupled thermo-mechanical model. The structure of the COMSOL project included global parameters, material definitions, geometry, physical interfaces, multiphysics coupling, mesh generation, and a time-dependent study.
 
 The main physics interfaces used in the model were:
 
-\begin{table}[H]
-\centering
-\caption{Main COMSOL physics interfaces and model components.}
-\label{tab:comsol_physics_interfaces}
-\begin{tabular}{p{0.28\textwidth} p{0.62\textwidth}}
-\hline
-\textbf{COMSOL component} & \textbf{Role in the simulation} \\
-\hline
-\textit{Solid Mechanics} & Computes displacement, velocity, strain, stress, and the mechanical response of the rock caused by thermal expansion. \\
-\hline
-\textit{Linear Elastic Material} & Defines the elastic behavior of the geological medium using material parameters such as Young's modulus, Poisson's ratio, density, and thermal expansion coefficient. \\
-\hline
-\textit{Free Boundary} & Allows selected boundaries to deform naturally without externally applied mechanical traction. \\
-\hline
-\textit{Heat Transfer in Solids} & Computes transient heat conduction inside the rock and rod domains. \\
-\hline
-\textit{Thermal Insulation} & Prevents heat flux through selected external boundaries. \\
-\hline
-\textit{Thermal Expansion} & Couples the temperature field with the mechanical model by converting temperature changes into thermal strain. \\
-\hline
-\textit{Temperature Coupling} & Transfers the temperature solution from the heat transfer interface to the solid mechanics interface. \\
-\hline
-\textit{Time Dependent Study} & Solves the coupled system over a sequence of time steps and produces time-dependent physical fields. \\
-\hline
-\end{tabular}
-\end{table}
+The COMSOL simulation was constructed using several physics interfaces and model components. Each of them had a specific role in describing the coupled thermoelastic behavior of the geological medium.
+
+\textbf{Solid Mechanics.}
+The Solid Mechanics interface was used to calculate the mechanical response of the rock domain. It computed displacement, velocity, strain, stress, and the propagation of mechanical disturbances caused by thermal expansion. This interface was necessary because heating of the rod creates deformation in the surrounding geological medium.
+
+\textbf{Linear Elastic Material.}
+The Linear Elastic Material model defined the mechanical behavior of the rock. It described the medium as an elastic solid using material parameters such as Young's modulus, Poisson's ratio, density, and the thermal expansion coefficient. These parameters determined how strongly the rock deformed under thermoelastic loading.
+
+\textbf{Free Boundary.}
+The Free Boundary condition was applied to selected external boundaries of the geometry. It allowed these boundaries to deform without externally applied mechanical traction. This condition was used to reproduce a natural mechanical response of the medium instead of artificially fixing all outer surfaces.
+
+\textbf{Heat Transfer in Solids.}
+The Heat Transfer in Solids interface was used to model transient heat conduction in the simulation domain. It calculated how heat propagated from the heated rod into the surrounding rock over time. This module provided the temperature field required for the thermoelastic coupling.
+
+\textbf{Thermal Insulation.}
+The Thermal Insulation condition was applied to selected external boundaries. It prevented heat flux through these surfaces and limited heat exchange with the external environment. This made it possible to control the thermal behavior of the model and focus on heat propagation inside the simulated rock domain.
+
+\textbf{Thermal Expansion.}
+The Thermal Expansion feature was used to couple the thermal and mechanical parts of the simulation. It transformed temperature changes into thermal strain. As a result, the temperature field obtained from the heat transfer analysis produced mechanical deformation in the solid mechanics model.
+
+\textbf{Temperature Coupling.}
+The Temperature Coupling feature transferred the computed temperature field from the Heat Transfer in Solids interface to the Solid Mechanics interface. This ensured that the mechanical response of the rock was calculated using the actual transient temperature distribution inside the model.
+
+\textbf{Time Dependent Study.}
+The Time Dependent Study was used to solve the coupled thermoelastic problem over a sequence of time steps. It produced time-dependent fields of temperature, displacement, stress, and strain. These results were later exported and used for synthetic dataset generation.
 
 This model structure is important because the final dataset is not generated from independent physical fields. Temperature, displacement, stress, and strain are obtained from the same coupled solution, which makes the exported data physically consistent.
 
