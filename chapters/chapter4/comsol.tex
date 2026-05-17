@@ -78,6 +78,61 @@ This model structure is important because the final dataset is not generated fro
 \caption{COMSOL model tree with Solid Mechanics, Heat Transfer in Solids, multiphysics coupling, mesh, and time-dependent study.}
 \label{fig:comsol_model_tree}
 \end{figure}
+The COMSOL experiment was designed as a controlled thermoelastic scenario in which a highly heated rod interacts with a geological medium. The main goal of this setup was to create a localized thermal disturbance inside the rock and to observe how this disturbance produces heat conduction, thermal expansion, stress formation, displacement, and wave-like mechanical response.
+
+The main computational domain was represented by a square rock block with a side length of \(1~\mathrm{m}\). Therefore, the model describes a \(1~\mathrm{m} \times 1~\mathrm{m}\) cross-section of a geological medium. This block was used as the main rock domain in which the thermoelastic response was studied.
+
+A cylindrical rod was placed inside the rock block and used as the localized heat source. The rod had a radius of \(0.04~\mathrm{m}\) and a length of \(0.5~\mathrm{m}\). Since the size of the main block was \(1~\mathrm{m}\), the rod occupied half of the characteristic length of the domain. This configuration made it possible to heat only a limited internal region of the rock instead of applying a uniform temperature load to the whole medium.
+
+At the beginning of the simulation, the rock was initialized at room temperature:
+
+\[
+T_0 = 293.15~\mathrm{K}.
+\]
+
+The reference temperature for thermal expansion was also set to the same value:
+
+\[
+T_{\mathrm{ref}} = 293.15~\mathrm{K}.
+\]
+
+This means that the rock was considered thermally undeformed at the initial state. In other words, before the heated rod affected the medium, no thermal strain was assumed to exist in the rock.
+
+The rod temperature was set much higher than the initial rock temperature:
+
+\[
+T_{\mathrm{rod},0} = 1500~\mathrm{K}.
+\]
+
+As a result, a strong temperature contrast appeared between the rod and the surrounding geological medium. The temperature difference between the heated rod and the initial rock state was
+
+\[
+\Delta T = 1500 - 293.15 = 1206.85~\mathrm{K}.
+\]
+
+This large temperature contrast created an intensive thermal gradient near the rod--rock contact region. Heat started to propagate from the rod into the surrounding medium. Since the temperature field was not uniform, different parts of the rock expanded by different amounts. This non-uniform expansion generated thermal strain and stress in the material.
+
+The physical logic of the experiment can be described as follows. First, the heated rod transfers heat to the surrounding rock. Then, the temperature increase causes local thermal expansion. Because the heated region is surrounded by colder material, this expansion is partially constrained. As a consequence, thermal stresses appear around the rod. These stresses lead to displacement of the rock material and form the basis of the thermoelastic wave-like response observed in the simulation.
+
+The main parameters of the experiment are presented in Table~\ref{tab:heated_rod_experiment_parameters}.
+
+\begin{table}[H]
+\centering
+\caption{Main parameters of the heated rod thermoelastic experiment.}
+\label{tab:heated_rod_experiment_parameters}
+\begin{tabular}{p{0.35\textwidth} p{0.25\textwidth} p{0.25\textwidth}}
+\hline
+\textbf{Parameter} & \textbf{Symbol} & \textbf{Value} \\
+\hline
+Main rock block size & \(L\) & \(1~\mathrm{m}\) \\
+Rod radius & \(r_{\mathrm{rod}}\) & \(0.04~\mathrm{m}\) \\
+Rod length & \(L_{\mathrm{rod}}\) & \(0.5~\mathrm{m}\) \\
+Initial rock temperature & \(T_0\) & \(293.15~\mathrm{K}\) \\
+Initial rod temperature & \(T_{\mathrm{rod},0}\) & \(1500~\mathrm{K}\) \\
+Initial temperature contrast & \(\Delta T\) & \(1206.85~\mathrm{K}\) \\
+\hline
+\end{tabular}
+\end{table}
 
 \subsection{Thermoelastic Physical Model}
 
@@ -200,13 +255,6 @@ These parameters are essential for dataset generation because changing them chan
 \subsection{Mesh Generation and Time-Dependent Study}
 
 The coupled thermoelastic problem was solved using the finite element method. In COMSOL, the continuous geometry is divided into a finite element mesh, and the solution is computed over this discretized domain. The mesh is especially important near the heated rod because this region contains the strongest temperature gradients and stress concentrations.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.85\textwidth]{chapters/chapter4/mesh.png}
-\caption{Finite element mesh used for the thermoelastic simulation.}
-\label{fig:comsol_mesh}
-\end{figure}
 
 The simulation was performed as a time-dependent study. The simulated time interval is represented as
 
