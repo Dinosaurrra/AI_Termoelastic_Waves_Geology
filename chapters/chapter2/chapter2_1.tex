@@ -2,10 +2,7 @@
 
 The problem considered in this thesis is the thermoelastic response of a deformable geological medium subjected to thermal and mechanical disturbance. From the physical point of view, the medium is a rock or rock mass in which temperature changes, deformation, strain, stress, and wave motion are connected. The aim of the mathematical formulation is to define the main physical fields, material parameters, governing relations, and directional quantities required to describe thermoelastic wave propagation in a simplified but physically consistent form.
 
-The geological medium is represented as a continuum body occupying a spatial domain
-\begin{equation}
-\Omega \subset \mathbb{R}^{2},
-\end{equation}
+The geological medium is represented as a continuum body occupying the 2D spatial domain $\Omega\subset\mathbb{R}^2$ already introduced in Eq.~\eqref{eq:domain-2d},
 where \(\Omega\) denotes the region of the rock under consideration. A material point is described by the position vector
 \begin{equation}
 x = (x, y),
@@ -25,17 +22,7 @@ This provides the general physical framework for thermoelastic wave propagation.
 
 Real geological media are heterogeneous, fractured, porous, and often anisotropic. However, a complete mathematical description of all pores, cracks, fractures, mineral grains, and fluid pathways is beyond the scope of this thesis. Therefore, the formulation adopts an effective continuum approximation. In this approximation, the rock is described by averaged material properties such as density, elastic moduli, thermal conductivity, heat capacity, and thermal expansion coefficient. These properties may represent sandstone, basalt, granite, or limestone as effective geological materials rather than as fully resolved microstructures \cite{jaeger2007,mavko2009}.
 
-The deformation is assumed to be small. This means that displacement gradients are sufficiently small for infinitesimal strain theory to be used. Under this assumption, the strain tensor is related to the displacement field by
-\begin{equation}
-\varepsilon_{ij}
-=
-\frac{1}{2}
-\left(
-\frac{\partial u_i}{\partial x_j}
-+
-\frac{\partial u_j}{\partial x_i}
-\right),
-\end{equation}
+The deformation is assumed to be small. This means that displacement gradients are sufficiently small for infinitesimal strain theory to be used. Under this assumption, the strain tensor is related to the displacement field by the small-strain relation already introduced in Eq.~\eqref{eq:strain-disp},
 where \(\varepsilon_{ij}\) is the strain tensor, \(u_i\) is the \(i\)-th component of displacement, and \(x_j\) is the \(j\)-th spatial coordinate. The small-strain assumption is appropriate as a first approximation for wave propagation, where the displacement caused by a propagating disturbance is usually small compared with the size of the medium \cite{aki2002,jaeger2007}.
 
 The mechanical response is assumed to be linearly elastic and isotropic as a first approximation. In this case, stress is related to strain and temperature perturbation through the linear thermoelastic constitutive relation
@@ -48,11 +35,7 @@ The mechanical response is assumed to be linearly elastic and isotropic as a fir
 -
 \gamma \delta_{ij}\theta .
 \end{equation}
-Here, \(\sigma_{ij}\) is the stress tensor, \(\lambda\) and \(\mu\) are the Lamé elastic parameters, \(\delta_{ij}\) is the Kronecker delta, \(\varepsilon_{kk}\) is the volumetric strain, \(\gamma\) is the thermoelastic coupling coefficient, and
-\begin{equation}
-\theta = T - T_0
-\end{equation}
-is the temperature perturbation relative to the reference temperature \(T_0\). This relation shows that stress is produced not only by mechanical deformation, but also by temperature change \cite{nowacki1986,boley1960}.
+Here, \(\sigma_{ij}\) is the stress tensor, \(\lambda\) and \(\mu\) are the Lamé elastic parameters, \(\delta_{ij}\) is the Kronecker delta, \(\varepsilon_{kk}\) is the volumetric strain, \(\gamma\) is the thermoelastic coupling coefficient, and $\theta = T - T_0$ is the temperature perturbation already introduced in Eq.~\eqref{eq:theta-def}, taken relative to the reference temperature \(T_0\). This relation shows that stress is produced not only by mechanical deformation, but also by temperature change \cite{nowacki1986,boley1960}.
 
 The mechanical motion of the medium is governed by the balance of linear momentum. Neglecting body forces for simplicity, the equation of motion is written as
 \begin{equation}

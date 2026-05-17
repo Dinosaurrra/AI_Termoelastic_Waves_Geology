@@ -4,12 +4,14 @@ Thermal expansion is the tendency of a solid to change its dimensions when its t
 
 A convenient measure of temperature change is the temperature perturbation,
 \begin{equation}
+\label{eq:theta-def}
 \theta = T - T_0,
 \end{equation}
 where \(T\) is the current temperature and \(T_0\) is a reference temperature, for example the initial ambient temperature of the rock. Thus, \(\theta\) represents the change in temperature from the reference state. Thermal strain and thermal stress depend on temperature differences rather than on absolute temperature alone, so using \(\theta\) or \(\Delta T\) emphasizes the relative change from an initial state \cite{boley1960,nowacki1986}.
 
 Under free expansion, the linear thermal strain \(\varepsilon_{\mathrm{th}}\) produced by a small temperature change is
 \begin{equation}
+\label{eq:eps-thermal}
 \varepsilon_{\mathrm{th}} = \alpha \Delta T,
 \end{equation}
 where \(\alpha\) is the coefficient of linear thermal expansion and \(\Delta T = T - T_0\) is the temperature change. The thermal strain \(\varepsilon_{\mathrm{th}}\) is dimensionless, while \(\alpha\) has units of inverse temperature, usually \(\mathrm{K^{-1}}\). A positive \(\Delta T\), corresponding to heating, produces positive thermal strain or expansion. A negative \(\Delta T\), corresponding to cooling, produces contraction. This relation describes how the material would deform if its thermal expansion were not resisted by external or internal constraints \cite{boley1960,jaeger2007}.
@@ -40,6 +42,7 @@ Here, \(\varepsilon_{ij}\) is the small-strain tensor and \(\varepsilon_{kk} = \
 \(\lambda \delta_{ij}\varepsilon_{kk} + 2\mu\varepsilon_{ij}\), represent the elastic stress caused by mechanical deformation. The last term,
 \(-\gamma\delta_{ij}\theta\), represents the stress contribution associated with temperature change, where \(\gamma\) is the thermoelastic coupling coefficient. For an isotropic material, this coefficient is commonly related to the bulk modulus \(K\) and the coefficient of linear thermal expansion \(\alpha\) by
 \begin{equation}
+\label{eq:gamma-def}
 \gamma = 3K\alpha.
 \end{equation}
 This relation shows that thermal stress depends not only on the magnitude of thermal expansion, but also on the resistance of the material to volumetric deformation \cite{nowacki1986,jaeger2007}.

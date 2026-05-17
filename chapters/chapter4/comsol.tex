@@ -273,9 +273,9 @@ The result of the simulation is therefore not a single static solution. It is a 
 The raw dataset was exported from COMSOL as a set of CSV files. Each export used the dataset \textit{Study 1/Solution 1 (sol1)} with time selection set to \textit{All}. Therefore, the exported tables contain the full time-dependent solution rather than a single selected time step. The mesh was exported separately as a COMSOL Multiphysics text file with the extension \texttt{.mphtxt}. This file preserves the spatial discretization of the numerical model and can later be used to reconstruct the mesh-based graph representation.
 
 The exported files were stored in the raw dataset directory:
-\[
+\begin{equation}
 \texttt{datasets/<dataset\_id>/raw/}.
-\]
+\end{equation}
 The raw directory contains CSV files with physical fields, the exported mesh file, and a scenario configuration file. An example of the raw dataset structure is shown in Figure~\ref{fig:raw_dataset_folder}.
 
 \begin{figure}[H]
@@ -327,13 +327,13 @@ Finite element mesh of the rod experiment. \\
 \end{table}
 
 Each CSV file contains COMSOL metadata rows and a numerical table. The metadata rows begin with the symbol \(\texttt{\%}\) and describe the model name, COMSOL version, date of export, spatial dimension, number of nodes, and exported expressions. The actual data table starts from the row containing the spatial coordinates
-\[
+\begin{equation}
 X,\quad Y,\quad Z.
-\]
+\end{equation}
 The remaining columns contain physical variables written in the COMSOL format
-\[
+\begin{equation}
 \texttt{field\_name (unit) @ t=value}.
-\]
+\end{equation}
 This naming convention stores three important pieces of information in each column name: the physical variable, its unit of measurement, and the simulation time. An example of such a raw COMSOL export is shown in Figure~\ref{fig:raw_comsol_csv_example}.
 
 \begin{figure}[H]
@@ -350,7 +350,7 @@ The preprocessing stage was designed as a common data preparation step for all n
 During CSV cleaning, COMSOL service rows were skipped, the true header row was detected, and only supported physical exports were parsed. Non-numerical entries were converted where possible, while invalid or missing values were handled before tensor construction. This was required because the exported variables have different units and numerical scales: temperature is measured in kelvin, displacement in meters, stress in pascals, strain is dimensionless, and material parameters may have substantially larger magnitudes.
 
 A separate coordinate-alignment step was required because different COMSOL exports may contain different point sets or the same points in a different order. Therefore, the files cannot be merged reliably by row index. A reference coordinate array was selected, and the remaining fields were mapped to this reference using nearest-neighbor matching in coordinate space:
-\[
+\begin{equation}
 j(i)
 =
 \arg\min_j
@@ -359,41 +359,41 @@ j(i)
 -
 \mathbf{r}^{\mathrm{src}}_j
 \right\|_2 .
-\]
+\end{equation}
 Here, \(\mathbf{r}^{\mathrm{ref}}_i\) is the \(i\)-th coordinate in the reference node set, and \(\mathbf{r}^{\mathrm{src}}_j\) is a coordinate from another exported file. This step produced a single aligned node set shared by all physical fields.
 
 After alignment, the data were separated into dynamic and static features. Dynamic features describe the time-dependent state of the thermoelastic process. These include temperature, displacement components, velocity components, stress components, and strain components. Static features describe quantities that do not change during one simulation, such as spatial coordinates, material parameters, source-region indicators, distance to the source, and scenario-level parameters. Material properties are not treated as prediction targets; they are used as conditioning information for the models.
 
 The dynamic part of the dataset was assembled into a spatio-temporal tensor
-\[
+\begin{equation}
 \mathbf{S}
 \in
 \mathbb{R}^{N_t \times N_p \times F_d},
-\]
+\end{equation}
 where \(N_t\) is the number of time steps, \(N_p\) is the number of spatial points or mesh nodes, and \(F_d\) is the number of dynamic physical channels. For one time step \(n\), the state of the simulated medium is represented as
-\[
+\begin{equation}
 \mathbf{S}_n
 \in
 \mathbb{R}^{N_p \times F_d}.
-\]
+\end{equation}
 The static part was stored as
-\[
+\begin{equation}
 \mathbf{A}
 \in
 \mathbb{R}^{N_p \times F_s},
-\]
+\end{equation}
 where \(F_s\) is the number of static node or scenario features.
 
 Normalization was applied separately to dynamic and static features. For each feature channel, the mean and standard deviation were computed and saved for later denormalization. The normalized value was calculated as
-\[
+\begin{equation}
 \widetilde{x}
 =
 \frac{x-\mu}{\sigma+\varepsilon},
-\]
+\end{equation}
 where \(x\) is the original feature value, \(\mu\) is the mean value of the corresponding channel, \(\sigma\) is its standard deviation, and \(\varepsilon\) is a small constant used for numerical stability. Separate normalization statistics are important because dynamic physical fields and static material parameters have different distributions and units.
 
 For graph-based models, the aligned coordinates were additionally converted into a graph representation. If the exported \(\texttt{.mphtxt}\) file was available and compatible with the aligned node set, mesh connectivity was used to construct graph edges. If the mesh connectivity could not be used, a nearest-neighbor graph was constructed from the node coordinates. For an edge from node \(i\) to node \(j\), the edge attribute vector was defined as
-\[
+\begin{equation}
 \mathbf{e}_{ij}
 =
 \left[
@@ -404,23 +404,23 @@ z_j-z_i,\,
 \mathbf{r}_j-\mathbf{r}_i
 \right\|_2
 \right].
-\]
+\end{equation}
 The first three components describe the relative spatial offset between neighboring nodes, while the last component stores the Euclidean distance.
 
 Training pairs were generated from the processed time sequence. Depending on the model type, the processed dataset can be used as full-field states, coordinate-time samples, temporal sequences, or graph trajectories. For one-step transition learning, the target can be represented as the state increment
-\[
+\begin{equation}
 \Delta \mathbf{S}_n
 =
 \mathbf{S}_{n+1}
 -
 \mathbf{S}_n .
-\]
+\end{equation}
 This delta representation is useful for transient thermoelastic dynamics because the model learns the local change of the physical state between consecutive time steps rather than predicting the complete field independently at every step.
 
 The output of the preprocessing stage was stored in
-\[
+\begin{equation}
 \texttt{datasets/<dataset\_id>/processed/}.
-\]
+\end{equation}
 An example of the processed dataset structure is shown in Figure~\ref{fig:processed_dataset_folder}.
 
 \begin{figure}[H]

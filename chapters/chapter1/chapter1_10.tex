@@ -18,10 +18,7 @@ The basic physical chain of a thermoelastic process may be written conceptually 
 \end{equation}
 This chain is useful for understanding thermoelastic wave propagation in rocks. A local temperature disturbance may create thermal strain. If the expansion or contraction is constrained by surrounding grains, layers, fractures, or in situ stress, thermal stress develops. Gradients of this stress can then contribute to elastic motion. Conversely, rapid deformation involving volume change may influence the temperature field through thermoelastic coupling \cite{boley1960,nowacki1986}.
 
-A convenient variable for describing temperature change is the temperature perturbation
-\begin{equation}
-\theta = T - T_0,
-\end{equation}
+A convenient variable for describing temperature change is the temperature perturbation $\theta = T - T_0$ already introduced in Eq.~\eqref{eq:theta-def},
 where \(\theta\) is the temperature perturbation, \(T\) is the current temperature, and \(T_0\) is the reference temperature. The reference temperature may represent the initial thermal state of the rock. Temperature perturbation is used because thermoelastic strain and stress are controlled by changes in temperature rather than by absolute temperature alone.
 
 For an isotropic solid, the thermal strain associated with a temperature perturbation may be written as
@@ -42,12 +39,7 @@ The stress relation for an isotropic linear thermoelastic solid may be written a
 \end{equation}
 Here, \(\sigma_{ij}\) is the stress tensor, \(\lambda\) and \(\mu\) are the Lamé elastic parameters, \(\delta_{ij}\) is the Kronecker delta, \(\varepsilon_{ij}\) is the strain tensor, \(\varepsilon_{kk}\) is the volumetric strain, \(\gamma\) is the thermoelastic coupling coefficient, and \(\theta\) is the temperature perturbation. The first two terms describe the mechanical stress produced by elastic deformation. The final term describes the thermal stress contribution caused by temperature change. This equation shows directly how the temperature field enters the mechanical stress state of the material \cite{boley1960,nowacki1986}.
 
-Mechanical motion is governed by the equation of motion. Neglecting body forces for simplicity, it can be written in index notation as
-\begin{equation}
-\rho \frac{\partial^2 u_i}{\partial t^2}
-=
-\frac{\partial \sigma_{ij}}{\partial x_j}.
-\end{equation}
+Mechanical motion is governed by the equation of motion. Neglecting body forces for simplicity, it can be written in index notation as the balance $\rho\,\partial_t^2 u_i = \partial_j\sigma_{ij}$ already given in Eq.~\eqref{eq:eom}.
 In this equation, \(\rho\) is the density of the medium, \(u_i\) is the \(i\)-th component of displacement, \(t\) is time, \(\sigma_{ij}\) is the stress tensor, and \(x_j\) is the spatial coordinate. The left-hand side represents inertia, while the right-hand side represents the effect of stress gradients. Physically, the equation states that spatial changes in stress cause acceleration of material particles. Since the stress tensor contains both mechanical and thermal contributions, temperature changes may influence motion through the thermoelastic stress term \cite{aki2002,nowacki1986}.
 
 The thermal part of the coupled problem is described by the heat equation. In the absence of thermoelastic coupling, heat conduction in a rock may be written in the form
