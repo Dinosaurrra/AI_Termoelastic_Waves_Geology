@@ -1,0 +1,257 @@
+\section{Web Implementation}
+\label{sec:web-implementation}
+
+Chapter~5 described the prediction stack as a service-oriented prototype
+in which a backend orchestrator routes thermoelastic prediction
+requests to several neural surrogate components. The present chapter
+documents the web interface that closes this stack from the user side.
+The interface is not an independent scientific contribution; it is a
+visualisation and configuration surface for the comparative prediction
+task formulated in Chapters~3--5. Its role is therefore to expose the
+unified prediction contract to the human operator in a form that is
+compact enough for a single planar source--probe scenario yet rich
+enough to read the directional, thermal, and mechanical components of
+the normalised response.
+
+The interface is built as a static single-page application served by a
+lightweight HTTP layer. It uses only vanilla HTML, CSS, and ECMAScript
+modules, without a runtime framework or build tooling. This choice
+keeps the front-end inside the bachelor-level scope of the project,
+avoids introducing additional dependencies into the docker stack
+described in Chapter~5, and lets the application start in the same
+container orchestration as the backend and the four model services.
+The whole frontend is therefore a set of small files that the browser
+consumes directly: a markup skeleton, six modular style sheets, and a
+small number of script modules that read the prediction-contract
+schema, build the request, render the response, and draw the planar
+domain. The visual style is intentionally dark and scientific so that
+numerical values and the two-dimensional geometry remain legible
+during long evaluation sessions.
+
+\subsection{Interface concept and landing area}
+
+The landing area introduces the application as a research prototype
+rather than as a validated thermoelastic simulator. It carries a short
+eyebrow line, the title \emph{AI-assisted 2D directional prediction in
+geological media}, a one-sentence operational summary, three contextual
+chips (\emph{Research prototype}, \emph{Fixed 1\,m\,$\times$\,1\,m
+domain}, \emph{Model comparison}), and a final disclaimer that the
+output should be read as a prototype prediction. This wording is
+consistent with Chapter~1, where geological media are described as
+heterogeneous and only effectively continuous, and with Chapter~5,
+where the prototype nature of the implementation is stated explicitly.
+The landing strip is shown in Figure~\ref{fig:web-title}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.96\textwidth]{chapters/web_implementation/figures/web_title}
+\caption{Landing area of the web interface.}
+\label{fig:web-title}
+\end{figure}
+
+Below the landing area, the workspace splits into a two-column grid.
+The left column hosts the prediction-setup form, and the right column
+hosts the prediction-result panel together with the planar domain
+visualisation. The split is preserved on standard desktop widths and
+collapses to a single column below the layout breakpoint so that the
+interface remains readable on narrower windows. This responsive
+behaviour is the only purely cosmetic departure from the desktop
+layout; the underlying data flow, validation, and rendering paths are
+identical in both regimes.
+
+\subsection{Prediction setup panel}
+
+The prediction-setup panel implements the public side of the unified
+prediction contract introduced in Chapter~5. Its structure follows the
+logical grouping of the contract rather than an ad hoc visual order, so
+that the inputs presented to the user map directly to the fields that
+the backend will validate. The panel is shown in
+Figure~\ref{fig:web-setup}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[height=0.74\textheight,keepaspectratio]{chapters/web_implementation/figures/web_setup}
+\caption{Prediction setup panel.}
+\label{fig:web-setup}
+\end{figure}
+
+The first group is model and material selection. The material drop-down
+exposes the four medium presets carried by the catalog described in
+Chapter~5: sandstone, limestone, basalt, and granite. The model
+drop-down exposes the four prediction routes: PINN, FNO,
+MeshGraphNet, and the Transformer-style operator. The two
+selectors are independent, so that the same medium can be evaluated
+through different routes and the same route can be evaluated on
+different media. This is the configuration that drives the comparison
+methodology of Chapter~7.
+
+The second and third groups are the source and probe coordinates. They
+are entered as $(x,y)$ pairs inside the fixed unit square
+$[0,1]\,\text{m}\times[0,1]\,\text{m}$ that defines the planar domain
+of Chapter~2. Both coordinates are constrained at the input level by
+the minimum, maximum, and step attributes of the numeric controls,
+which prevents the user from submitting points outside the trained
+operating envelope. The fourth group, \emph{Simplified scenario
+settings}, exposes three locked prototype values (\emph{point} thermal
+source, \emph{free} mechanical constraint, \emph{prototype simplified}
+boundary condition). These values are pinned because the surrogate
+models in Chapter~5 were trained under exactly these assumptions.
+Exposing them as a read-only block in the interface is a deliberate
+design choice: it documents the operating envelope to the user without
+inviting requests that would push the inference outside the training
+distribution.
+
+The fifth group is the observation time, given in seconds. The
+final block is a collapsible reference panel that lists the resolved
+physical properties of the selected medium, including density,
+porosity, $V_p$, $V_s$, thermal conductivity, heat capacity, and
+thermal expansion. The panel does not allow editing because these
+quantities are stored in the catalog rather than entered by the user;
+its role is purely informational, so that the operator can confirm
+which preset is about to be sent to the backend. Three action buttons
+close the panel: \emph{Use demo values} populates the form with a
+canonical demo scenario, \emph{Reset} clears the current result and
+restores the demo defaults, and \emph{Run prediction} submits the form.
+
+\subsection{Two-dimensional domain visualisation}
+
+The right column of the workspace opens with a single SVG canvas that
+draws the source--probe geometry of the current request. The canvas is
+re-rendered on every form change and on every successful response.
+Figure~\ref{fig:web-visualization} reproduces the visualisation for a
+representative MeshGraphNet scenario.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\textwidth]{chapters/web_implementation/figures/web_visualization}
+\caption{Planar domain visualisation with source, probe, propagation
+arrow, and unit-direction key.}
+\label{fig:web-visualization}
+\end{figure}
+
+The canvas reserves a fixed band above the unit square for two text
+labels: the active model identifier (\emph{MeshGraphNet} in the
+figure) and the domain-size annotation \emph{Fixed
+1.00\,m\,$\times$\,1.00\,m domain}. The axis labels $y\cdot1.00$\,m and
+$x\cdot1.00$\,m sit outside the unit square on the left and bottom-right
+edges. Inside the square, the source point is drawn as a warm-toned
+disc and the probe as a cool-toned disc, each annotated with its
+$(x,y)$ coordinates. The propagation arrow connects the two points and
+carries two derived quantities directly on the line: the distance in
+metres and the azimuth in degrees. A unit-direction key in the
+bottom-left corner shows the normalised propagation vector in component
+form. The distance and the azimuth are obtained from the same
+geometry computation that the backend uses when it enriches the
+prediction response, so that the visualisation and the numeric panels
+report identical directional quantities. This is consistent with the
+contract decision of Chapter~5, where the directional summary is
+treated as an output normalised by the backend rather than as a
+visual artefact of the front-end.
+
+The SVG layout uses separate top, bottom, left, and right margins so
+that the header band, the unit square, and the bottom note do not
+share vertical space. Source and probe labels are offset from the
+markers, the distance and azimuth label is centred on the propagation
+arrow, and the unit-direction key is anchored to the bottom-left
+corner of the unit square. This placement is robust to extreme
+geometries: even when the source and the probe are placed near opposite
+corners of the unit square, the labels remain inside the canvas and do
+not overlap the model header.
+
+\subsection{Prediction result panel}
+
+The prediction-result panel collects the normalised response of the
+backend into five thematic cards. The panel is shown in
+Figure~\ref{fig:web-result}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.94\textwidth]{chapters/web_implementation/figures/web_result}
+\caption{Prediction result panel populated with a MeshGraphNet
+response.}
+\label{fig:web-result}
+\end{figure}
+
+The first card, \emph{Thermal response}, shows the predicted
+temperature $T$ at the probe and the corresponding temperature
+perturbation $\theta = T - T_{0}$ in Kelvin, together with the source
+field that produced the value (a \emph{Direct Model Prediction} tag in
+the figure). The second card, \emph{Mechanical displacement response},
+shows the in-plane displacement components $u_{x}$ and $u_{y}$, the
+displacement magnitude $\lVert u\rVert$, and a compact vector diagram
+that scales the two components into a small SVG. The third card,
+\emph{Directional response}, lists the source--probe distance, azimuth,
+unit-direction vector, and a normalised magnitude score. The fourth
+card, \emph{Temporal response}, lists the predicted travel time in
+both seconds and milliseconds. The fifth card, \emph{Model metadata},
+lists the model identifier, the version string, the inference time in
+milliseconds, the request identifier, and the fallback status.
+
+All five cards inherit a common visual structure so that the user can
+read across routes without re-learning the panel layout. Long values
+such as the request identifier or scientific-notation displacement
+components are allowed to wrap inside their cells, which keeps the
+result grid stable even when the formatted output is several tokens
+long. Numeric formatting is delegated to the same helpers that produce
+the diagnostics block at the bottom of the panel; this block reports
+the run state of the response (\emph{Normal response} or
+\emph{Fallback response}), the schema version, the request identifier,
+and the warning/notes lists carried by the diagnostics field of the
+contract. The diagnostics block is the place where the prototype note
+\emph{``Prototype prediction; not a field-validated thermoelastic
+simulation''} appears for every response. Its presence ensures that
+the disclaimer stated in Chapter~1 and in the landing strip is also
+attached to each rendered result and not only to the marketing surface
+of the page.
+
+A latency pill is placed in the header of the result card to keep the
+practical cost of the prediction visible at all times. Together with
+the inference-time field of the metadata card, it lets the user
+compare not only the directional quantities but also the wall-clock
+behaviour of the four routes, which is the basis for the latency
+discussion in Chapter~7.
+
+\subsection{Front-end and back-end interaction}
+
+The interaction between the front-end and the backend follows the
+unified contract described in Chapter~5. When the page loads, the
+application requests the medium catalog and the model registry from
+the backend and populates the two drop-downs. When the user clicks
+\emph{Run prediction}, the application serialises the form into a v2
+prediction-request payload, validates it locally against the same
+field constraints that the backend enforces, and submits it to the
+prediction endpoint. The response is normalised on the backend side
+into the v2 prediction-response shape and the front-end renders it
+directly without secondary post-processing. Errors carry a
+machine-readable code, an HTTP status, and the request identifier; they
+are displayed in a dedicated banner above the result cards so that
+they cannot be confused with a successful prediction. The complete
+request and response are also written into a collapsible debug panel
+at the bottom of the page, which can be expanded when the operator
+needs to inspect the raw JSON or copy it for an experiment log.
+
+The front-end is intentionally thin: it does not perform any
+thermoelastic computation, does not derive new physical quantities,
+and does not implement any of the four model architectures of
+Chapter~5. All thermal, mechanical, directional, and temporal numbers
+visible in the result panel are values produced by the backend or by
+the selected model service. This separation is important for the
+correctness of the comparison in Chapter~7, because it guarantees
+that the four routes are evaluated under identical pre-processing,
+identical post-processing, and identical rendering, and that any
+observed difference between routes is attributable to the model
+service rather than to the user interface.
+
+\subsection{Summary}
+
+The web interface implements the user-facing surface of the prototype
+described in Chapter~5. Its design priorities are alignment with the
+unified prediction contract, transparent presentation of the planar
+source--probe geometry, and consistent rendering of the directional,
+thermal, mechanical, and temporal components of the normalised
+response. The interface is implemented as a static single-page
+application without runtime dependencies, which keeps it consistent
+with the bachelor-level scope of the project and with the
+container-based deployment of the underlying services. It is the
+operational entry point used to produce the scenarios that the
+comparative evaluation of Chapter~7 reports.
