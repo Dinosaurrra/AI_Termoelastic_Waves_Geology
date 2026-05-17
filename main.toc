@@ -60,85 +60,85 @@
 \contentsline {subsection}{\numberline {7.4}Training data and sampling}{96}{subsection.7.4}%
 \contentsline {subsection}{\numberline {7.5}Role in the comparison framework}{96}{subsection.7.5}%
 \contentsline {section}{\numberline {8}Two-Dimensional Fourier Neural Operator for Thermoelastic Field Prediction}{97}{section.8}%
-\contentsline {subsection}{\numberline {8.1}Implementation-Oriented Model Formulation}{97}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.1}Model Formulation}{97}{subsection.8.1}%
 \contentsline {subsection}{\numberline {8.2}Input and Output Tensor Format}{98}{subsection.8.2}%
-\contentsline {subsection}{\numberline {8.3}Main Architecture of the FNO Model}{99}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.3}Main Architecture of the FNO Model}{98}{subsection.8.3}%
 \contentsline {subsection}{\numberline {8.4}Coordinate Grid Encoding}{99}{subsection.8.4}%
 \contentsline {subsection}{\numberline {8.5}Lifting Layer}{100}{subsection.8.5}%
-\contentsline {subsection}{\numberline {8.6}Padding Before Fourier Blocks}{101}{subsection.8.6}%
+\contentsline {subsection}{\numberline {8.6}Boundary Extension Before Fourier Blocks}{100}{subsection.8.6}%
 \contentsline {subsection}{\numberline {8.7}Fourier Blocks}{101}{subsection.8.7}%
-\contentsline {subsection}{\numberline {8.8}Spectral Convolution}{102}{subsection.8.8}%
-\contentsline {subsection}{\numberline {8.9}Complex Multiplication in Fourier Space}{103}{subsection.8.9}%
-\contentsline {subsection}{\numberline {8.10}Factorized Spectral Weights}{104}{subsection.8.10}%
-\contentsline {subsection}{\numberline {8.11}Local Convolution Branch}{104}{subsection.8.11}%
-\contentsline {subsection}{\numberline {8.12}Optional MLP Layer}{105}{subsection.8.12}%
-\contentsline {subsection}{\numberline {8.13}Projection Layer}{105}{subsection.8.13}%
-\contentsline {subsection}{\numberline {8.14}Temporal Prediction Task}{106}{subsection.8.14}%
-\contentsline {subsection}{\numberline {8.15}Supervised Training Objective}{106}{subsection.8.15}%
-\contentsline {subsection}{\numberline {8.16}Normalization of Physical Channels}{107}{subsection.8.16}%
-\contentsline {subsection}{\numberline {8.17}Evaluation Metrics}{108}{subsection.8.17}%
-\contentsline {subsection}{\numberline {8.18}Hyperparameters}{108}{subsection.8.18}%
-\contentsline {subsection}{\numberline {8.19}Summary}{109}{subsection.8.19}%
-\contentsline {section}{\numberline {9}MeshGraphNet Model for Thermoelastic Wave Prediction}{109}{section.9}%
-\contentsline {subsection}{\numberline {9.1}Motivation for Using a Graph Neural Network}{109}{subsection.9.1}%
-\contentsline {subsection}{\numberline {9.2}Graph Representation of the COMSOL Mesh}{110}{subsection.9.2}%
-\contentsline {subsection}{\numberline {9.3}Node Features and Physical State Variables}{112}{subsection.9.3}%
-\contentsline {subsection}{\numberline {9.4}Prediction Target}{114}{subsection.9.4}%
-\contentsline {subsection}{\numberline {9.5}Encoder--Processor--Decoder Architecture}{115}{subsection.9.5}%
-\contentsline {subsubsection}{\numberline {9.5.1}Node and Edge Encoders}{116}{subsubsection.9.5.1}%
-\contentsline {subsubsection}{\numberline {9.5.2}Message Passing Processor}{117}{subsubsection.9.5.2}%
-\contentsline {subsubsection}{\numberline {9.5.3}Decoder}{119}{subsubsection.9.5.3}%
-\contentsline {subsection}{\numberline {9.6}Physical Interpretation of Message Passing}{120}{subsection.9.6}%
-\contentsline {subsection}{\numberline {9.7}Loss Function}{121}{subsection.9.7}%
-\contentsline {subsection}{\numberline {9.8}Evaluation Metrics}{122}{subsection.9.8}%
-\contentsline {subsection}{\numberline {9.9}Training Procedure}{123}{subsection.9.9}%
-\contentsline {subsection}{\numberline {9.10}Fine-Tuning Strategy}{126}{subsection.9.10}%
-\contentsline {subsubsection}{\numberline {9.10.1}Full Fine-Tuning}{126}{subsubsection.9.10.1}%
-\contentsline {subsubsection}{\numberline {9.10.2}Decoder-Only Fine-Tuning}{127}{subsubsection.9.10.2}%
-\contentsline {subsubsection}{\numberline {9.10.3}Processor-Decoder Fine-Tuning}{127}{subsubsection.9.10.3}%
-\contentsline {subsection}{\numberline {9.11}Advantages of MeshGraphNet for This Task}{128}{subsection.9.11}%
-\contentsline {subsection}{\numberline {9.12}Limitations}{129}{subsection.9.12}%
-\contentsline {subsection}{\numberline {9.13}Summary}{131}{subsection.9.13}%
-\contentsline {section}{\numberline {10}Transformer-Based Neural Operator}{133}{section.10}%
-\contentsline {subsection}{\numberline {10.1}Motivation for an attention-based surrogate}{133}{subsection.10.1}%
-\contentsline {subsubsection}{\numberline {10.1.1}Tokenisation of the thermoelastic state}{133}{subsubsection.10.1.1}%
-\contentsline {subsection}{\numberline {10.2}Scaled dot-product attention}{134}{subsection.10.2}%
-\contentsline {subsection}{\numberline {10.3}Multi-head attention}{134}{subsection.10.3}%
-\contentsline {subsection}{\numberline {10.4}Encoder block}{135}{subsection.10.4}%
-\contentsline {subsection}{\numberline {10.5}Cross-attention decoder for query points}{135}{subsection.10.5}%
-\contentsline {subsection}{\numberline {10.6}Architecture used in this work}{136}{subsection.10.6}%
-\contentsline {subsection}{\numberline {10.7}Training objective}{136}{subsection.10.7}%
-\contentsline {subsection}{\numberline {10.8}Comparison with related Transformer neural operators}{138}{subsection.10.8}%
-\contentsline {subsection}{\numberline {10.9}Discretisation invariance and operator-learning view}{138}{subsection.10.9}%
-\contentsline {subsection}{\numberline {10.10}Summary}{139}{subsection.10.10}%
-\contentsline {section}{\numberline {11}Web Implementation}{140}{section.11}%
-\contentsline {subsection}{\numberline {11.1}Interface concept and landing area}{140}{subsection.11.1}%
-\contentsline {subsection}{\numberline {11.2}Prediction setup panel}{141}{subsection.11.2}%
-\contentsline {subsection}{\numberline {11.3}Two-dimensional domain visualisation}{142}{subsection.11.3}%
-\contentsline {subsection}{\numberline {11.4}Prediction result panel}{142}{subsection.11.4}%
-\contentsline {subsection}{\numberline {11.5}Front-end and back-end interaction}{143}{subsection.11.5}%
-\contentsline {subsection}{\numberline {11.6}Summary}{144}{subsection.11.6}%
-\contentsline {section}{\numberline {12}Results and Discussion}{148}{section.12}%
-\contentsline {subsection}{\numberline {12.1}Experimental setup}{148}{subsection.12.1}%
-\contentsline {subsection}{\numberline {12.2}Travel-time predictions}{148}{subsection.12.2}%
-\contentsline {subsubsection}{\numberline {12.2.1}Accuracy against the analytical reference}{150}{subsubsection.12.2.1}%
-\contentsline {subsection}{\numberline {12.3}Maximum displacement}{151}{subsection.12.3}%
-\contentsline {subsection}{\numberline {12.4}Temperature perturbation}{152}{subsection.12.4}%
-\contentsline {subsection}{\numberline {12.5}Directional prediction}{152}{subsection.12.5}%
-\contentsline {subsection}{\numberline {12.6}Inference latency and model size}{153}{subsection.12.6}%
-\contentsline {subsection}{\numberline {12.7}Training behaviour}{154}{subsection.12.7}%
-\contentsline {subsection}{\numberline {12.8}Cross-material analysis}{155}{subsection.12.8}%
-\contentsline {subsection}{\numberline {12.9}Per-model time-series traces}{155}{subsection.12.9}%
-\contentsline {subsection}{\numberline {12.10}Threats to validity and limitations}{156}{subsection.12.10}%
-\contentsline {subsection}{\numberline {12.11}Summary and recommendations}{157}{subsection.12.11}%
-\contentsline {section}{Conclusion}{159}{subsection.12.11}%
-\contentsline {section}{\numberline {A}API contract v2: Pydantic request schemas}{165}{appendix.A}%
-\contentsline {section}{Appendix A. API contract v2 schemas}{165}{appendix.A}%
-\contentsline {section}{\numberline {B}Derived geometric and elastic quantities}{167}{appendix.B}%
-\contentsline {section}{Appendix B. Derived quantities}{167}{appendix.B}%
-\contentsline {section}{\numberline {C}PINN composite loss assembly}{169}{appendix.C}%
-\contentsline {section}{Appendix C. PINN composite loss}{169}{appendix.C}%
-\contentsline {section}{\numberline {D}MeshGraphNet 2D dataset field mapping}{171}{appendix.D}%
-\contentsline {section}{Appendix D. MGN field mapping}{171}{appendix.D}%
-\contentsline {section}{\numberline {E}Accuracy and latency measurement}{173}{appendix.E}%
-\contentsline {section}{Appendix E. Accuracy + latency script}{173}{appendix.E}%
+\contentsline {subsection}{\numberline {8.8}Spectral Convolution}{101}{subsection.8.8}%
+\contentsline {subsection}{\numberline {8.9}Complex Multiplication in Fourier Space}{102}{subsection.8.9}%
+\contentsline {subsection}{\numberline {8.10}Factorized Spectral Weights}{103}{subsection.8.10}%
+\contentsline {subsection}{\numberline {8.11}Local Convolution Branch}{103}{subsection.8.11}%
+\contentsline {subsection}{\numberline {8.12}Pointwise Channel-Mixing Layer}{104}{subsection.8.12}%
+\contentsline {subsection}{\numberline {8.13}Projection Layer}{104}{subsection.8.13}%
+\contentsline {subsection}{\numberline {8.14}Temporal Prediction Task}{105}{subsection.8.14}%
+\contentsline {subsection}{\numberline {8.15}Supervised Training Objective}{105}{subsection.8.15}%
+\contentsline {subsection}{\numberline {8.16}Normalization of Physical Channels}{106}{subsection.8.16}%
+\contentsline {subsection}{\numberline {8.17}Evaluation Metrics}{107}{subsection.8.17}%
+\contentsline {subsection}{\numberline {8.18}Architectural and Training Parameters}{107}{subsection.8.18}%
+\contentsline {subsection}{\numberline {8.19}Summary}{108}{subsection.8.19}%
+\contentsline {section}{\numberline {9}MeshGraphNet Model for Thermoelastic Wave Prediction}{108}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Motivation for Using a Graph Neural Network}{108}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Graph Representation of the COMSOL Mesh}{109}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Node Features and Physical State Variables}{111}{subsection.9.3}%
+\contentsline {subsection}{\numberline {9.4}Prediction Target}{113}{subsection.9.4}%
+\contentsline {subsection}{\numberline {9.5}Encoder--Processor--Decoder Architecture}{114}{subsection.9.5}%
+\contentsline {subsubsection}{\numberline {9.5.1}Node and Edge Encoders}{115}{subsubsection.9.5.1}%
+\contentsline {subsubsection}{\numberline {9.5.2}Message Passing Processor}{116}{subsubsection.9.5.2}%
+\contentsline {subsubsection}{\numberline {9.5.3}Decoder}{118}{subsubsection.9.5.3}%
+\contentsline {subsection}{\numberline {9.6}Physical Interpretation of Message Passing}{119}{subsection.9.6}%
+\contentsline {subsection}{\numberline {9.7}Loss Function}{120}{subsection.9.7}%
+\contentsline {subsection}{\numberline {9.8}Evaluation Metrics}{121}{subsection.9.8}%
+\contentsline {subsection}{\numberline {9.9}Training Procedure}{122}{subsection.9.9}%
+\contentsline {subsection}{\numberline {9.10}Fine-Tuning Strategy}{125}{subsection.9.10}%
+\contentsline {subsubsection}{\numberline {9.10.1}Full Fine-Tuning}{125}{subsubsection.9.10.1}%
+\contentsline {subsubsection}{\numberline {9.10.2}Decoder-Only Fine-Tuning}{126}{subsubsection.9.10.2}%
+\contentsline {subsubsection}{\numberline {9.10.3}Processor-Decoder Fine-Tuning}{126}{subsubsection.9.10.3}%
+\contentsline {subsection}{\numberline {9.11}Advantages of MeshGraphNet for This Task}{127}{subsection.9.11}%
+\contentsline {subsection}{\numberline {9.12}Limitations}{128}{subsection.9.12}%
+\contentsline {subsection}{\numberline {9.13}Summary}{130}{subsection.9.13}%
+\contentsline {section}{\numberline {10}Transformer-Based Neural Operator}{132}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Motivation for an attention-based surrogate}{132}{subsection.10.1}%
+\contentsline {subsubsection}{\numberline {10.1.1}Tokenisation of the thermoelastic state}{132}{subsubsection.10.1.1}%
+\contentsline {subsection}{\numberline {10.2}Scaled dot-product attention}{133}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}Multi-head attention}{133}{subsection.10.3}%
+\contentsline {subsection}{\numberline {10.4}Encoder block}{134}{subsection.10.4}%
+\contentsline {subsection}{\numberline {10.5}Cross-attention decoder for query points}{134}{subsection.10.5}%
+\contentsline {subsection}{\numberline {10.6}Architecture used in this work}{135}{subsection.10.6}%
+\contentsline {subsection}{\numberline {10.7}Training objective}{135}{subsection.10.7}%
+\contentsline {subsection}{\numberline {10.8}Comparison with related Transformer neural operators}{137}{subsection.10.8}%
+\contentsline {subsection}{\numberline {10.9}Discretisation invariance and operator-learning view}{137}{subsection.10.9}%
+\contentsline {subsection}{\numberline {10.10}Summary}{138}{subsection.10.10}%
+\contentsline {section}{\numberline {11}Web Implementation}{139}{section.11}%
+\contentsline {subsection}{\numberline {11.1}Interface concept and landing area}{139}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.2}Prediction setup panel}{140}{subsection.11.2}%
+\contentsline {subsection}{\numberline {11.3}Two-dimensional domain visualisation}{140}{subsection.11.3}%
+\contentsline {subsection}{\numberline {11.4}Prediction result panel}{140}{subsection.11.4}%
+\contentsline {subsection}{\numberline {11.5}Front-end and back-end interaction}{141}{subsection.11.5}%
+\contentsline {subsection}{\numberline {11.6}Summary}{141}{subsection.11.6}%
+\contentsline {section}{\numberline {12}Results and Discussion}{145}{section.12}%
+\contentsline {subsection}{\numberline {12.1}Experimental setup}{145}{subsection.12.1}%
+\contentsline {subsection}{\numberline {12.2}Travel-time predictions}{145}{subsection.12.2}%
+\contentsline {subsubsection}{\numberline {12.2.1}Accuracy against the analytical reference}{147}{subsubsection.12.2.1}%
+\contentsline {subsection}{\numberline {12.3}Maximum displacement}{148}{subsection.12.3}%
+\contentsline {subsection}{\numberline {12.4}Temperature perturbation}{149}{subsection.12.4}%
+\contentsline {subsection}{\numberline {12.5}Directional prediction}{149}{subsection.12.5}%
+\contentsline {subsection}{\numberline {12.6}Inference latency and model size}{150}{subsection.12.6}%
+\contentsline {subsection}{\numberline {12.7}Training behaviour}{151}{subsection.12.7}%
+\contentsline {subsection}{\numberline {12.8}Cross-material analysis}{152}{subsection.12.8}%
+\contentsline {subsection}{\numberline {12.9}Per-model time-series traces}{152}{subsection.12.9}%
+\contentsline {subsection}{\numberline {12.10}Threats to validity and limitations}{153}{subsection.12.10}%
+\contentsline {subsection}{\numberline {12.11}Summary and recommendations}{154}{subsection.12.11}%
+\contentsline {section}{Conclusion}{156}{subsection.12.11}%
+\contentsline {section}{\numberline {A}API contract v2: Pydantic request schemas}{162}{appendix.A}%
+\contentsline {section}{Appendix A. API contract v2 schemas}{162}{appendix.A}%
+\contentsline {section}{\numberline {B}Derived geometric and elastic quantities}{164}{appendix.B}%
+\contentsline {section}{Appendix B. Derived quantities}{164}{appendix.B}%
+\contentsline {section}{\numberline {C}PINN composite loss assembly}{166}{appendix.C}%
+\contentsline {section}{Appendix C. PINN composite loss}{166}{appendix.C}%
+\contentsline {section}{\numberline {D}MeshGraphNet 2D dataset field mapping}{168}{appendix.D}%
+\contentsline {section}{Appendix D. MGN field mapping}{168}{appendix.D}%
+\contentsline {section}{\numberline {E}Accuracy and latency measurement}{170}{appendix.E}%
+\contentsline {section}{Appendix E. Accuracy + latency script}{170}{appendix.E}%

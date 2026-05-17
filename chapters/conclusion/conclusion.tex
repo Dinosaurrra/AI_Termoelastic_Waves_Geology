@@ -36,7 +36,7 @@ $273.15$~K, source temperature $1500$~K, domain $1\,\text{m}\times
 1\,\text{m}$, no source frequency) are locked server-side so clients
 cannot push the trained models out of distribution.
 
-The empirical part (Chapter~7) compared the four routes on a balanced
+The empirical part (Chapter~6) compared the four routes on a balanced
 sweep of $40$ scenarios per material across four rocks (sandstone,
 limestone, basalt, granite) under one experimental protocol. The
 main quantitative findings are:
@@ -97,7 +97,7 @@ literature parameters, not site-measured values. Six of the ten
 materials in the v2 catalog have no thermal expansion coefficient in
 the source CSV and are therefore gated off from thermoelastic
 prediction by design. The FNO calibration problem identified in
-Chapter~7 requires a retraining pass that is out of scope for the
+Chapter~6 requires a retraining pass that is out of scope for the
 present iteration. MeshGraphNet was loaded against a 2D dataset
 padded to match a 3D checkpoint; absolute magnitudes there inherit
 the cost of that mismatch.
