@@ -2,7 +2,7 @@
 \addcontentsline{toc}{section}{Appendix A. API contract v2 schemas}
 
 This appendix shows the Pydantic schemas that implement the
-client-facing v2 request contract described in Chapter~5. Only the
+client-facing v2 request contract described in Chapter~6. Only the
 v2 subset is reproduced here; the same source module also contains
 the v1 schemas, which remain valid through the schema-version
 dispatch.
@@ -66,7 +66,7 @@ class PredictionRequestV2Schema(BaseModel):
 \end{lstlisting}
 
 The four \texttt{Literal[...]} fields combined with
-\texttt{extra="forbid"} implement the rejection rules of Chapter~5:
+\texttt{extra="forbid"} implement the rejection rules of Chapter~6:
 any client field for \texttt{thermal\_state}, \texttt{frequency\_hz},
 or \texttt{domain.size} is refused with a
 \texttt{schema\_validation\_failed} error. The coincidence check in

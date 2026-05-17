@@ -5,7 +5,7 @@
 Among the four predictive routes considered in this thesis, the
 physics-informed neural network (PINN) is the only one whose training
 objective explicitly contains residuals of the governing thermoelastic
-equations introduced in Chapter~2. The other three routes (FNO,
+equations introduced in Chapter~3. The other three routes (FNO,
 MeshGraphNet and the Transformer-style operator) are data-driven
 surrogates: they are trained against simulation snapshots, but they do
 not directly penalise violations of the coupled heat--momentum system.
@@ -26,7 +26,7 @@ f_{\theta}\colon\;
 \end{equation}
 Here $(x,y)$ is the in-plane probe coordinate in the 2D plane-strain
 domain, $t$ is the observation time, and the six material parameters
-follow Section~2.4. The output triple $(T,u,v)$ contains the
+follow Section~3.4. The output triple $(T,u,v)$ contains the
 temperature and the two in-plane displacement components; stress and
 strain are recovered analytically from the predicted displacement and
 temperature during loss assembly.
@@ -103,14 +103,14 @@ k\,\nabla^2 T
 \;=\;0.
 \end{equation}
 The last term is exactly the volumetric-strain feedback discussed in
-Section~2.5. Including it makes the PINN sensitive to the geometric
+Section~3.5. Including it makes the PINN sensitive to the geometric
 coupling between mechanical and thermal evolution; data-driven
 surrogates without this term cannot detect it.
 
 \subsection{Training data and sampling}
 
 The PINN consumes the same per-rock 2D structured datasets that
-Chapter~4 exported from COMSOL ($230$ nodes per material,
+Chapter~5 exported from COMSOL ($230$ nodes per material,
 $101$ time samples). Each training row carries the probe coordinates,
 the time stamp, the material parameters of the current rock, and the
 ground-truth $(T,u,v)$ snapshot. The four loss terms are evaluated on
@@ -122,7 +122,7 @@ residuals on a randomly drawn collocation subset.
 Because the PINN penalises violations of the governing equations
 directly, its predictions are constrained to remain on a physically
 meaningful manifold even when the supervised signal is noisy. The
-comparison results of Chapter~6 will show that this is the only route
+comparison results of Chapter~12 will show that this is the only route
 whose travel-time predictions stay within $10\%$ of the analytical
 reference $r/V_p$ for every scenario in the balanced sweep, and the
 only route whose time-series traces show a smooth time-dependent

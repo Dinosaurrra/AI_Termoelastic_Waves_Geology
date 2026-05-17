@@ -2,7 +2,7 @@
 
 \subsection{Motivation for an attention-based surrogate}
 
-The coupled thermoelastic system written down in Chapter~2 defines a
+The coupled thermoelastic system written down in Chapter~3 defines a
 deterministic mapping
 \begin{equation}
 \mathcal{G}: (a,\,\mathrm{IC},\,\mathrm{BC},\,s) \;\longmapsto\; \big(T(x,t),\,u(x,t),\,\sigma(x,t)\big),
@@ -12,7 +12,7 @@ where the input collects the material parameter field
 boundary conditions, and the source description. A neural surrogate
 \(\mathcal{G}_\theta\) with learnable parameters \(\theta\) is intended
 to approximate this mapping at a fraction of the cost of running the
-COMSOL solver of Chapter~4. Three properties of the present problem
+COMSOL solver of Chapter~5. Three properties of the present problem
 constrain the choice of architecture. First, the geological domain is
 discretised by an unstructured tetrahedral mesh and not by a regular
 grid, so the surrogate must accept arbitrary point clouds. Second, the
@@ -240,7 +240,7 @@ W_{\mathrm{out}}\,Z^{(L_{\mathrm{dec}})}_{j,:}
 \in\mathbb{R}^{C_{\mathrm{out}}},
 \qquad C_{\mathrm{out}} = 3.
 \end{equation}
-Within the framework of Chapter~2 these three channels coincide with
+Within the framework of Chapter~3 these three channels coincide with
 the primary unknowns of the two-dimensional thermoelastic system: the
 temperature field and the two in-plane components of the displacement
 vector. The other
@@ -342,7 +342,7 @@ channels at every query location.}
 \subsection{Training objective}
 
 The Transformer is trained on COMSOL ground-truth solutions of the
-coupled thermoelastic problem of Chapter~4. The primary supervised
+coupled thermoelastic problem of Chapter~5. The primary supervised
 loss is the mean squared error between the predicted and the reference
 fields, evaluated on the set of query tokens that are randomly drawn
 at every training step:
@@ -368,7 +368,7 @@ not just its instantaneous value:
 where the time derivative \(\partial_t\hat{u}_j\) is obtained
 by automatic differentiation through the model output with respect to
 the query time coordinate. A third term enforces the diffusion side of
-the heat equation derived in Chapter~2,
+the heat equation derived in Chapter~3,
 \begin{equation}
 \mathcal{L}_{\mathrm{th}}(\theta) =
 \frac{1}{N_q}\sum_{j=1}^{N_q}
@@ -418,7 +418,7 @@ wishes to evaluate the operator on very large meshes. The Transolver
 latent slots between the input and the queries, so that each slot can
 specialise to a different sub-region or physical regime; this is
 reported to be advantageous in problems with sharp material contrasts
-such as the rod-in-rock setup of Chapter~4. We treat the plain
+such as the rod-in-rock setup of Chapter~5. We treat the plain
 Transformer of this section as the natural starting point and leave
 Galerkin- and Transolver-style refinements as a direction for future
 work.
@@ -458,17 +458,17 @@ evaluated through a separate set of query coordinates that are not
 required to coincide with the inputs; in particular, the model can be
 trained on \(1024\) nodes per sample and queried at a much denser
 grid at inference. This makes the Transformer-based surrogate a useful
-complement to the Fourier neural operator of Section~5.2, which is
+complement to the Fourier neural operator of Chapter~8, which is
 intrinsically tied to a regular grid, and to the MeshGraphNet of
-Section~5.3, which is intrinsically tied to a particular graph
+Chapter~9, which is intrinsically tied to a particular graph
 topology.
 
 \subsection{Summary}
 
 The Transformer-based neural operator of this section is a
 discretisation-invariant surrogate for the coupled thermoelastic system
-of Chapter~2 trained on the COMSOL ground-truth solutions of
-Chapter~4. It tokenises the medium into input points with embedded
+of Chapter~3 trained on the COMSOL ground-truth solutions of
+Chapter~5. It tokenises the medium into input points with embedded
 material properties and queries it at arbitrary output locations; it
 relies on multi-head self-attention in the encoder to capture global
 relations within the rock and on multi-head cross-attention in the
@@ -478,4 +478,4 @@ supervised reconstruction, velocity consistency, and a thermal-residual
 regulariser. The architecture sits in the OFormer family of neural
 operators and is intentionally kept minimal so that its behaviour can
 be analysed and compared on an equal footing with the PINN, FNO, and
-MeshGraphNet routes evaluated in the remainder of Chapter~5.
+MeshGraphNet routes evaluated in the same comparison framework.

@@ -1,7 +1,7 @@
 \section{PINN composite loss assembly}
 \addcontentsline{toc}{section}{Appendix C. PINN composite loss}
 
-The PINN training objective described in Chapter~5 has four
+The PINN training objective described in Chapter~7 has four
 components: a supervised loss, a velocity-consistency loss, an
 elastic-wave residual, and a coupled-thermal residual. The composite
 loss \eqref{eq:mse} weights them with task-specific coefficients. The
@@ -72,6 +72,6 @@ heat-equation residuals is produced by \texttt{torch.autograd.grad}
 with \texttt{create\_graph=True}, so the residual gradients propagate
 back into the network parameters during the optimiser step. The
 $\gamma T_0\, \partial_t(\nabla\!\cdot\!u)$ term is the coupling
-source identified in Section~2.5; it is what distinguishes the
+source identified in Section~3.5; it is what distinguishes the
 PINN's training objective from the data-only MSE used by the other
 three routes.
