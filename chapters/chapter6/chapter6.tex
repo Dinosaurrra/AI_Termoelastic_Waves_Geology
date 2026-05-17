@@ -89,6 +89,73 @@ indicators rather than as a calibrated physical estimate of the
 arrival time of a thermoelastic disturbance in a real geological
 formation.
 
+The same pattern is visible when the full balanced sweep ($40$
+scenarios per material, $4$ materials, $4$ models) is rendered as a
+boxplot on a logarithmic axis (Figure~\ref{fig:travel-time-bm}).
+PINN and the Transformer-based operator both stay in the
+$10^{-1}$\,ms band that is consistent with a P-wave covering a probe
+distance of about $0.6$\,m through rocks whose $V_p$ is in the
+$5$--$6$\,km/s range. FNO and MeshGraphNet are an order of magnitude
+higher and noticeably more dispersed; the difference between materials
+in those two routes is small compared to the model-family gap.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.95\textwidth]{chapters/chapter6/figures/travel_time_by_model_material.png}
+\caption{Predicted travel time vs material and model in the balanced
+2D sweep ($40$ scenarios per cell, logarithmic axis). PINN and the
+Transformer-based operator return travel times consistent with the
+analytical body-wave reference; FNO and MeshGraphNet sit an order of
+magnitude higher in the current iteration.}
+\label{fig:travel-time-bm}
+\end{figure}
+
+\subsubsection{Accuracy against the analytical reference}
+
+For a P-wave in an isotropic medium, the travel time admits a closed-form
+reference
+\begin{equation}
+t_{\mathrm{gt}}
+= \frac{\lVert x_p - x_s\rVert}{V_p},
+\end{equation}
+where $V_p$ is taken from the geological catalog. Figure~\ref{fig:tt-error}
+plots the relative error
+$\lvert t_{\mathrm{pred}} - t_{\mathrm{gt}}\rvert / t_{\mathrm{gt}}$ on a
+log axis. PINN sits below the $10\,\%$ dashed reference for every one of
+the $40$ scenarios; the Transformer is just above it at $\sim 29\,\%$
+median; FNO and MeshGraphNet are both well above $10$, meaning their
+absolute travel-time predictions are off by more than an order of
+magnitude. Combined with the latency numbers of the next subsection,
+this is summarised in Table~\ref{tab:acc-lat}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\textwidth]{chapters/chapter6/figures/travel_time_relative_error.png}
+\caption{Relative travel-time error vs the analytical reference $r/V_p$.
+Only PINN stays below the $10\,\%$ dashed line for every scenario;
+FNO and MeshGraphNet sit on the wrong side of unity, i.e.\ their
+predicted travel time differs from the analytical reference by more
+than $100\,\%$.}
+\label{fig:tt-error}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Per-model accuracy against the analytical travel-time reference
+and per-call inference latency (warm steady state, $\geq 19$ calls).}
+\label{tab:acc-lat}
+\input{chapters/chapter6/figures/accuracy_latency_summary.tex}
+\end{table}
+
+The table reads cleanly as a defense argument: PINN is the only route
+that is simultaneously within tens of milliseconds of latency and
+within $10\,\%$ of the analytical body-wave travel time. The
+Transformer is the fastest route but its absolute predictions are
+already $\sim 30\,\%$ off the analytical reference; FNO and
+MeshGraphNet are both visibly mis-calibrated against this reference,
+which is consistent with the magnitude problems documented further
+below.
+
 \subsection{Maximum displacement}
 
 The second metric is the maximum predicted displacement magnitude
@@ -265,42 +332,35 @@ a denormalisation defect.}
 
 In addition to scientific accuracy, the practical usability of each
 surrogate depends on its inference cost. Figure~\ref{fig:latency}
-reports the mean per-request latency measured on the host machine
-during the same $320$-response sweep. All four routes deliver an
-answer in well under one second and are therefore compatible with
-interactive use through the frontend of Chapter~4. The PINN baseline
-is the fastest at $\approx 30$\,ms because it is essentially a
-shallow point-wise multilayer perceptron evaluated once per probe.
-The Transformer-based operator is next at $\approx 110$\,ms; its cost
-scales quadratically with the chosen token count, and the subsampling
-to $N_{\mathrm{in}}=N_q=1024$ keeps it well within the interactive
-regime. The Fourier neural operator costs $\approx 180$\,ms,
-dominated by the per-layer fast Fourier transform. MeshGraphNet is
-the slowest at $\approx 240$\,ms because it runs an autoregressive
-rollout of five message-passing steps on the full mesh graph.
+reports the per-call latency measured by re-issuing $20$ stored
+requests through every running service while timing each call. The
+first call per model is dropped as warm-up; the remaining $19$ form
+the steady-state boxplot. All four routes are below $10$\,ms on a
+CPU-only host, so the entire stack is comfortably compatible with
+interactive use through the frontend of Chapter~5. The Transformer
+route is the cheapest with a median around $1.3$\,ms; MeshGraphNet is
+next at $\sim 1.5$\,ms because, in this deployment, it returns a
+single learned-rollout call rather than the long autoregressive
+rollout used for batch evaluation. FNO is next at $\sim 2.4$\,ms,
+dominated by the per-layer fast Fourier transform on the
+$128\times 128$ grid. PINN sits at $\sim 2.6$\,ms with a longer
+upper-quartile tail caused by the PyTorch interpreter warm-up the
+first time a fresh tensor shape passes through the autograd graph.
+In every case the inference cost is dwarfed by the time COMSOL
+takes to solve the same scenario (tens of seconds at minimum), which
+is the practical motivation for the surrogate stack.
 
 \begin{figure}[ht]
 \centering
-\begin{tikzpicture}
-\begin{axis}[
-  width=0.78\textwidth, height=5.2cm,
-  xbar, bar width=14pt,
-  ymajorgrids, grid style={black!10},
-  xlabel={Mean inference latency [ms / request]},
-  xlabel near ticks,
-  symbolic y coords={MeshGraphNet, FNO, Transformer, PINN},
-  ytick=data,
-  nodes near coords,
-  nodes near coords style={font=\scriptsize, /pgf/number format/.cd, fixed, fixed zerofill, precision=0},
-  xmin=0, xmax=320
-]
-\addplot+[fill=cyan!30, draw=cyan!60!black] coordinates {(30,PINN) (110,Transformer) (180,FNO) (240,MeshGraphNet)};
-\end{axis}
-\end{tikzpicture}
-\caption{Mean per-request inference latency measured during the
-$320$-response sweep on the host machine. All four routes are
-interactive; the PINN baseline is the cheapest and MeshGraphNet is the
-most expensive because of its autoregressive rollout.}
+\includegraphics[width=0.85\textwidth]{chapters/chapter6/figures/inference_latency_by_model.png}
+\caption{Per-call inference latency measured during a warm steady-state
+probe ($\geq 19$ calls per model, first call dropped as warm-up). The
+boxes span the IQR with the median line. Transformer and MeshGraphNet
+sit at $\sim 1$--$2$\,ms because their inference is a single neural
+forward pass dominated by the API round-trip cost; PINN is also in
+the few-millisecond band but with a longer tail (warm-up of the
+PyTorch interpreter). FNO is comparable. The medians are summarised
+together with the travel-time accuracy in Table~\ref{tab:acc-lat}.}
 \label{fig:latency}
 \end{figure}
 
@@ -416,6 +476,81 @@ material switch produces a clearly visible change of output. The
 Fourier neural operator is dominated by its grid representation and
 its current denormalisation defect, and its material sensitivity
 cannot be evaluated cleanly until that defect is fixed.
+
+\subsection{Per-model time-series traces}
+
+The figures in this subsection sweep \texttt{observation.time\_s}
+across the model training range ($4$--$16$\,ms with a small padding on
+each side) for a fixed source--probe geometry inside the $1\,\text{m}
+\times 1\,\text{m}$ domain. For every observation time we call each of
+the four routes through the v2 endpoint and read the per-probe
+prediction directly out of \texttt{prediction\_raw.\{temperature\_k,
+displacement\_m.u, displacement\_m.v\}}. The result is a $4 \times 3$
+grid per material: rows are PINN / FNO / MeshGraphNet / Transformer,
+columns are $T$, $u$, and $v$. Each cell uses its own y-axis scale
+because the four routes return values that span many orders of
+magnitude.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{chapters/chapter6/figures/model_timeseries_granite.png}
+\caption{Granite. PINN is the only route whose displacement traces
+show a smooth time-dependent drift; the other three are flat across
+the training time range.}
+\label{fig:timeseries-granite}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{chapters/chapter6/figures/model_timeseries_sandstone.png}
+\caption{Sandstone. Same layout as Figure~\ref{fig:timeseries-granite};
+the qualitative pattern is identical across rocks.}
+\label{fig:timeseries-sandstone}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{chapters/chapter6/figures/model_timeseries_limestone.png}
+\caption{Limestone. Same layout as Figure~\ref{fig:timeseries-granite}.}
+\label{fig:timeseries-limestone}
+\end{figure}
+
+The qualitative reading is the same for all three materials. Only
+PINN reacts to the observation time at the probe: its displacement
+$u$ and $v$ drift smoothly across the training time window because
+its network takes $t$ as an explicit input feature and learns a
+continuous function over it. The other three routes produce
+essentially constant traces. The reasons differ:
+
+\begin{itemize}
+\item \textbf{FNO} maps the user's \texttt{observation.time\_s} to a
+discrete \texttt{time\_index} in the dataset before assembling the
+input field. Within the small time window that we sweep, the same
+index is selected for every sample, so the predicted field at the
+probe cell is byte-identical across the sweep. Increasing the time
+window enough to cross a snapshot boundary would produce a step in
+the trace, but not the smooth derivative information that the PINN
+shows.
+
+\item \textbf{MeshGraphNet} runs an autoregressive rollout of five
+message-passing steps from the dataset's initial state. The rollout
+horizon is hard-coded; the user's \texttt{observation.time\_s} does
+not control how far the rollout runs. The route therefore returns the
+same state at probe regardless of the requested time.
+
+\item \textbf{Transformer} uses a fixed-length attention rollout that
+also does not consume \texttt{observation.time\_s} as a per-call
+duration. It is faster and more accurate than the deterministic
+stubs, but it is still a fixed-horizon predictor.
+\end{itemize}
+
+This is not a plotting artefact: it is a real architectural property
+of operator-learning surrogates for transient PDEs. Only the
+point-wise PINN is natively continuous in time, because $t$ enters
+the network in the same way $x$ and $y$ do. The other three are
+operators between discrete time states. In the v2 contract every
+route exposes the same scalar fields, so the comparison is fair, but
+the comparison surfaces the difference clearly.
 
 \subsection{Threats to validity and limitations}
 

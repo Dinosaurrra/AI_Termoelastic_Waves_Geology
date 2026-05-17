@@ -1,0 +1,131 @@
+\section{Physics-Informed Neural Network for Thermoelastic Prediction}
+
+\subsection{Motivation for a physics-informed surrogate}
+
+Among the four predictive routes considered in this thesis, the
+physics-informed neural network (PINN) is the only one whose training
+objective explicitly contains residuals of the governing thermoelastic
+equations introduced in Chapter~2. The other three routes (FNO,
+MeshGraphNet and the Transformer-style operator) are data-driven
+surrogates: they are trained against simulation snapshots, but they do
+not directly penalise violations of the coupled heat--momentum system.
+The PINN component therefore plays a dual role inside the comparison
+framework: it is both a candidate predictor and the only baseline that
+embeds physical knowledge inside the loss.
+
+\subsection{Network mapping and inputs}
+
+The PINN is a single multilayer perceptron $f_{\theta}$ that takes a
+point query in space--time together with the local material parameters
+and returns the predicted thermoelastic state at that point:
+\begin{equation}
+f_{\theta}\colon\;
+\bigl(x,\,y,\,t,\,E,\,\nu,\,\rho,\,\alpha,\,k,\,C_p\bigr)
+\;\longmapsto\;
+\bigl(T,\,u,\,v\bigr).
+\end{equation}
+Here $(x,y)$ is the in-plane probe coordinate in the 2D plane-strain
+domain, $t$ is the observation time, and the six material parameters
+follow Section~2.4. The output triple $(T,u,v)$ contains the
+temperature and the two in-plane displacement components; stress and
+strain are recovered analytically from the predicted displacement and
+temperature during loss assembly.
+
+The network is implemented as an MLP with $L$ hidden layers of width
+$d_h$ and a smooth activation $\varphi$ (the implementation uses
+$\tanh$). Layer $\ell$ computes
+\begin{equation}
+h^{(\ell)} = \varphi\bigl(W^{(\ell)} h^{(\ell-1)} + b^{(\ell)}\bigr),
+\qquad
+h^{(0)} = z = (x,y,t,E,\nu,\rho,\alpha,k,C_p),
+\end{equation}
+and the output head produces
+$(T,u,v) = W^{(L+1)} h^{(L)} + b^{(L+1)}$.
+The smooth activation matters: $\tanh$ has bounded derivatives of
+every order, so the higher-order derivatives needed by the PDE loss
+(below) remain numerically stable.
+
+\subsection{Composite training loss}
+
+The PINN parameters $\theta$ are obtained by minimising a weighted sum
+of four loss components on a batch of collocation points
+$\{(x_i, y_i, t_i)\}$ drawn from the training scenarios:
+\begin{equation}
+\mathcal{L}(\theta)
+=
+\lambda_{\mathrm{sup}}\,\mathcal{L}_{\mathrm{sup}}
++ \lambda_{\mathrm{vel}}\,\mathcal{L}_{\mathrm{vel}}
++ \lambda_{\mathrm{el}}\,\mathcal{L}_{\mathrm{elastic}}
++ \lambda_{\mathrm{th}}\,\mathcal{L}_{\mathrm{thermal}}.
+\end{equation}
+
+\textbf{Supervised loss} $\mathcal{L}_{\mathrm{sup}}$ is the standard
+mean-squared error between the predicted $(T,u,v)$ and the
+ground-truth values exported from COMSOL at the corresponding
+$(x_i,y_i,t_i)$.
+
+\textbf{Velocity consistency} $\mathcal{L}_{\mathrm{vel}}$ enforces
+that the displacement time derivative obtained by automatic
+differentiation matches the velocity field that COMSOL reported as
+$u_t,v_t$ in the same probe samples. This term prevents the network
+from drifting toward spatially correct but temporally inconsistent
+displacement fields.
+
+\textbf{Elastic-wave residual} $\mathcal{L}_{\mathrm{elastic}}$
+evaluates the residual of the linear-momentum balance
+\begin{equation}
+\rho\,\partial_t^2 u
+\;-\;
+\nabla\!\cdot\!\sigma
+\;=\;0,
+\qquad
+\sigma
+= \lambda\,(\nabla\!\cdot\!u)\,I
++ 2\mu\,\varepsilon
+- \gamma\,\theta\,I,
+\end{equation}
+at the same collocation points, with $\varepsilon$ computed from the
+predicted displacement gradients, $\theta = T - T_{\mathrm{ref}}$ the
+temperature perturbation, and $\gamma = 3K\alpha$ the thermoelastic
+coupling coefficient. All derivatives entering this residual are
+obtained via automatic differentiation of the network output with
+respect to its inputs.
+
+\textbf{Coupled-thermal residual} $\mathcal{L}_{\mathrm{thermal}}$
+evaluates the residual of the heat equation extended by the
+thermoelastic coupling source:
+\begin{equation}
+\rho\,C_p\,\partial_t T
+\;-\;
+k\,\nabla^2 T
+\;+\;
+\gamma\,T_0\,\partial_t\!\bigl(\nabla\!\cdot\!u\bigr)
+\;=\;0.
+\end{equation}
+The last term is exactly the volumetric-strain feedback discussed in
+Section~2.5. Including it makes the PINN sensitive to the geometric
+coupling between mechanical and thermal evolution; data-driven
+surrogates without this term cannot detect it.
+
+\subsection{Training data and sampling}
+
+The PINN consumes the same per-rock 2D structured datasets that
+Chapter~4 exported from COMSOL ($230$ nodes per material,
+$101$ time samples). Each training row carries the probe coordinates,
+the time stamp, the material parameters of the current rock, and the
+ground-truth $(T,u,v)$ snapshot. The four loss terms are evaluated on
+the same batch: supervised terms on the actual exported samples,
+residuals on a randomly drawn collocation subset.
+
+\subsection{Role in the comparison framework}
+
+Because the PINN penalises violations of the governing equations
+directly, its predictions are constrained to remain on a physically
+meaningful manifold even when the supervised signal is noisy. The
+comparison results of Chapter~6 will show that this is the only route
+whose travel-time predictions stay within $10\%$ of the analytical
+reference $r/V_p$ for every scenario in the balanced sweep, and the
+only route whose time-series traces show a smooth time-dependent
+drift at the probe. The other three routes are reported alongside the
+PINN under the same v2 input/output contract, but they should be
+read as data-driven baselines rather than physics-informed solvers.
