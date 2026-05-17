@@ -210,7 +210,7 @@ The decoder is the operator-learning component. Its purpose is to
 compute the predicted state at every query location by attending to
 the encoded inputs. The query coordinates are first lifted by a
 separate linear projection
-\(W_{\mathrm{q}}\in\mathbb{R}^{3\times d_m}\) into a query
+\(W_{\mathrm{q}}\in\mathbb{R}^{2\times d_m}\) into a query
 embedding \(Z^{(0)}\in\mathbb{R}^{N_q\times d_m}\). A stack of
 \(L_{\mathrm{dec}}\) decoder blocks then refines this representation
 via cross-attention between the query embedding (as queries) and the
@@ -307,7 +307,7 @@ chosen so that training and inference remain feasible on a CPU.
 \node[below=2mm of d2]   (ddots) {\(\vdots\)};
 \node[dec, below=2mm of ddots] (dL) {Cross-attention layer \(L_{\mathrm{dec}}\)};
 
-\node[outp, below=18mm of $(eL)!0.5!(dL)$] (head) {Linear head \(\mathbb{R}^{d_m}\!\to\!\mathbb{R}^{3}\)};
+\node[outp, below=18mm of $(eL)!0.5!(dL)$] (head) {Linear head \(\mathbb{R}^{d_m}\!\to\!\mathbb{R}^{2}\)};
 \node[outp, below=of head] (yhat) {\(\hat{y}_j = (\hat T_j,\,\hat u_j,\,\hat v_j)\)};
 
 \draw[arr] (in) -- (ip);
