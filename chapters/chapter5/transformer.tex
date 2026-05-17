@@ -1,6 +1,6 @@
-\subsection{Transformer-Based Neural Operator}
+\section{Transformer-Based Neural Operator}
 
-\subsubsection{Motivation for an attention-based surrogate}
+\subsection{Motivation for an attention-based surrogate}
 
 The coupled thermoelastic system written down in Chapter~2 defines a
 deterministic mapping
@@ -34,7 +34,7 @@ sampling. For these reasons we adopt a Transformer-based neural
 operator as one of the four surrogate families compared in this
 thesis.
 
-\subsubsection{Tokenisation of the thermoelastic state}
+\{Tokenisation of the thermoelastic state}
 
 The first step is to encode the physical state of the medium as a
 sequence of \emph{tokens}. For every retained mesh node
@@ -107,7 +107,7 @@ coordinates and indicate where the predicted fields should be returned.}
 \label{fig:transformer-tokens}
 \end{figure}
 
-\subsubsection{Scaled dot-product attention}
+\subsection{Scaled dot-product attention}
 
 The basic operation in a Transformer is attention. Given a query
 representation \(Q\in\mathbb{R}^{N_q\times d_k}\), key and
@@ -133,7 +133,7 @@ operator-learning point of view this operation is a soft, data-driven
 analogue of an integral kernel, in which the kernel itself depends on
 the input through its keys and queries.
 
-\subsubsection{Multi-head attention}
+\subsection{Multi-head attention}
 
 A single attention head describes one relational pattern. To express
 several patterns in parallel, the embedding space is split into
@@ -162,7 +162,7 @@ principle specialise in different physical interactions, for example
 near-field heat diffusion in one head and longer-range elastic
 coupling in another.
 
-\subsubsection{Encoder block}
+\subsection{Encoder block}
 
 The input tokens \(\{a_i\}\) are first lifted into the embedding space
 by a learnt linear projection
@@ -204,7 +204,7 @@ the original Transformer choice \cite{vaswani2017}. After
 how each input token relates to every other input token through the
 learnt self-attention pattern.
 
-\subsubsection{Cross-attention decoder for query points}
+\subsection{Cross-attention decoder for query points}
 
 The decoder is the operator-learning component. Its purpose is to
 compute the predicted state at every query location by attending to
@@ -249,7 +249,7 @@ tensors, can either be derived from the predicted displacement by
 spatial differentiation or be added as additional output channels in
 future iterations of the model.
 
-\subsubsection{Architecture used in this work}
+\subsection{Architecture used in this work}
 
 Figure~\ref{fig:transformer-arch} shows the architecture in its
 complete form. The hyperparameters retained for the baseline of this
@@ -339,7 +339,7 @@ channels at every query location.}
 \label{fig:transformer-arch}
 \end{figure}
 
-\subsubsection{Training objective}
+\subsection{Training objective}
 
 The Transformer is trained on COMSOL ground-truth solutions of the
 coupled thermoelastic problem of Chapter~4. The primary supervised
@@ -401,7 +401,7 @@ uniformly at random from the COMSOL nodes at every training step. This
 the cost of attention and it enforces discretisation invariance, since
 the model never sees the full mesh during a single forward pass.
 
-\subsubsection{Comparison with related Transformer neural operators}
+\subsection{Comparison with related Transformer neural operators}
 
 The architecture above is intentionally the simplest member of the
 family of Transformer neural operators. Three more elaborate variants
@@ -447,7 +447,7 @@ the Transolver.}
 \label{tab:transformer-variants}
 \end{table}
 
-\subsubsection{Discretisation invariance and operator-learning view}
+\subsection{Discretisation invariance and operator-learning view}
 
 Two properties of the construction together make it a neural operator
 in the strict sense of the term. First, the model treats the spatial
@@ -463,7 +463,7 @@ intrinsically tied to a regular grid, and to the MeshGraphNet of
 Section~5.3, which is intrinsically tied to a particular graph
 topology.
 
-\subsubsection{Summary}
+\subsection{Summary}
 
 The Transformer-based neural operator of this section is a
 discretisation-invariant surrogate for the coupled thermoelastic system

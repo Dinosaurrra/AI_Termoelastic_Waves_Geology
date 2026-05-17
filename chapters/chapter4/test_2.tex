@@ -1,0 +1,46 @@
+\subsection{Dataset preprocessing and transformation}
+
+After COMSOL simulations are completed, each case is stored as a dataset instance under \texttt{datasets/<dataset\_id>/raw/}. The raw directory contains exported CSV tables for physical fields (e.g., \texttt{data\_displacement.csv}, \texttt{data\_temperature.csv}, \texttt{data\_strain.csv}, \texttt{data\_stress\_1.csv}, \texttt{data\_stress\_2.csv}, \texttt{data\_stress\_3.csv}, \texttt{data\_materials.csv}), and may additionally include an optional COMSOL mesh export in \texttt{.mphtxt} format. In the preprocessing workflow, these raw files are treated as immutable input and are not overwritten.
+
+The CSV ingestion stage is restricted to supported COMSOL field prefixes: \texttt{data\_displacement}, \texttt{data\_temperature}, \texttt{data\_strain}, \texttt{data\_stress}, and \texttt{data\_materials}. Auxiliary CSV files are ignored to avoid mixing non-physical helper content with simulation targets. During parsing, metadata lines beginning with \texttt{\%} are skipped, while the true header row is still detected from coordinate keys \texttt{X}, \texttt{Y}, and \texttt{Z} even when the header line itself is prefixed by \texttt{\%}. Values are converted to floating-point representation; malformed numeric entries are coerced and handled at later cleaning steps. Time-dependent columns are identified by names of the form
+\begin{equation}
+\texttt{field\_name (unit) @ t=value},
+\end{equation}
+from which the pipeline extracts the field identifier, physical unit, and simulation time stamp.
+
+Because COMSOL exports from different quantities may have non-identical row sets, the transformation does not rely on row index alignment. Instead, one coordinate set is selected as the reference grid (typically from the smallest dynamic export), and other fields are remapped to this reference via nearest-neighbor matching in coordinate space. This step ensures that all physical channels are synchronized to the same node ordering before tensor construction.
+
+A central design decision is separating \emph{dynamic} and \emph{static} information. Dynamic channels are time-dependent physical states predicted by the model (e.g., temperature, displacement/velocity-related components, stress and strain components). Material and helper quantities are excluded from prediction targets and moved to static context. Consequently, material parameters (such as Young's modulus, Poisson's ratio, density, thermal conductivity, heat capacity, and thermal expansion) are encoded as static node/scenario attributes. Static descriptors also include coordinates, distance-to-source features, source-region indicators, and scenario-level control parameters.
+
+The cleaned dynamic channels are assembled into a state tensor
+\begin{equation}
+\mathbf{S}_{\text{raw}} \in \mathbb{R}^{T \times N \times F},
+\end{equation}
+where $T$ is the number of time steps, $N$ is the number of nodes, and $F$ is the number of dynamic features. Missing entries are imputed using feature-level valid statistics (e.g., means) to prevent NaN propagation into model inputs. Time metadata are inferred from parsed column descriptors whenever available.
+
+Normalization is applied separately to dynamic and static features. For each feature channel, the mean and standard deviation are estimated and stored in \texttt{dynamic\_normalization.json}, \texttt{static\_normalization.json}, and consolidated \texttt{normalization.json}. This separation is required because static geometric/material descriptors and transient physical states differ substantially in units and scale; joint normalization would degrade numerical conditioning and training stability.
+
+Graph construction converts the aligned point-based representation into the topology expected by MeshGraphNet. If a valid \texttt{.mphtxt} mesh is available and consistent with node count, edges are derived from COMSOL mesh connectivity. Otherwise, the pipeline falls back to a coordinate-based $k$-nearest-neighbor graph. Edge attributes encode relative geometry and metric distance:
+\begin{equation}
+[\Delta x,\Delta y,\Delta z, d], \quad d = \sqrt{(\Delta x)^2 + (\Delta y)^2 + (\Delta z)^2}.
+\end{equation}
+
+Training samples are generated over time-ordered states. For each step $t$, the input contains normalized static features concatenated with the normalized dynamic state at time $t$. In the \texttt{target\_mode=delta} setting, the supervision target is
+\begin{equation}
+\Delta \mathbf{S}_t = \mathbf{S}_{\text{norm}}[t+1]-\mathbf{S}_{\text{norm}}[t].
+\end{equation}
+Delta prediction emphasizes incremental transient evolution, which is typically smoother and easier to learn than absolute-state regression for multi-physics trajectories. The sequence is then split into train/validation/test subsets in chronological order to preserve temporal causality.
+
+The processing stage produces MeshGraphNet-ready artifacts in \texttt{processed/}: \texttt{graph.pt}, \texttt{trajectories.pt}, \texttt{metadata.json}, \texttt{normalization.json}, \texttt{dynamic\_normalization.json}, \texttt{static\_normalization.json}, and \texttt{preview.csv}. Here, \texttt{graph.pt} stores node coordinates, edge index, edge attributes, and static node features; \texttt{trajectories.pt} stores train/validation/test input-target trajectory pairs; \texttt{metadata.json} stores dataset dimensions, feature and unit descriptors, graph source, target mode, and scenario metadata; and \texttt{preview.csv} provides a quick consistency/range check for converted fields.
+
+For multi-model interoperability, the universal formatter can additionally export a canonical model-agnostic representation with adapters for MeshGraphNet, FNO, PINN, and Transformer pipelines. For MeshGraphNet specifically, the graph adapter produces \texttt{processed/graph/graph.pt} and \texttt{processed/graph/trajectories.pt}, while keeping legacy compatibility copies in \texttt{processed/graph.pt} and \texttt{processed/trajectories.pt}.
+
+\begin{table}[h]
+\centering
+\caption{COMSOL-to-MeshGraphNet data transformation pipeline.}
+\begin{tabular}{p{0.95\linewidth}}
+\hline
+\texttt{Raw COMSOL CSV/.mphtxt} $\rightarrow$ \texttt{cleaned field tables} $\rightarrow$ \texttt{aligned node set} $\rightarrow$ \texttt{dynamic/static tensors} $\rightarrow$ \texttt{graph construction} $\rightarrow$ \texttt{normalized trajectories} $\rightarrow$ \texttt{MeshGraphNet artifacts} \\
+\hline
+\end{tabular}
+\end{table}
