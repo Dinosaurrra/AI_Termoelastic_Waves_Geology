@@ -19,6 +19,21 @@
 \usepackage{setspace}
 \singlespacing
 
+% --- Normal-control font rule: all visible text is kept at the document
+%     base size (14 pt), including title pages, annotations, headings,
+%     signatures, tables, and listings. ---
+\AtBeginDocument{%
+  \let\tiny\normalsize
+  \let\scriptsize\normalsize
+  \let\footnotesize\normalsize
+  \let\small\normalsize
+  \let\large\normalsize
+  \let\Large\normalsize
+  \let\LARGE\normalsize
+  \let\huge\normalsize
+  \let\Huge\normalsize
+}
+
 % --- Microtypography and looser justification to prevent right-margin
 %     overflows on long compounds (thermoelastic, three-dimensional,
 %     discretisation-invariant, neural-operator, etc.) ---
@@ -29,6 +44,10 @@
 
 \usepackage{booktabs}
 \usepackage{float}
+\usepackage{flafter}
+\setlength{\intextsep}{\baselineskip}
+\setlength{\textfloatsep}{\baselineskip}
+\setlength{\floatsep}{\baselineskip}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,calc,fit,backgrounds}
 \usepackage{pgfplots}
@@ -36,14 +55,17 @@
 
 % --- Captions per MM-04 §7.21 (figures) and §7.24 (tables) ---
 \usepackage{caption}
-\captionsetup[figure]{name=Figure,labelsep=endash,justification=centering,singlelinecheck=false,font=normalsize}
+\captionsetup[figure]{name=Figure,labelsep=endash,justification=centering,singlelinecheck=false,font=normalsize,skip=0.5\baselineskip}
 \captionsetup[table]{name=Table,labelsep=endash,justification=raggedright,singlelinecheck=false,font=normalsize}
+\renewcommand{\thefigure}{\arabic{figure}}
 
 % --- Section headings: UPPERCASE per MM-04 §7.10; subsection numbers
 %     without trailing dot per §7.16 ---
 \usepackage{titlesec}
 \titleformat{\section}
-  {\normalfont\large\bfseries\MakeUppercase}{\thesection}{1em}{}
+  {\normalfont\normalsize\bfseries\MakeUppercase}{\thesection}{1em}{}
+\titleformat{name=\section,numberless}
+  {\normalfont\normalsize\bfseries\filcenter\MakeUppercase}{}{0pt}{}
 \titleformat{\subsection}
   {\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
 \titleformat{\subsubsection}
@@ -55,6 +77,8 @@
 \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
 \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
 
+% --- IEEE-style numeric citations. ---
+\usepackage{cite}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
 % --- Source-code listings for the appendices ---
@@ -65,13 +89,13 @@
 \definecolor{cm}{HTML}{777777}
 \definecolor{bg}{HTML}{F7F7F2}
 \lstdefinestyle{thesiscode}{
-  basicstyle=\ttfamily\footnotesize,
+  basicstyle=\normalfont\normalsize,
   backgroundcolor=\color{bg},
   keywordstyle=\color{kw}\bfseries,
   stringstyle=\color{str},
   commentstyle=\color{cm}\itshape,
   numbers=left,
-  numberstyle=\tiny\color{cm},
+  numberstyle=\normalfont\normalsize\color{cm},
   numbersep=6pt,
   frame=single,
   rulecolor=\color{cm!40},
@@ -108,7 +132,9 @@
 
 % Main introduction.
 \selectlanguage{english}
+\setcounter{secnumdepth}{0}
 \input{introduction.tex}
+\setcounter{secnumdepth}{3}
 
 \clearpage
 
