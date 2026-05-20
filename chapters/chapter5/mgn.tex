@@ -75,7 +75,7 @@ z_i
 
 where \(p_i\) is the position vector of node \(i\), and \(x_i\), \(y_i\), and \(z_i\) are the Cartesian coordinates of this node.
 
-For each edge \((i,j)\), the relative geometric vector is defined as
+The relative geometric vector for every edge \((i,j)\), is defined as
 
 \begin{equation}
 r_{ij} = p_j - p_i
@@ -548,7 +548,7 @@ h_j^k
 
 where \(h_j^{k+1}\) is the updated latent representation of node \(j\), \(\operatorname{LayerNorm}\) is the normalization operation, \(h_j^k\) is the previous node representation, and \(\tilde{h}_j^{k+1}\) is the learned node update.
 
-Residual connections help preserve information from previous representations and improve gradient flow during training. Layer normalization stabilizes the distribution of latent features and makes training more robust. This is important because the model performs several message passing steps, and without stabilization, the latent representations may become difficult to optimize.
+The residual connections help to preserve the information from previous representations and improve the gradient flow during training. Layer normalization stabilizes the distribution of latent features and makes training more robust. This is important because the model performs several message passing steps, and without stabilization, the latent representations may become difficult to optimize.
 \subsubsection{Decoder}
 
 After \(K\) message passing steps, each graph node contains a final latent representation that already includes information from its local neighborhood. The decoder transforms this latent representation into predicted physical fields. For node \(i\), the decoding operation is written as
@@ -891,8 +891,7 @@ The edge feature matrix is written as
 where \(\texttt{edge\_attr}\) stores edge features, \(M\) is the number of edges, and \(F_e\) is the number of edge features.
 
 The dataset is divided into training, validation, and test subsets. The training subset is used to update the model parameters. The validation subset is used to monitor generalization during training and select the best checkpoint. The test subset is used only for final evaluation after the training process is complete.
-
-The model parameters are optimized using the Adam optimizer. The parameter update can be written as
+The Adam optimizer is used to optimize the model parameters. The parameter update can be written as
 
 \begin{equation}
 \theta_{t+1}
@@ -903,7 +902,7 @@ The model parameters are optimized using the Adam optimizer. The parameter updat
 \frac{\hat{m}_t}{\sqrt{\hat{v}_t}+\epsilon}
 \end{equation}
 
-where \(\theta_t\) is the parameter vector at optimization step \(t\), \(\theta_{t+1}\) is the updated parameter vector, \(\eta\) is the learning rate, \(\hat{m}_t\) is the bias-corrected first moment estimate of the gradient, \(\hat{v}_t\) is the bias-corrected second moment estimate of the gradient, and \(\epsilon\) is a small constant used for numerical stability.
+where \(\theta_t\) is the parameter vector at is the parameter vector at optimization step \(t\), \(\theta_{t+1}\) is the updated parameter vector, \(\eta\) is the learning rate, \(\hat{m}_t\) is the bias-corrected first moment estimate of the gradient, \(\hat{v}_t\) is the bias-corrected first moment estimate of the gradient and \(\epsilon\) is a small constant used for numerical stability.
 
 Gradient clipping is applied to prevent unstable updates. The clipped gradient is computed as
 
@@ -921,7 +920,7 @@ g
 
 where \(g\) is the gradient vector, \(\tau\) is the maximum allowed gradient norm, and \(\|g\|_2\) is the Euclidean norm of the gradient.
 
-The average training loss for epoch \(e\) is written as
+The average training loss for epoch \(e\) is given by
 
 \begin{equation}
 \mathcal{L}_{train}^{(e)}
@@ -957,7 +956,7 @@ The final test loss is computed as
 
 where \(\mathcal{L}_{test}\) is the test loss, \(\mathcal{D}_{test}\) is the test dataset, \(b\) is a test batch or sample, and \(\mathcal{L}^{(b)}\) is the loss computed for batch \(b\).
 
-Early stopping is used to stop training when the validation loss does not improve. The condition for no improvement at epoch \(e\) can be written as
+Early stopping is used to stop training when the validation loss no longer improves.The condition of no improvement at epoch \(e\) can be written as
 
 \begin{equation}
 \mathcal{L}_{val}^{(e)}
@@ -966,9 +965,9 @@ Early stopping is used to stop training when the validation loss does not improv
 \mathcal{L}_{val}^{(r)}
 \end{equation}
 
-where \(\mathcal{L}_{val}^{(e)}\) is the validation loss at epoch \(e\), \(\mathcal{L}_{val}^{(r)}\) is the validation loss at an earlier epoch \(r\), and the minimum is taken over all previous epochs.
+where \(\mathcal{L}_{val}^{(e)}\) is the validation loss at epoch \(e\), \(\mathcal{L}_{val}^{(r)}\)  is the validation loss at an earlier epoch \(r\), and the minimum is taken over all previous epochs.
 
-In practice, training is stopped when this condition remains true for a predefined number of epochs called patience. This prevents unnecessary training and reduces the risk of overfitting. During training, two checkpoints are saved. The last checkpoint stores the final model state, while the best checkpoint stores the model state with the lowest validation loss.
+In practice, training is stopped when this condition holds for a pre-defined number of epochs, called patience. This minimizes the chances of overtraining and unnecessary training. Two checkpoints are saved during training. The last checkpoint stores the final model state, while the best checkpoint stores the model state with the lowest validation loss.
 
 The checkpoint metadata include field names, input dimensions, output dimensions, dataset identifiers, normalization parameters, and model configuration. This information is necessary for reproducibility and for correct inference, because the model can be reused only when the feature schema and target field structure are consistent.
 
@@ -1206,7 +1205,7 @@ where \(\hat{q}^{t+(n+1)\Delta t}\) is the predicted physical state at rollout s
 
 In this setting, prediction errors can accumulate over time. Even a small error at one step may influence the next input and gradually lead to drift in the predicted trajectory. Therefore, long-horizon prediction requires careful validation.
 
-The third limitation is that physical constraints are learned implicitly. The model is trained to match COMSOL outputs, but it does not strictly enforce conservation laws, constitutive equations, or boundary conditions during inference. Therefore, the predicted fields may be numerically accurate on average but still contain local physical inconsistencies in some cases.
+Third limitation is that physical constraints are learned implicitly. The model is trained to match COMSOL outputs, but it does not strictly enforce conservation laws, constitutive equations, or boundary conditions during inference. Therefore, the predicted fields may be numerically accurate on average but still contain local physical inconsistencies in some cases.
 
 A general supervised learning objective can be written as
 
