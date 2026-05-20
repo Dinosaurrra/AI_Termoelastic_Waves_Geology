@@ -44,6 +44,9 @@
 
 \usepackage{booktabs}
 \usepackage{float}
+\setlength{\intextsep}{\baselineskip}
+\setlength{\textfloatsep}{\baselineskip}
+\setlength{\floatsep}{\baselineskip}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,calc,fit,backgrounds}
 \usepackage{pgfplots}
@@ -51,8 +54,9 @@
 
 % --- Captions per MM-04 §7.21 (figures) and §7.24 (tables) ---
 \usepackage{caption}
-\captionsetup[figure]{name=Figure,labelsep=endash,justification=centering,singlelinecheck=false,font=normalsize}
+\captionsetup[figure]{name=Figure,labelsep=endash,justification=centering,singlelinecheck=false,font=normalsize,skip=0.5\baselineskip}
 \captionsetup[table]{name=Table,labelsep=endash,justification=raggedright,singlelinecheck=false,font=normalsize}
+\renewcommand{\thefigure}{\arabic{figure}}
 
 % --- Section headings: UPPERCASE per MM-04 §7.10; subsection numbers
 %     without trailing dot per §7.16 ---
