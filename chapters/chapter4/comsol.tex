@@ -47,7 +47,7 @@ The main physics interfaces used in the model were:
 The COMSOL simulation was constructed using several physics interfaces and model components. Each of them had a specific role in describing the coupled thermoelastic behavior of the geological medium.
 
 Solid Mechanics.
-The Solid Mechanics interface was used to calculate the mechanical response of the rock domain. It computed displacement, velocity, strain, stress, and the propagation of mechanical disturbances caused by thermal expansion. This interface was necessary because heating of the rod creates deformation in the surrounding geological medium.
+The Solid Mechanics interface was used to calculate the mechanical behavior of the rock domain. It calculated displacement, velocity, strain, stress and propagation of mechanical disturbances due to thermal expansion. This interface was necessary because heating of the rod creates deformation in the surrounding geological medium.
 
 Linear Elastic Material.
 The Linear Elastic Material model defined the mechanical behavior of the rock. It described the medium as an elastic solid using material parameters such as Young's modulus, Poisson's ratio, density, and the thermal expansion coefficient. These parameters determined how strongly the rock deformed under thermoelastic loading.
@@ -56,19 +56,19 @@ Free Boundary.
 The Free Boundary condition was applied to selected external boundaries of the geometry. It allowed these boundaries to deform without externally applied mechanical traction. This condition was used to reproduce a natural mechanical response of the medium instead of artificially fixing all outer surfaces.
 
 Heat Transfer in Solids.
-The Heat Transfer in Solids interface was used to model transient heat conduction in the simulation domain. It calculated how heat propagated from the heated rod into the surrounding rock over time. This module provided the temperature field required for the thermoelastic coupling.
+The Heat Transfer in Solids interface was used to model transient heat conduction in the simulation domain. It calculated how heat from the heated rod diffused into the surrounding rock with time. This module provided the temperature field needed for the thermoelastic coupling.
 
 Thermal Insulation.
-The Thermal Insulation condition was applied to selected external boundaries. It prevented heat flux through these surfaces and limited heat exchange with the external environment. This made it possible to control the thermal behavior of the model and focus on heat propagation inside the simulated rock domain.
+Thermal Insulation condition was imposed on some external boundaries. It prevented heat flux through these surfaces and reduced the heat exchange with the outside environment. This made it possible to control the thermal behavior of the model and focus on heat propagation inside the simulated rock domain.
 
 Thermal Expansion.
-The Thermal Expansion feature was used to couple the thermal and mechanical parts of the simulation. It transformed temperature changes into thermal strain. As a result, the temperature field obtained from the heat transfer analysis produced mechanical deformation in the solid mechanics model.
+The coupling between the thermal and mechanical parts of the simulation was made using the Thermal Expansion feature. It converted temperature changes into thermal strain. The temperature field obtained from the heat transfer analysis then led to mechanical deformation in the solid mechanics model.
 
 Temperature Coupling.
 The Temperature Coupling feature transferred the computed temperature field from the Heat Transfer in Solids interface to the Solid Mechanics interface. This ensured that the mechanical response of the rock was calculated using the actual transient temperature distribution inside the model.
 
 Time Dependent Study.
-The Time Dependent Study was used to solve the coupled thermoelastic problem over a sequence of time steps. It produced time-dependent fields of temperature, displacement, stress, and strain. These results were later exported and used for synthetic dataset generation.
+The Time Dependent Study was used to solve the coupled thermoelastic problem over a sequence of time steps. It generated time-dependent temperature, displacement, stress and strain fields. These r sults were later exported and used for synthetic dataset generation.
 
 This model structure is important because the final dataset is not generated from independent physical fields. Temperature, displacement, stress, and strain are obtained from the same coupled solution, which makes the exported data physically consistent.
 
@@ -456,7 +456,7 @@ Simulation time values corresponding to the dynamic states. \\
 Normalization statistics required for scaling and denormalization. \\
 \hline
 \texttt{metadata.json} &
-Dataset metadata, including feature names, dimensions, time-step information, and processing configuration. \\
+Metadata for the dataset: feature names, dimensions, time-step information, processing. \\
 \hline
 \texttt{graph.pt} &
 Graph representation used by graph-based models: edge index, edge attributes, coordinates, and static node features. \\
@@ -514,8 +514,8 @@ These visualizations were used as a qualitative validation step. If the temperat
 
 The generated dataset depends on the assumptions used in the COMSOL model. The simulation considers a controlled two-dimensional thermoelastic setup, which is suitable for generating consistent training data but does not fully reproduce all complexities of real geological formations. Real rocks may contain cracks, pores, layers, anisotropy, and heterogeneous material properties.
 
-The mesh resolution also affects the accuracy of the exported fields. A coarse mesh may not capture sharp gradients near the heated rod, while a very fine mesh increases computational cost and file size. The time step has a similar effect: smaller time steps provide a more detailed temporal description, but they produce larger CSV files and require more processing time.
+The exported fields' accuracy is also affected by the mesh resolution. A coarse mesh may not be able to resolve sharp gradients near the heated rod. A very fine mesh is computationally expensive and can result in large file size. The time step has a similar effect: smaller time steps provide a more detailed temporal description, but they produce larger CSV files and require more processing time.
 
 Another limitation is that the dataset is synthetic. It is physically consistent within the assumptions of the numerical model, but it is not a direct measurement from a real geological experiment. Nevertheless, the synthetic approach is appropriate for this work because it provides complete access to temperature, displacement, velocity, stress, strain, material parameters, coordinates, and mesh information at all simulated time steps.
 
-Overall, COMSOL Multiphysics served as the main environment for creating the thermoelastic experiment, solving the coupled physical problem, visualizing the propagation process, and exporting the structured dataset for further computational analysis.
+The thermoelastic experiment was mainly designed and realized through COMSOL Multiphysics, which was used to solve the coupled physical problem, visualize the propagation process and export the structured dataset for further computational analysis.
