@@ -59,6 +59,8 @@
 \usepackage{titlesec}
 \titleformat{\section}
   {\normalfont\normalsize\bfseries\MakeUppercase}{\thesection}{1em}{}
+\titleformat{name=\section,numberless}
+  {\normalfont\normalsize\bfseries\filcenter\MakeUppercase}{}{0pt}{}
 \titleformat{\subsection}
   {\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
 \titleformat{\subsubsection}
@@ -125,7 +127,9 @@
 
 % Main introduction.
 \selectlanguage{english}
+\setcounter{secnumdepth}{0}
 \input{introduction.tex}
+\setcounter{secnumdepth}{3}
 
 \clearpage
 
