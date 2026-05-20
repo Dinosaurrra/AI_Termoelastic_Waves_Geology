@@ -19,6 +19,21 @@
 \usepackage{setspace}
 \singlespacing
 
+% --- Normal-control font rule: all visible text is kept at the document
+%     base size (14 pt), including title pages, annotations, headings,
+%     signatures, tables, and listings. ---
+\AtBeginDocument{%
+  \let\tiny\normalsize
+  \let\scriptsize\normalsize
+  \let\footnotesize\normalsize
+  \let\small\normalsize
+  \let\large\normalsize
+  \let\Large\normalsize
+  \let\LARGE\normalsize
+  \let\huge\normalsize
+  \let\Huge\normalsize
+}
+
 % --- Microtypography and looser justification to prevent right-margin
 %     overflows on long compounds (thermoelastic, three-dimensional,
 %     discretisation-invariant, neural-operator, etc.) ---
@@ -43,7 +58,7 @@
 %     without trailing dot per §7.16 ---
 \usepackage{titlesec}
 \titleformat{\section}
-  {\normalfont\large\bfseries\MakeUppercase}{\thesection}{1em}{}
+  {\normalfont\normalsize\bfseries\MakeUppercase}{\thesection}{1em}{}
 \titleformat{\subsection}
   {\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
 \titleformat{\subsubsection}
@@ -65,13 +80,13 @@
 \definecolor{cm}{HTML}{777777}
 \definecolor{bg}{HTML}{F7F7F2}
 \lstdefinestyle{thesiscode}{
-  basicstyle=\ttfamily\footnotesize,
+  basicstyle=\normalfont\normalsize,
   backgroundcolor=\color{bg},
   keywordstyle=\color{kw}\bfseries,
   stringstyle=\color{str},
   commentstyle=\color{cm}\itshape,
   numbers=left,
-  numberstyle=\tiny\color{cm},
+  numberstyle=\normalfont\normalsize\color{cm},
   numbersep=6pt,
   frame=single,
   rulecolor=\color{cm!40},
