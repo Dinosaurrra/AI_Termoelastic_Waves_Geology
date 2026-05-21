@@ -12,7 +12,7 @@ prediction contract, and an end-to-end software prototype that
 exposes the comparison through a backend orchestrator and a web
 frontend.
 
-The theoretical part (Chapters~2 and~3) established the physical
+The theoretical part (Chapters~1 and~2) established the physical
 and mathematical setting. Rocks were treated as locally homogeneous
 isotropic linear thermoelastic media with effective parameters drawn
 from the canonical material table of the thesis. The coupled
@@ -22,7 +22,7 @@ constitutive backbone reused by every later chapter. Directional
 quantities were defined through the source--probe geometry without
 requiring a full three-dimensional field solution.
 
-The methodological and implementation part (Chapters~4--10) described
+The methodological and implementation part (Chapters~3--6) described
 the comparative prediction methodology, the COMSOL setup that
 produced the per-rock 2D datasets, the system implementation, and the
 four surrogate architectures. A v2 API contract was frozen and implemented
@@ -36,7 +36,7 @@ $273.15$~K, source temperature $1500$~K, domain $1\,\text{m}\times
 1\,\text{m}$, no source frequency) are locked server-side so clients
 cannot push the trained models out of distribution.
 
-The empirical part (Chapter~12) compared the four routes on a balanced
+The empirical part (Chapter~7) compared the four routes on a balanced
 sweep of $40$ scenarios per material across four rocks (sandstone,
 limestone, basalt, granite) under one experimental protocol. The
 measurement script used for the accuracy and latency comparison is
@@ -99,7 +99,7 @@ literature parameters, not site-measured values. Six of the ten
 materials in the v2 catalog have no thermal expansion coefficient in
 the source CSV and are therefore gated off from thermoelastic
 prediction by design. The FNO calibration problem identified in
-Chapter~12 requires a retraining pass that is out of scope for the
+Chapter~7 requires a retraining pass that is out of scope for the
 present iteration. MeshGraphNet was loaded against a 2D dataset
 padded to match a 3D checkpoint; absolute magnitudes there inherit
 the cost of that mismatch.
