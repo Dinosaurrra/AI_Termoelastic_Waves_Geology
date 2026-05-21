@@ -24,7 +24,7 @@ From this vector, directional quantities such as propagation distance and orient
 \begin{equation}
 \phi = \operatorname{atan2}(d_y,d_x).
 \end{equation}
-The request schema also validates the user-provided source direction to ensure that it is finite and nonzero before normalization. This is important because the source direction may later be compared with the source--probe direction or combined with geometry-aware post-processing in model-specific inference pipelines.
+The request schema also validates the user-provided source direction to ensure that it is finite and nonzero before normalization. This is important because the source direction may later be compared with the source--probe direction or combined with geometry-aware post-processing in model-specific inference pipelines. The concrete v2 request schemas are provided in Appendix~\ref{app:v2-schemas}, and the implementation of the derived geometric and elastic quantities is provided in Appendix~\ref{app:derived-quantities}.
 
 Another required input group is the domain description. It specifies the domain type, in-plane size, in-plane resolution, and boundary conditions. The thesis experiments are based on rectangular two-dimensional domains, consistent with the plane-strain formulation of Chapter~3. The request shape remains compatible with future extensions, while the current experiments operate on planar cross-sections or selected directional paths.
 

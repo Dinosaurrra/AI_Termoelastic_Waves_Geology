@@ -19,7 +19,7 @@ The PINN is a single multilayer perceptron $f_{\theta}$ that takes a
 point query in space--time together with the local material parameters
 and returns the predicted thermoelastic state at that point:
 \begin{equation}
-f_{\theta}\colon\;
+f_{\theta}\colon\; 
 \bigl(x,\,y,\,t,\,E,\,\nu,\,\rho,\,\alpha,\,k,\,C_p\bigr)
 \;\longmapsto\;
 \bigl(T,\,u,\,v\bigr).
@@ -58,6 +58,8 @@ $\{(x_i, y_i, t_i)\}$ drawn from the training scenarios:
 + \lambda_{\mathrm{el}}\,\mathcal{L}_{\mathrm{elastic}}
 + \lambda_{\mathrm{th}}\,\mathcal{L}_{\mathrm{thermal}}.
 \end{equation}
+The implementation-level assembly of this composite objective is shown
+in Appendix~\ref{app:pinn-loss}.
 
 Supervised loss $\mathcal{L}_{\mathrm{sup}}$ is the standard
 mean-squared error between the predicted $(T,u,v)$ and the

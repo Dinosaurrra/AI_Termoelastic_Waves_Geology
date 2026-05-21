@@ -3,12 +3,20 @@
 \renewcommand{\thesection}{\Alph{section}}
 \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
 
+\newcommand{\thesisappendix}[2]{%
+  \clearpage
+  \refstepcounter{section}%
+  \begin{center}
+  \textbf{Appendix \thesection}\\[\baselineskip]
+  \textbf{#1}
+  \end{center}
+  \addcontentsline{toc}{section}{Appendix \thesection. #1}
+  \label{#2}
+  \vspace{\baselineskip}
+}
+
 \input{chapters/appendices/appendix_a_v2_schemas.tex}
-\clearpage
 \input{chapters/appendices/appendix_b_derived_quantities.tex}
-\clearpage
 \input{chapters/appendices/appendix_c_pinn_loss.tex}
-\clearpage
 \input{chapters/appendices/appendix_d_mgn_field_mapping.tex}
-\clearpage
 \input{chapters/appendices/appendix_e_accuracy_latency.tex}
