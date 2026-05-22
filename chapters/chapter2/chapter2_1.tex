@@ -25,38 +25,11 @@ Real geological media are heterogeneous, fractured, porous, and often anisotropi
 The deformation is assumed to be small. This means that displacement gradients are sufficiently small for infinitesimal strain theory to be used. Under this assumption, the strain tensor is related to the displacement field by the small-strain relation already introduced in Eq.~\eqref{eq:strain-disp},
 where \(\varepsilon_{ij}\) is the strain tensor, \(u_i\) is the \(i\)-th component of displacement, and \(x_j\) is the \(j\)-th spatial coordinate. The small-strain assumption is appropriate as a first approximation for wave propagation, where the displacement caused by a propagating disturbance is usually small compared with the size of the medium \cite{aki2002,jaeger2007}.
 
-The mechanical response is assumed to be linearly elastic and isotropic as a first approximation. In this case, stress is related to strain and temperature perturbation through the linear thermoelastic constitutive relation
-\begin{equation}
-\sigma_{ij}
-=
-\lambda \delta_{ij}\varepsilon_{kk}
-+
-2\mu \varepsilon_{ij}
--
-\gamma \delta_{ij}\theta .
-\end{equation}
-Here, \(\sigma_{ij}\) is the stress tensor, \(\lambda\) and \(\mu\) are the Lamé elastic parameters, \(\delta_{ij}\) is the Kronecker delta, \(\varepsilon_{kk}\) is the volumetric strain, \(\gamma\) is the thermoelastic coupling coefficient, and $\theta = T - T_0$ is the temperature perturbation already introduced in Eq.~\eqref{eq:theta-def}, taken relative to the reference temperature \(T_0\). This relation shows that stress is produced not only by mechanical deformation, but also by temperature change \cite{nowacki1986,boley1960}.
+The mechanical response is assumed to be linearly elastic and isotropic as a first approximation. In this case, stress is related to strain and temperature perturbation through the linear thermoelastic constitutive relation in Eq.~\eqref{eq:thermoelastic-constitutive}, where \(\sigma_{ij}\) is the stress tensor, \(\lambda\) and \(\mu\) are the Lamé elastic parameters, \(\delta_{ij}\) is the Kronecker delta, \(\varepsilon_{kk}\) is the volumetric strain, \(\gamma\) is the thermoelastic coupling coefficient, and $\theta = T - T_0$ is the temperature perturbation already introduced in Eq.~\eqref{eq:theta-def}, taken relative to the reference temperature \(T_0\). This relation shows that stress is produced not only by mechanical deformation, but also by temperature change \cite{nowacki1986,boley1960}.
 
-The mechanical motion of the medium is governed by the balance of linear momentum. Neglecting body forces for simplicity, the equation of motion is written as
-\begin{equation}
-\rho
-\frac{\partial^2 u_i}{\partial t^2}
-=
-\frac{\partial \sigma_{ij}}{\partial x_j},
-\end{equation}
-where \(\rho\) is the density of the medium. The left-hand side represents inertia, while the right-hand side represents the divergence of stress. Physically, this equation states that spatial variations in stress cause acceleration of material particles. Since the stress tensor contains a thermal term, temperature perturbations can influence mechanical motion through thermal stress \cite{aki2002,nowacki1986}.
+The mechanical motion of the medium is governed by the balance of linear momentum. Neglecting body forces for simplicity, the equation of motion is given in Eq.~\eqref{eq:eom}. The left-hand side represents inertia, while the right-hand side represents the divergence of stress. Physically, this equation states that spatial variations in stress cause acceleration of material particles. Since the stress tensor contains a thermal term, temperature perturbations can influence mechanical motion through thermal stress \cite{aki2002,nowacki1986}.
 
-The thermal field is described by heat conduction with possible thermoelastic coupling. A simplified coupled form may be written as
-\begin{equation}
-k \nabla^2 T
--
-C
-\frac{\partial T}{\partial t}
-=
-\gamma T_0
-\frac{\partial \varepsilon_{kk}}{\partial t},
-\end{equation}
-where \(k\) is thermal conductivity, \(C=\rho C_p\) is volumetric heat capacity, \(C_p\) is specific heat capacity, and \(\partial \varepsilon_{kk}/\partial t\) is the rate of volumetric strain. This equation expresses the fact that temperature evolves through heat conduction, while volumetric deformation may contribute to the thermal field in a coupled thermoelastic process \cite{nowacki1986,boley1960}.
+The thermal field is described by heat conduction with possible thermoelastic coupling. The simplified coupled form used in this thesis is given in Eq.~\eqref{eq:coupled-heat}, where \(k\) is thermal conductivity, \(C=\rho C_p\) is volumetric heat capacity, \(C_p\) is specific heat capacity, and \(\partial \varepsilon_{kk}/\partial t\) is the rate of volumetric strain. This equation expresses the fact that temperature evolves through heat conduction, while volumetric deformation may contribute to the thermal field in a coupled thermoelastic process \cite{nowacki1986,boley1960}.
 
 Directional propagation is included because geological materials may have structure-dependent physical behavior. In an ideal homogeneous and isotropic medium, wave speeds and thermal diffusion are independent of direction. In real rocks, bedding, fractures, aligned pores, mineral fabrics, lithological contrasts, and stress-induced anisotropy may cause the response to vary with propagation direction. In this thesis, the mathematical formulation is written first for an effective isotropic continuum, while geological anisotropy and heterogeneity are treated as important interpretation factors and limitations of the simplified model \cite{mavko2009,aki2002}.
 
