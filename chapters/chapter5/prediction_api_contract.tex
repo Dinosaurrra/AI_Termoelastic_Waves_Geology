@@ -8,22 +8,8 @@ The material-related part of the contract is conceptually grounded in the parame
 
 The next input group describes the thermoelastic scenario. The scenario carries at least the reference temperature, the confining pressure, and the observation time. These parameters encode the thermal and mechanical state under which the prediction is requested. The source group adds the excitation description through fields such as source type, source coordinates, amplitude, frequency, and a direction vector. The probe group specifies the observation point. Together, these fields provide the practical representation of the source--probe geometry introduced theoretically in Chapter~3.
 
-The directional part of the contract follows directly from the mathematical formulation. If the source position is denoted by \(x_s\) and the probe position by \(x_p\), then the propagation vector is
-\begin{equation}
-d
-=
-x_p - x_s,
-\end{equation}
-and the corresponding unit direction vector is
-\begin{equation}
-\hat{d}
-=
-\frac{d}{\|d\|}.
-\end{equation}
-From this vector, directional quantities such as propagation distance and orientation can be computed. In two-dimensional notation, if \(d=(d_x,d_y)\), then the propagation angle is given by
-\begin{equation}
-\phi = \operatorname{atan2}(d_y,d_x).
-\end{equation}
+The directional part of the contract follows directly from the mathematical formulation. The propagation vector, unit direction vector, and propagation angle are defined in Eq.~\eqref{eq:propagation-vector}, Eq.~\eqref{eq:unit-direction}, and Eq.~\eqref{eq:propagation-angle}, respectively. These quantities allow the backend to compute propagation distance and orientation from the submitted source and probe coordinates without restating the geometric definitions.
+
 The request schema also validates the user-provided source direction to ensure that it is finite and nonzero before normalization. This is important because the source direction may later be compared with the source--probe direction or combined with geometry-aware post-processing in model-specific inference pipelines. The concrete v2 request schemas are provided in Appendix~\ref{app:v2-schemas}, and the implementation of the derived geometric and elastic quantities is provided in Appendix~\ref{app:derived-quantities}.
 
 Another required input group is the domain description. It specifies the domain type, in-plane size, in-plane resolution, and boundary conditions. The thesis experiments are based on rectangular two-dimensional domains, consistent with the plane-strain formulation of Chapter~3. The request shape remains compatible with future extensions, while the current experiments operate on planar cross-sections or selected directional paths.

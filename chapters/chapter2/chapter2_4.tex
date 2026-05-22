@@ -6,20 +6,7 @@ The first important parameter is density, denoted by \(\rho\). Density is the ma
 
 The elastic response of the medium is described by elastic moduli. Young's modulus \(E\) measures the resistance of the material to axial deformation under uniaxial loading. It has units of pressure, \(\mathrm{Pa}\). This means that for the same applied stress a rock with a higher Young's modulus will deform less (i.e. less axial strain) while a more compliant rock will deform more easily. Poisson’s ratio \(\nu\) is  is of dimensionless nature and relates the lateral and axial deformation. It defines how much the material will expand laterally when compressed or contract laterally when stretched. The pair \(E\) and \(\nu\) together can be used to derive the other elastic constants in the isotropic linear elastic approximation \cite{jaeger2007,mavko2009}.
 
-The shear modulus, denoted by \(\mu\) or \(G\), measures resistance to shear deformation. It relates shear stress to shear strain and controls the ability of the medium to support S-waves. For an isotropic elastic material, it is related to Young's modulus and Poisson's ratio by
-\begin{equation}
-\mu = G = \frac{E}{2(1+\nu)}.
-\end{equation}
-The bulk modulus \(K\) measures resistance to uniform volumetric compression. It is especially important for compressional deformation and therefore for P-wave propagation. In terms of \(E\) and \(\nu\), it is written as
-\begin{equation}
-K = \frac{E}{3(1-2\nu)}.
-\end{equation}
-The first Lamé parameter \(\lambda\) is another elastic constant used in the tensor form of the isotropic stress--strain relation. It is defined by
-\begin{equation}
-\lambda =
-\frac{E\nu}{(1+\nu)(1-2\nu)}.
-\end{equation}
-The parameters \(\lambda\) and \(\mu\) are convenient because they enter directly into the thermoelastic constitutive equation for stress \cite{aki2002,jaeger2007}.
+The shear modulus, denoted by \(\mu\) or \(G\), measures resistance to shear deformation. It relates shear stress to shear strain and controls the ability of the medium to support S-waves. For an isotropic elastic material, it is related to Young's modulus and Poisson's ratio as shown in Eq.~\eqref{eq:shear-modulus}. The bulk modulus \(K\), defined from the same primary elastic constants in Eq.~\eqref{eq:bulk-modulus}, measures resistance to uniform volumetric compression. It is especially important for compressional deformation and therefore for P-wave propagation. The first Lamé parameter \(\lambda\), introduced in Eq.~\eqref{eq:lame-parameter}, is another elastic constant used in the tensor form of the isotropic stress--strain relation. The parameters \(\lambda\) and \(\mu\) are convenient because they enter directly into the thermoelastic constitutive equation for stress \cite{aki2002,jaeger2007}.
 
 The thermal response of the medium is described by the coefficient of linear thermal expansion \(\alpha\), thermal conductivity \(k\), and specific heat capacity \(C_p\). The coefficient \(\alpha\), measured in \(\mathrm{K^{-1}}\), describes the relative linear expansion of the rock per unit temperature change. It enters the thermal strain relation and therefore determines how temperature perturbations are converted into deformation. Thermal conductivity \(k\), measured in \(\mathrm{W\,m^{-1}\,K^{-1}}\), describes the ability of the rock to conduct heat. It controls the conductive heat flux and appears in the heat equation. Specific heat capacity \(C_p\), measured in \(\mathrm{J\,kg^{-1}\,K^{-1}}\), describes the amount of heat required to raise the temperature of a unit mass of rock by one degree \cite{robertson1988,turcotte2014}.
 

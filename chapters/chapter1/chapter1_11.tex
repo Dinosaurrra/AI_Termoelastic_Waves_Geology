@@ -11,27 +11,9 @@ Using the coupled thermoelastic framework introduced in the previous section, th
 \end{equation}
 This equation states that stress gradients produce acceleration of material particles. In the context of wave propagation, a local disturbance creates a changing displacement field; this displacement field produces strain; strain produces stress; and spatial variation in stress drives the motion forward through the medium. Thus, displacement, strain, stress, and acceleration evolve together during elastic wave propagation \cite{aki2002,jaeger2007}.
 
-The thermoelastic nature of the process enters through the stress relation
-\begin{equation}
-\sigma_{ij}
-=
-\lambda \delta_{ij} \varepsilon_{kk}
-+
-2\mu \varepsilon_{ij}
--
-\gamma \delta_{ij} \theta .
-\end{equation}
-The first two terms describe the ordinary elastic stress produced by mechanical deformation, while the final term represents the stress contribution associated with temperature perturbation. This means that heating or cooling can modify the stress field through which the wave propagates. If temperature changes are spatially non-uniform or mechanically constrained, they may produce additional stress gradients and therefore influence the motion of the medium \cite{nowacki1986,boley1960}.
+The thermoelastic nature of the process enters through the stress relation given in Eq.~\eqref{eq:thermoelastic-constitutive}. The first two terms describe the ordinary elastic stress produced by mechanical deformation, while the final term represents the stress contribution associated with temperature perturbation. This means that heating or cooling can modify the stress field through which the wave propagates. If temperature changes are spatially non-uniform or mechanically constrained, they may produce additional stress gradients and therefore influence the motion of the medium \cite{nowacki1986,boley1960}.
 
-The thermal field is coupled to the mechanical field through the heat-conduction equation with a thermoelastic coupling term:
-\begin{equation}
-k \nabla^2 T
--
-C \frac{\partial T}{\partial t}
-=
-\gamma T_0 \frac{\partial \varepsilon_{kk}}{\partial t}.
-\end{equation}
-This equation shows that temperature evolution is governed by heat conduction and by changes in volumetric deformation. The term involving \(\partial \varepsilon_{kk}/\partial t\) is important because it links the thermal field to compressional deformation. Therefore, thermoelastic wave propagation is not simply the superposition of heat conduction and elastic waves; it is a coupled process in which temperature affects stress and deformation affects temperature \cite{nowacki1986,boley1960}.
+The thermal field is coupled to the mechanical field through the heat-conduction equation with a thermoelastic coupling term given in Eq.~\eqref{eq:coupled-heat}. This equation shows that temperature evolution is governed by heat conduction and by changes in volumetric deformation. The term involving \(\partial \varepsilon_{kk}/\partial t\) is important because it links the thermal field to compressional deformation. Therefore, thermoelastic wave propagation is not simply the superposition of heat conduction and elastic waves; it is a coupled process in which temperature affects stress and deformation affects temperature \cite{nowacki1986,boley1960}.
 
 In this context, P-waves and S-waves have different thermoelastic significance. P-waves are compressional waves and involve changes in volume. Since the thermoelastic coupling term depends on volumetric strain \(\varepsilon_{kk}\), compressional motion is directly connected with temperature perturbations in the classical coupled theory. S-waves mainly involve shear deformation and do not produce volume change in the same way in an ideal isotropic medium. For this reason, direct thermoelastic coupling is usually more closely associated with compressional deformation than with purely shear deformation. In real rocks, however, fractures, pores, anisotropy, and heterogeneity may complicate this distinction because shear motion can interact with cracks, pore fluids, and non-uniform stress fields \cite{aki2002,mavko2009,jaeger2007}.
 

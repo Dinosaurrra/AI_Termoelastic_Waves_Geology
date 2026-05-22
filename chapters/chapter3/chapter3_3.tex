@@ -17,19 +17,7 @@ The elastic parameters describe the mechanical response of the medium. Density c
 
 The thermal parameters describe heat transfer, heat storage, and thermal-mechanical coupling. The temperature field \(T\) and perturbation \(\theta\) represent the thermal state of the medium. Thermal conductivity \(k\) controls the rate of heat conduction, while \(C_p\) and \(C=\rho C_p\) describe heat storage. The coefficient of thermal expansion \(\alpha\) determines how temperature change produces thermal strain, and the coupling coefficient \(\gamma=3K\alpha\) connects temperature perturbation with thermal stress in the thermoelastic constitutive relation.
 
-The geometric part of the input describes direction. The source point \(x_s\) and probe point \(x_p\) determine the propagation vector
-\begin{equation}
-d
-=
-x_p-x_s,
-\end{equation}
-and the unit direction vector
-\begin{equation}
-\hat{d}
-=
-\frac{d}{\|d\|}.
-\end{equation}
-This source--probe representation allows the response to be interpreted along selected propagation directions. It is also compatible with simplified two-dimensional sections or local cross-sections when a full two-dimensional field is not being computed.
+The geometric part of the input describes direction. The source point \(x_s\) and probe point \(x_p\) determine the propagation vector in Eq.~\eqref{eq:propagation-vector} and the unit direction vector in Eq.~\eqref{eq:unit-direction}. This source--probe representation allows the response to be interpreted along selected propagation directions. It is also compatible with simplified two-dimensional sections or local cross-sections when a full two-dimensional field is not being computed.
 
 The output variables describe the predicted thermoelastic response. A general output vector may be written as
 \begin{equation}
