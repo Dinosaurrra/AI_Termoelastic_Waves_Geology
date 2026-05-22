@@ -55,9 +55,12 @@
 
 % --- Captions per MM-04 §7.21 (figures) and §7.24 (tables) ---
 \usepackage{caption}
+\usepackage{floatrow}
+\floatsetup[table]{capposition=top}
 \captionsetup[figure]{name=Figure,labelsep=endash,justification=centering,singlelinecheck=false,font=normalsize,skip=0.5\baselineskip}
-\captionsetup[table]{name=Table,labelsep=endash,justification=raggedright,singlelinecheck=false,font=normalsize}
+\captionsetup[table]{name=Table,labelsep=endash,justification=raggedright,singlelinecheck=false,font=normalsize,position=above,skip=0.5\baselineskip,belowskip=0.5\baselineskip,indention=\parindent}
 \renewcommand{\thefigure}{\arabic{figure}}
+\renewcommand{\thetable}{\arabic{table}}
 
 % --- Section headings: UPPERCASE per MM-04 §7.10; subsection numbers
 %     without trailing dot per §7.16 ---
