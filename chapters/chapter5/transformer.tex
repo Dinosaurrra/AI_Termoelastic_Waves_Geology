@@ -99,11 +99,7 @@ construction discretisation-invariant.
 \node[draw=black!50, dashed, fit=(q1) (qN), inner sep=4mm, label=above:{Query set (arbitrary points)}] (qset) {};
 
 \end{tikzpicture}
-\caption{Tokenisation of the thermoelastic state used by the
-Transformer-based neural operator. Input tokens carry their spatial
-coordinates together with the initial thermal and mechanical state of
-the rock and the local material parameters. Query tokens carry only
-coordinates and indicate where the predicted fields should be returned.}
+\caption{Tokenisation of the thermoelastic state}
 \label{fig:transformer-tokens}
 \end{figure}
 
@@ -330,12 +326,7 @@ chosen so that training and inference remain feasible on a CPU.
 
 \end{tikzpicture}
 \caption{End-to-end architecture of the Transformer-based neural
-operator. The left column processes the input set with
-\(L_{\mathrm{enc}}\) self-attention layers. The right column lifts the
-query coordinates and applies \(L_{\mathrm{dec}}\) cross-attention
-layers in which the encoded context provides keys and values. A linear
-head maps the decoded query embeddings to the three predicted physical
-channels at every query location.}
+operator}
 \label{fig:transformer-arch}
 \end{figure}
 
@@ -438,12 +429,8 @@ Transolver \cite{wuTransolver2024} & \(\mathcal{O}(N M d_m)\) & Latent physics-a
 This work & \(\mathcal{O}(N_{\mathrm{in}} N_q d_m)\) & OFormer baseline, \(N_{\mathrm{in}}\!=\!N_q\!=\!1024\) subsampling \\
 \bottomrule
 \end{tabular}
-\caption{Position of the Transformer-based neural operator used in this
-thesis with respect to other set-based neural operators. The notation
-\(N\) refers to the total number of tokens, \(N_{\mathrm{in}}\) and
-\(N_q\) to the sizes of the input and query sets, \(d_m\) to the
-embedding dimension, and \(M\) to the number of latent slots used by
-the Transolver.}
+\caption{Position of the Transformer-based neural operator among
+set-based operators}
 \label{tab:transformer-variants}
 \end{table}
 

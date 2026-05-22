@@ -29,7 +29,7 @@
 \contentsline {subsection}{\numberline {2.3}Primary Physical Fields}{57}{subsection.2.3}%
 \contentsline {subsection}{\numberline {2.4}Material Parameters of Geological Media}{59}{subsection.2.4}%
 \contentsline {subsection}{\numberline {2.5}Governing Thermoelastic Equations}{62}{subsection.2.5}%
-\contentsline {subsection}{\numberline {2.6}Initial and Boundary Conditions}{63}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.6}Initial and Boundary Conditions}{62}{subsection.2.6}%
 \contentsline {subsection}{\numberline {2.7}Directional Propagation Quantities}{64}{subsection.2.7}%
 \contentsline {subsection}{\numberline {2.8}Summary of Chapter 2}{65}{subsection.2.8}%
 \contentsline {section}{\numberline {3}Methodology of Directional Thermoelastic Wave Prediction}{68}{section.3}%
@@ -102,21 +102,21 @@
 \contentsline {subsection}{\numberline {5.6}Transformer-Based Neural Operator}{136}{subsection.5.6}%
 \contentsline {subsubsection}{\numberline {5.6.1}Motivation for an attention-based surrogate}{136}{subsubsection.5.6.1}%
 \contentsline {subsubsection}{\numberline {5.6.2}Tokenisation of the thermoelastic state}{137}{subsubsection.5.6.2}%
-\contentsline {subsubsection}{\numberline {5.6.3}Scaled dot-product attention}{138}{subsubsection.5.6.3}%
+\contentsline {subsubsection}{\numberline {5.6.3}Scaled dot-product attention}{137}{subsubsection.5.6.3}%
 \contentsline {subsubsection}{\numberline {5.6.4}Multi-head attention}{138}{subsubsection.5.6.4}%
 \contentsline {subsubsection}{\numberline {5.6.5}Encoder block}{138}{subsubsection.5.6.5}%
 \contentsline {subsubsection}{\numberline {5.6.6}Cross-attention decoder for query points}{139}{subsubsection.5.6.6}%
 \contentsline {subsubsection}{\numberline {5.6.7}Architecture used in this work}{139}{subsubsection.5.6.7}%
-\contentsline {subsubsection}{\numberline {5.6.8}Training objective}{140}{subsubsection.5.6.8}%
+\contentsline {subsubsection}{\numberline {5.6.8}Training objective}{139}{subsubsection.5.6.8}%
 \contentsline {subsubsection}{\numberline {5.6.9}Comparison with related Transformer neural operators}{141}{subsubsection.5.6.9}%
-\contentsline {subsubsection}{\numberline {5.6.10}Discretisation invariance and operator-learning view}{141}{subsubsection.5.6.10}%
+\contentsline {subsubsection}{\numberline {5.6.10}Discretisation invariance and operator-learning view}{142}{subsubsection.5.6.10}%
 \contentsline {subsubsection}{\numberline {5.6.11}Summary}{142}{subsubsection.5.6.11}%
 \contentsline {section}{\numberline {6}Web Implementation}{143}{section.6}%
 \contentsline {subsection}{\numberline {6.1}Interface concept and landing area}{143}{subsection.6.1}%
 \contentsline {subsection}{\numberline {6.2}Prediction setup panel}{144}{subsection.6.2}%
 \contentsline {subsection}{\numberline {6.3}Two-dimensional domain visualisation}{145}{subsection.6.3}%
 \contentsline {subsection}{\numberline {6.4}Prediction result panel}{146}{subsection.6.4}%
-\contentsline {subsection}{\numberline {6.5}Front-end and back-end interaction}{148}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.5}Front-end and back-end interaction}{147}{subsection.6.5}%
 \contentsline {subsection}{\numberline {6.6}Summary}{148}{subsection.6.6}%
 \contentsline {section}{\numberline {7}Results and Discussion}{149}{section.7}%
 \contentsline {subsection}{\numberline {7.1}Experimental setup}{149}{subsection.7.1}%
