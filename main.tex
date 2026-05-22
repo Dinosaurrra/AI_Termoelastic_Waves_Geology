@@ -75,10 +75,11 @@
   {\normalfont\normalsize\itshape}{\thesubsubsection}{1em}{}
 \titlespacing*{\section}{\parindent}{2\baselineskip}{1\baselineskip}
 \titlespacing*{\subsection}{\parindent}{1\baselineskip}{0.5\baselineskip}
-\titlespacing*{\subsubsection}{\parindent}{0.5\baselineskip}{0.3\baselineskip}
+\titlespacing*{\subsubsection}{0.5\parindent}{0.5\baselineskip}{0.3\baselineskip}
 \renewcommand{\thesection}{\arabic{section}}
 \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
 \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+\numberwithin{equation}{section}
 
 % --- IEEE-style numeric citations. ---
 \usepackage{cite}
