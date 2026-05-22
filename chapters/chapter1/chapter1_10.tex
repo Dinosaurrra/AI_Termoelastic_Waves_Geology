@@ -33,14 +33,7 @@ The stress relation for an isotropic linear thermoelastic solid is the constitut
 Mechanical motion is governed by the equation of motion. Neglecting body forces for simplicity, it can be written in index notation as the balance $\rho\,\partial_t^2 u_i = \partial_j\sigma_{ij}$ already given in Eq.~\eqref{eq:eom}.
 In this equation, \(\rho\) is the density of the medium, \(u_i\) is the \(i\)-th component of displacement, \(t\) is time, \(\sigma_{ij}\) is the stress tensor, and \(x_j\) is the spatial coordinate. The left-hand side represents inertia, while the right-hand side represents the effect of stress gradients. Physically, the equation states that spatial changes in stress cause acceleration of material particles. Since the stress tensor contains both mechanical and thermal contributions, temperature changes may influence motion through the thermoelastic stress term \cite{aki2002,nowacki1986}.
 
-The thermal part of the coupled problem is described by the heat equation. In the absence of thermoelastic coupling, heat conduction in a rock may be written in the form
-\begin{equation}
-\label{eq:heat-conduction}
-\rho C_p \frac{\partial T}{\partial t}
-=
-\nabla \cdot (k \nabla T) + Q,
-\end{equation}
-where \(C_p\) is the specific heat capacity, \(\rho C_p\) is the volumetric heat capacity, \(k\) is the thermal conductivity, and \(Q\) is a heat source per unit volume. This equation describes how temperature evolves due to heat conduction and heat supply \cite{robertson1988,turcotte2014}.
+The thermal part of the coupled problem is described by the heat equation. In the absence of thermoelastic coupling, heat conduction in a rock may be written in the form already introduced in Eq.~\eqref{eq:heat-conduction}. This equation describes how temperature evolves due to heat conduction and heat supply \cite{robertson1988,turcotte2014}.
 
 In coupled thermoelasticity, an additional term appears because changing volumetric strain may generate or absorb heat. A commonly used linear coupled form is
 \begin{equation}
