@@ -1,144 +1,140 @@
 \xpg@aux {}{english}
 \xpg@aux {}{english}
-\contentsline {section}{\numberline {1}Introduction}{8}{section.1}%
-\contentsline {subsection}{\numberline {1.1}General Background}{8}{subsection.1.1}%
-\contentsline {subsection}{\numberline {1.2}Physical and Geological Motivation}{8}{subsection.1.2}%
-\contentsline {subsection}{\numberline {1.3}Thermal--Mechanical Interaction in Rocks}{9}{subsection.1.3}%
-\contentsline {subsection}{\numberline {1.4}Heat Conduction and Elastic Wave Propagation}{9}{subsection.1.4}%
-\contentsline {subsection}{\numberline {1.5}Directional Behavior in Geological Wave Propagation}{10}{subsection.1.5}%
-\contentsline {subsection}{\numberline {1.6}Research Gap}{11}{subsection.1.6}%
-\contentsline {subsection}{\numberline {1.7}Problem Statement}{11}{subsection.1.7}%
-\contentsline {subsection}{\numberline {1.8}Aim and Scope of the Theoretical Part}{12}{subsection.1.8}%
-\contentsline {section}{\numberline {2}Physical and Geological Foundations of Thermoelastic Wave Propagation}{13}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Geological Media as Physical Materials}{13}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Main Rock Types Relevant to Thermoelastic Wave Propagation}{15}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Physical Properties Controlling Thermoelastic Wave Propagation}{17}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Elastic Deformation of Rocks}{21}{subsection.2.4}%
-\contentsline {subsection}{\numberline {2.5}Stress and Strain in Geological Materials}{23}{subsection.2.5}%
-\contentsline {subsection}{\numberline {2.6}Elastic Constants and Wave Velocities}{25}{subsection.2.6}%
-\contentsline {subsection}{\numberline {2.7}Thermal Properties of Rocks}{29}{subsection.2.7}%
-\contentsline {subsection}{\numberline {2.8}Thermal Expansion and Thermal Stress}{31}{subsection.2.8}%
-\contentsline {subsection}{\numberline {2.9}Heat Conduction in Rocks}{34}{subsection.2.9}%
-\contentsline {subsection}{\numberline {2.10}Coupled Thermoelastic Behavior}{37}{subsection.2.10}%
-\contentsline {subsection}{\numberline {2.11}Thermoelastic Wave Propagation in Geological Media}{40}{subsection.2.11}%
-\contentsline {subsection}{\numberline {2.12}Geological Factors Affecting Directional Propagation}{42}{subsection.2.12}%
-\contentsline {subsection}{\numberline {2.13}Summary of Chapter 1}{46}{subsection.2.13}%
-\contentsline {section}{\numberline {3}Mathematical Formulation of the Thermoelastic Wave Propagation Problem}{47}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Problem Definition and Modelling Assumptions}{47}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Spatial Domain, Time Interval, and Coordinate System}{50}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Primary Physical Fields}{52}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}Material Parameters of Geological Media}{54}{subsection.3.4}%
-\contentsline {subsection}{\numberline {3.5}Governing Thermoelastic Equations}{56}{subsection.3.5}%
-\contentsline {subsection}{\numberline {3.6}Initial and Boundary Conditions}{58}{subsection.3.6}%
-\contentsline {subsection}{\numberline {3.7}Directional Propagation Quantities}{59}{subsection.3.7}%
-\contentsline {subsection}{\numberline {3.8}Summary of Chapter 2}{60}{subsection.3.8}%
-\contentsline {section}{\numberline {4}Methodology of Directional Thermoelastic Wave Prediction}{62}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Methodology Overview}{62}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}From Thermoelastic Formulation to Prediction Task}{63}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Input and Output Variables}{64}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Model Comparison Framework}{65}{subsection.4.4}%
-\contentsline {subsection}{\numberline {4.5}Evaluation Criteria}{66}{subsection.4.5}%
-\contentsline {subsection}{\numberline {4.6}Scope and Limitations of the Methodology}{68}{subsection.4.6}%
-\contentsline {section}{\numberline {5}Simulation in COMSOL Multiphysics}{69}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Purpose of the COMSOL Simulation}{69}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Geometry of the Thermoelastic Experiment}{70}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}COMSOL Model Structure}{70}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}Thermoelastic Physical Model}{74}{subsection.5.4}%
-\contentsline {subsection}{\numberline {5.5}Initial and Boundary Conditions}{75}{subsection.5.5}%
-\contentsline {subsection}{\numberline {5.6}Material Parameters}{75}{subsection.5.6}%
-\contentsline {subsection}{\numberline {5.7}Mesh Generation and Time-Dependent Study}{76}{subsection.5.7}%
-\contentsline {subsection}{\numberline {5.8}COMSOL Data Export and Dataset Processing}{77}{subsection.5.8}%
-\contentsline {subsection}{\numberline {5.9}Visualization and Validation of the Simulation}{83}{subsection.5.9}%
-\contentsline {subsection}{\numberline {5.10}Limitations of the Simulation Setup}{87}{subsection.5.10}%
-\contentsline {section}{\numberline {6}Implementation and System Architecture}{89}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Implementation and System Architecture}{89}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}Prediction Interface Contract}{92}{subsection.6.2}%
-\contentsline {section}{\numberline {7}Physics-Informed Neural Network for Thermoelastic Prediction}{95}{section.7}%
-\contentsline {subsection}{\numberline {7.1}Motivation for a physics-informed surrogate}{95}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Network mapping and inputs}{95}{subsection.7.2}%
-\contentsline {subsection}{\numberline {7.3}Composite training loss}{96}{subsection.7.3}%
-\contentsline {subsection}{\numberline {7.4}Training data and sampling}{96}{subsection.7.4}%
-\contentsline {subsection}{\numberline {7.5}Role in the comparison framework}{96}{subsection.7.5}%
-\contentsline {section}{\numberline {8}Two-Dimensional Fourier Neural Operator for Thermoelastic Field Prediction}{97}{section.8}%
-\contentsline {subsection}{\numberline {8.1}Model Formulation}{97}{subsection.8.1}%
-\contentsline {subsection}{\numberline {8.2}Input and Output Tensor Format}{98}{subsection.8.2}%
-\contentsline {subsection}{\numberline {8.3}Main Architecture of the FNO Model}{98}{subsection.8.3}%
-\contentsline {subsection}{\numberline {8.4}Coordinate Grid Encoding}{99}{subsection.8.4}%
-\contentsline {subsection}{\numberline {8.5}Lifting Layer}{100}{subsection.8.5}%
-\contentsline {subsection}{\numberline {8.6}Boundary Extension Before Fourier Blocks}{100}{subsection.8.6}%
-\contentsline {subsection}{\numberline {8.7}Fourier Blocks}{101}{subsection.8.7}%
-\contentsline {subsection}{\numberline {8.8}Spectral Convolution}{101}{subsection.8.8}%
-\contentsline {subsection}{\numberline {8.9}Complex Multiplication in Fourier Space}{102}{subsection.8.9}%
-\contentsline {subsection}{\numberline {8.10}Factorized Spectral Weights}{103}{subsection.8.10}%
-\contentsline {subsection}{\numberline {8.11}Local Convolution Branch}{103}{subsection.8.11}%
-\contentsline {subsection}{\numberline {8.12}Pointwise Channel-Mixing Layer}{104}{subsection.8.12}%
-\contentsline {subsection}{\numberline {8.13}Projection Layer}{104}{subsection.8.13}%
-\contentsline {subsection}{\numberline {8.14}Temporal Prediction Task}{105}{subsection.8.14}%
-\contentsline {subsection}{\numberline {8.15}Supervised Training Objective}{105}{subsection.8.15}%
-\contentsline {subsection}{\numberline {8.16}Normalization of Physical Channels}{106}{subsection.8.16}%
-\contentsline {subsection}{\numberline {8.17}Evaluation Metrics}{107}{subsection.8.17}%
-\contentsline {subsection}{\numberline {8.18}Architectural and Training Parameters}{107}{subsection.8.18}%
-\contentsline {subsection}{\numberline {8.19}Summary}{108}{subsection.8.19}%
-\contentsline {section}{\numberline {9}MeshGraphNet Model for Thermoelastic Wave Prediction}{108}{section.9}%
-\contentsline {subsection}{\numberline {9.1}Motivation for Using a Graph Neural Network}{108}{subsection.9.1}%
-\contentsline {subsection}{\numberline {9.2}Graph Representation of the COMSOL Mesh}{109}{subsection.9.2}%
-\contentsline {subsection}{\numberline {9.3}Node Features and Physical State Variables}{111}{subsection.9.3}%
-\contentsline {subsection}{\numberline {9.4}Prediction Target}{113}{subsection.9.4}%
-\contentsline {subsection}{\numberline {9.5}Encoder--Processor--Decoder Architecture}{114}{subsection.9.5}%
-\contentsline {subsubsection}{\numberline {9.5.1}Node and Edge Encoders}{115}{subsubsection.9.5.1}%
-\contentsline {subsubsection}{\numberline {9.5.2}Message Passing Processor}{116}{subsubsection.9.5.2}%
-\contentsline {subsubsection}{\numberline {9.5.3}Decoder}{118}{subsubsection.9.5.3}%
-\contentsline {subsection}{\numberline {9.6}Physical Interpretation of Message Passing}{119}{subsection.9.6}%
-\contentsline {subsection}{\numberline {9.7}Loss Function}{120}{subsection.9.7}%
-\contentsline {subsection}{\numberline {9.8}Evaluation Metrics}{121}{subsection.9.8}%
-\contentsline {subsection}{\numberline {9.9}Training Procedure}{122}{subsection.9.9}%
-\contentsline {subsection}{\numberline {9.10}Fine-Tuning Strategy}{125}{subsection.9.10}%
-\contentsline {subsubsection}{\numberline {9.10.1}Full Fine-Tuning}{125}{subsubsection.9.10.1}%
-\contentsline {subsubsection}{\numberline {9.10.2}Decoder-Only Fine-Tuning}{126}{subsubsection.9.10.2}%
-\contentsline {subsubsection}{\numberline {9.10.3}Processor-Decoder Fine-Tuning}{126}{subsubsection.9.10.3}%
-\contentsline {subsection}{\numberline {9.11}Advantages of MeshGraphNet for This Task}{127}{subsection.9.11}%
-\contentsline {subsection}{\numberline {9.12}Limitations}{128}{subsection.9.12}%
-\contentsline {subsection}{\numberline {9.13}Summary}{130}{subsection.9.13}%
-\contentsline {section}{\numberline {10}Transformer-Based Neural Operator}{132}{section.10}%
-\contentsline {subsection}{\numberline {10.1}Motivation for an attention-based surrogate}{132}{subsection.10.1}%
-\contentsline {subsubsection}{\numberline {10.1.1}Tokenisation of the thermoelastic state}{132}{subsubsection.10.1.1}%
-\contentsline {subsection}{\numberline {10.2}Scaled dot-product attention}{133}{subsection.10.2}%
-\contentsline {subsection}{\numberline {10.3}Multi-head attention}{133}{subsection.10.3}%
-\contentsline {subsection}{\numberline {10.4}Encoder block}{134}{subsection.10.4}%
-\contentsline {subsection}{\numberline {10.5}Cross-attention decoder for query points}{134}{subsection.10.5}%
-\contentsline {subsection}{\numberline {10.6}Architecture used in this work}{135}{subsection.10.6}%
-\contentsline {subsection}{\numberline {10.7}Training objective}{135}{subsection.10.7}%
-\contentsline {subsection}{\numberline {10.8}Comparison with related Transformer neural operators}{137}{subsection.10.8}%
-\contentsline {subsection}{\numberline {10.9}Discretisation invariance and operator-learning view}{137}{subsection.10.9}%
-\contentsline {subsection}{\numberline {10.10}Summary}{138}{subsection.10.10}%
-\contentsline {section}{\numberline {11}Web Implementation}{139}{section.11}%
-\contentsline {subsection}{\numberline {11.1}Interface concept and landing area}{139}{subsection.11.1}%
-\contentsline {subsection}{\numberline {11.2}Prediction setup panel}{140}{subsection.11.2}%
-\contentsline {subsection}{\numberline {11.3}Two-dimensional domain visualisation}{140}{subsection.11.3}%
-\contentsline {subsection}{\numberline {11.4}Prediction result panel}{140}{subsection.11.4}%
-\contentsline {subsection}{\numberline {11.5}Front-end and back-end interaction}{141}{subsection.11.5}%
-\contentsline {subsection}{\numberline {11.6}Summary}{141}{subsection.11.6}%
-\contentsline {section}{\numberline {12}Results and Discussion}{145}{section.12}%
-\contentsline {subsection}{\numberline {12.1}Experimental setup}{145}{subsection.12.1}%
-\contentsline {subsection}{\numberline {12.2}Travel-time predictions}{145}{subsection.12.2}%
-\contentsline {subsubsection}{\numberline {12.2.1}Accuracy against the analytical reference}{147}{subsubsection.12.2.1}%
-\contentsline {subsection}{\numberline {12.3}Maximum displacement}{148}{subsection.12.3}%
-\contentsline {subsection}{\numberline {12.4}Temperature perturbation}{149}{subsection.12.4}%
-\contentsline {subsection}{\numberline {12.5}Directional prediction}{149}{subsection.12.5}%
-\contentsline {subsection}{\numberline {12.6}Inference latency and model size}{150}{subsection.12.6}%
-\contentsline {subsection}{\numberline {12.7}Training behaviour}{151}{subsection.12.7}%
-\contentsline {subsection}{\numberline {12.8}Cross-material analysis}{152}{subsection.12.8}%
-\contentsline {subsection}{\numberline {12.9}Per-model time-series traces}{152}{subsection.12.9}%
-\contentsline {subsection}{\numberline {12.10}Threats to validity and limitations}{153}{subsection.12.10}%
-\contentsline {subsection}{\numberline {12.11}Summary and recommendations}{154}{subsection.12.11}%
-\contentsline {section}{Conclusion}{156}{subsection.12.11}%
-\contentsline {section}{\numberline {A}API contract v2: Pydantic request schemas}{162}{appendix.A}%
-\contentsline {section}{Appendix A. API contract v2 schemas}{162}{appendix.A}%
-\contentsline {section}{\numberline {B}Derived geometric and elastic quantities}{164}{appendix.B}%
-\contentsline {section}{Appendix B. Derived quantities}{164}{appendix.B}%
-\contentsline {section}{\numberline {C}PINN composite loss assembly}{166}{appendix.C}%
-\contentsline {section}{Appendix C. PINN composite loss}{166}{appendix.C}%
-\contentsline {section}{\numberline {D}MeshGraphNet 2D dataset field mapping}{168}{appendix.D}%
-\contentsline {section}{Appendix D. MGN field mapping}{168}{appendix.D}%
-\contentsline {section}{\numberline {E}Accuracy and latency measurement}{170}{appendix.E}%
-\contentsline {section}{Appendix E. Accuracy + latency script}{170}{appendix.E}%
+\contentsline {section}{Introduction}{14}{section*.3}%
+\contentsline {subsection}{General Background}{14}{subsection*.4}%
+\contentsline {subsection}{Physical and Geological Motivation}{14}{subsection*.5}%
+\contentsline {subsection}{Thermal--Mechanical Interaction in Rocks}{15}{subsection*.6}%
+\contentsline {subsection}{Heat Conduction and Elastic Wave Propagation}{15}{subsection*.7}%
+\contentsline {subsection}{Directional Behavior in Geological Wave Propagation}{16}{subsection*.8}%
+\contentsline {subsection}{Research Gap}{17}{subsection*.9}%
+\contentsline {subsection}{Problem Statement}{17}{subsection*.10}%
+\contentsline {subsection}{Aim and Scope of the Theoretical Part}{18}{subsection*.11}%
+\contentsline {section}{\numberline {1}Physical and Geological Foundations of Thermoelastic Wave Propagation}{19}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Geological Media as Physical Materials}{19}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Main Rock Types Relevant to Thermoelastic Wave Propagation}{21}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Physical Properties Controlling Thermoelastic Wave Propagation}{23}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Elastic Deformation of Rocks}{27}{subsection.1.4}%
+\contentsline {subsection}{\numberline {1.5}Stress and Strain in Geological Materials}{29}{subsection.1.5}%
+\contentsline {subsection}{\numberline {1.6}Elastic Constants and Wave Velocities}{31}{subsection.1.6}%
+\contentsline {subsection}{\numberline {1.7}Thermal Properties of Rocks}{34}{subsection.1.7}%
+\contentsline {subsection}{\numberline {1.8}Thermal Expansion and Thermal Stress}{37}{subsection.1.8}%
+\contentsline {subsection}{\numberline {1.9}Heat Conduction in Rocks}{40}{subsection.1.9}%
+\contentsline {subsection}{\numberline {1.10}Coupled Thermoelastic Behavior}{43}{subsection.1.10}%
+\contentsline {subsection}{\numberline {1.11}Thermoelastic Wave Propagation in Geological Media}{45}{subsection.1.11}%
+\contentsline {subsection}{\numberline {1.12}Geological Factors Affecting Directional Propagation}{48}{subsection.1.12}%
+\contentsline {subsection}{\numberline {1.13}Summary of Chapter 1}{51}{subsection.1.13}%
+\contentsline {section}{\numberline {2}Mathematical Formulation of the Thermoelastic Wave Propagation Problem}{53}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Problem Definition and Modelling Assumptions}{53}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Spatial Domain, Time Interval, and Coordinate System}{55}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Primary Physical Fields}{57}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Material Parameters of Geological Media}{59}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Governing Thermoelastic Equations}{62}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Initial and Boundary Conditions}{63}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.7}Directional Propagation Quantities}{64}{subsection.2.7}%
+\contentsline {subsection}{\numberline {2.8}Summary of Chapter 2}{65}{subsection.2.8}%
+\contentsline {section}{\numberline {3}Methodology of Directional Thermoelastic Wave Prediction}{68}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Methodology Overview}{68}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}From Thermoelastic Formulation to Prediction Task}{69}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Input and Output Variables}{70}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Model Comparison Framework}{71}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Evaluation Criteria}{72}{subsection.3.5}%
+\contentsline {subsection}{\numberline {3.6}Scope and Limitations of the Methodology}{73}{subsection.3.6}%
+\contentsline {section}{\numberline {4}Simulation in COMSOL Multiphysics}{75}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Purpose of the COMSOL Simulation}{75}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Geometry of the Thermoelastic Experiment}{76}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}COMSOL Model Structure}{76}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Thermoelastic Physical Model}{80}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Initial and Boundary Conditions}{81}{subsection.4.5}%
+\contentsline {subsection}{\numberline {4.6}Material Parameters}{81}{subsection.4.6}%
+\contentsline {subsection}{\numberline {4.7}Mesh Generation and Time-Dependent Study}{82}{subsection.4.7}%
+\contentsline {subsection}{\numberline {4.8}COMSOL Data Export and Dataset Processing}{83}{subsection.4.8}%
+\contentsline {subsection}{\numberline {4.9}Visualization and Validation of the Simulation}{89}{subsection.4.9}%
+\contentsline {subsection}{\numberline {4.10}Limitations of the Simulation Setup}{93}{subsection.4.10}%
+\contentsline {section}{\numberline {5}Implementation and System Architecture}{95}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Implementation and System Architecture}{95}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Prediction Interface Contract}{98}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Physics-Informed Neural Network for Thermoelastic Prediction}{101}{subsection.5.3}%
+\contentsline {subsubsection}{\numberline {5.3.1}Motivation for a physics-informed surrogate}{101}{subsubsection.5.3.1}%
+\contentsline {subsubsection}{\numberline {5.3.2}Network mapping and inputs}{101}{subsubsection.5.3.2}%
+\contentsline {subsubsection}{\numberline {5.3.3}Composite training loss}{101}{subsubsection.5.3.3}%
+\contentsline {subsubsection}{\numberline {5.3.4}Training data and sampling}{102}{subsubsection.5.3.4}%
+\contentsline {subsubsection}{\numberline {5.3.5}Role in the comparison framework}{102}{subsubsection.5.3.5}%
+\contentsline {subsection}{\numberline {5.4}Two-Dimensional Fourier Neural Operator for Thermoelastic Field Prediction}{103}{subsection.5.4}%
+\contentsline {subsubsection}{\numberline {5.4.1}Model Formulation}{103}{subsubsection.5.4.1}%
+\contentsline {subsubsection}{\numberline {5.4.2}Input and Output Tensor Format}{103}{subsubsection.5.4.2}%
+\contentsline {subsubsection}{\numberline {5.4.3}Main Architecture of the FNO Model}{104}{subsubsection.5.4.3}%
+\contentsline {subsubsection}{\numberline {5.4.4}Coordinate Grid Encoding}{105}{subsubsection.5.4.4}%
+\contentsline {subsubsection}{\numberline {5.4.5}Lifting Layer}{105}{subsubsection.5.4.5}%
+\contentsline {subsubsection}{\numberline {5.4.6}Boundary Extension Before Fourier Blocks}{106}{subsubsection.5.4.6}%
+\contentsline {subsubsection}{\numberline {5.4.7}Fourier Blocks}{106}{subsubsection.5.4.7}%
+\contentsline {subsubsection}{\numberline {5.4.8}Spectral Convolution}{107}{subsubsection.5.4.8}%
+\contentsline {subsubsection}{\numberline {5.4.9}Complex Multiplication in Fourier Space}{108}{subsubsection.5.4.9}%
+\contentsline {subsubsection}{\numberline {5.4.10}Factorized Spectral Weights}{108}{subsubsection.5.4.10}%
+\contentsline {subsubsection}{\numberline {5.4.11}Local Convolution Branch}{109}{subsubsection.5.4.11}%
+\contentsline {subsubsection}{\numberline {5.4.12}Pointwise Channel-Mixing Layer}{109}{subsubsection.5.4.12}%
+\contentsline {subsubsection}{\numberline {5.4.13}Projection Layer}{110}{subsubsection.5.4.13}%
+\contentsline {subsubsection}{\numberline {5.4.14}Temporal Prediction Task}{110}{subsubsection.5.4.14}%
+\contentsline {subsubsection}{\numberline {5.4.15}Supervised Training Objective}{111}{subsubsection.5.4.15}%
+\contentsline {subsubsection}{\numberline {5.4.16}Normalization of Physical Channels}{112}{subsubsection.5.4.16}%
+\contentsline {subsubsection}{\numberline {5.4.17}Evaluation Metrics}{112}{subsubsection.5.4.17}%
+\contentsline {subsubsection}{\numberline {5.4.18}Architectural and Training Parameters}{112}{subsubsection.5.4.18}%
+\contentsline {subsubsection}{\numberline {5.4.19}Summary}{113}{subsubsection.5.4.19}%
+\contentsline {subsection}{\numberline {5.5}MeshGraphNet Model for Thermoelastic Wave Prediction}{113}{subsection.5.5}%
+\contentsline {subsubsection}{\numberline {5.5.1}Motivation for Using a Graph Neural Network}{113}{subsubsection.5.5.1}%
+\contentsline {subsubsection}{\numberline {5.5.2}Graph Representation of the COMSOL Mesh}{115}{subsubsection.5.5.2}%
+\contentsline {subsubsection}{\numberline {5.5.3}Node Features and Physical State Variables}{116}{subsubsection.5.5.3}%
+\contentsline {subsubsection}{\numberline {5.5.4}Prediction Target}{117}{subsubsection.5.5.4}%
+\contentsline {subsubsection}{\numberline {5.5.5}Encoder--Processor--Decoder Architecture}{119}{subsubsection.5.5.5}%
+\contentsline {subsubsection}{\numberline {5.5.6}Node and Edge Encoders}{120}{subsubsection.5.5.6}%
+\contentsline {subsubsection}{\numberline {5.5.7}Message Passing Processor}{121}{subsubsection.5.5.7}%
+\contentsline {subsubsection}{\numberline {5.5.8}Decoder}{123}{subsubsection.5.5.8}%
+\contentsline {subsubsection}{\numberline {5.5.9}Physical Interpretation of Message Passing}{124}{subsubsection.5.5.9}%
+\contentsline {subsubsection}{\numberline {5.5.10}Loss Function}{125}{subsubsection.5.5.10}%
+\contentsline {subsubsection}{\numberline {5.5.11}Evaluation Metrics}{126}{subsubsection.5.5.11}%
+\contentsline {subsubsection}{\numberline {5.5.12}Training Procedure}{127}{subsubsection.5.5.12}%
+\contentsline {subsubsection}{\numberline {5.5.13}Fine-Tuning Strategy}{129}{subsubsection.5.5.13}%
+\contentsline {subsubsection}{\numberline {5.5.14}Full Fine-Tuning}{130}{subsubsection.5.5.14}%
+\contentsline {subsubsection}{\numberline {5.5.15}Decoder-Only Fine-Tuning}{130}{subsubsection.5.5.15}%
+\contentsline {subsubsection}{\numberline {5.5.16}Processor-Decoder Fine-Tuning}{131}{subsubsection.5.5.16}%
+\contentsline {subsubsection}{\numberline {5.5.17}Advantages of MeshGraphNet for This Task}{132}{subsubsection.5.5.17}%
+\contentsline {subsubsection}{\numberline {5.5.18}Limitations}{133}{subsubsection.5.5.18}%
+\contentsline {subsubsection}{\numberline {5.5.19}Summary}{135}{subsubsection.5.5.19}%
+\contentsline {subsection}{\numberline {5.6}Transformer-Based Neural Operator}{136}{subsection.5.6}%
+\contentsline {subsubsection}{\numberline {5.6.1}Motivation for an attention-based surrogate}{136}{subsubsection.5.6.1}%
+\contentsline {subsubsection}{\numberline {5.6.2}Tokenisation of the thermoelastic state}{137}{subsubsection.5.6.2}%
+\contentsline {subsubsection}{\numberline {5.6.3}Scaled dot-product attention}{138}{subsubsection.5.6.3}%
+\contentsline {subsubsection}{\numberline {5.6.4}Multi-head attention}{138}{subsubsection.5.6.4}%
+\contentsline {subsubsection}{\numberline {5.6.5}Encoder block}{138}{subsubsection.5.6.5}%
+\contentsline {subsubsection}{\numberline {5.6.6}Cross-attention decoder for query points}{139}{subsubsection.5.6.6}%
+\contentsline {subsubsection}{\numberline {5.6.7}Architecture used in this work}{139}{subsubsection.5.6.7}%
+\contentsline {subsubsection}{\numberline {5.6.8}Training objective}{140}{subsubsection.5.6.8}%
+\contentsline {subsubsection}{\numberline {5.6.9}Comparison with related Transformer neural operators}{141}{subsubsection.5.6.9}%
+\contentsline {subsubsection}{\numberline {5.6.10}Discretisation invariance and operator-learning view}{141}{subsubsection.5.6.10}%
+\contentsline {subsubsection}{\numberline {5.6.11}Summary}{142}{subsubsection.5.6.11}%
+\contentsline {section}{\numberline {6}Web Implementation}{143}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Interface concept and landing area}{143}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Prediction setup panel}{144}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Two-dimensional domain visualisation}{145}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Prediction result panel}{146}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Front-end and back-end interaction}{148}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6}Summary}{148}{subsection.6.6}%
+\contentsline {section}{\numberline {7}Results and Discussion}{149}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Experimental setup}{149}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Travel-time predictions}{149}{subsection.7.2}%
+\contentsline {subsubsection}{\numberline {7.2.1}Accuracy against the analytical reference}{151}{subsubsection.7.2.1}%
+\contentsline {subsection}{\numberline {7.3}Maximum displacement}{152}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4}Temperature perturbation}{153}{subsection.7.4}%
+\contentsline {subsection}{\numberline {7.5}Directional prediction}{153}{subsection.7.5}%
+\contentsline {subsection}{\numberline {7.6}Inference latency and model size}{154}{subsection.7.6}%
+\contentsline {subsection}{\numberline {7.7}Training behaviour}{154}{subsection.7.7}%
+\contentsline {subsection}{\numberline {7.8}Cross-material analysis}{155}{subsection.7.8}%
+\contentsline {subsection}{\numberline {7.9}Per-model time-series traces}{156}{subsection.7.9}%
+\contentsline {subsection}{\numberline {7.10}Threats to validity and limitations}{158}{subsection.7.10}%
+\contentsline {subsection}{\numberline {7.11}Summary and recommendations}{159}{subsection.7.11}%
+\contentsline {section}{CONCLUSION}{161}{subsection.7.11}%
+\contentsline {section}{REFERENCES}{164}{subsection.7.11}%
+\contentsline {section}{Appendix A. API contract v2: Pydantic request schemas}{167}{appendix.A}%
+\contentsline {section}{Appendix B. Derived geometric and elastic quantities}{169}{appendix.B}%
+\contentsline {section}{Appendix C. PINN composite loss assembly}{172}{appendix.C}%
+\contentsline {section}{Appendix D. MeshGraphNet 2D dataset field mapping}{174}{appendix.D}%
+\contentsline {section}{Appendix E. Accuracy and latency measurement}{176}{appendix.E}%

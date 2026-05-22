@@ -33,13 +33,7 @@ The landing area is shown in Figure~\ref{fig:web-title}.
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.96\textwidth]{chapters/web_implementation/figures/web_title}
-\caption{Landing area of the web interface. The dark hero strip
-carries the eyebrow line \emph{Directional Prediction Workspace}, the
-main title, a short operational summary, and three contextual chips
-that pin the scope of the prototype (research prototype, fixed
-1\,m\,$\times$\,1\,m domain, model comparison). The bottom-left badge
-states that the output is a prototype prediction rather than a
-field-validated thermoelastic simulation}
+\caption{Landing area: title, summary, and prototype-scope chips}
 \label{fig:web-title}
 \end{figure}
 
@@ -62,14 +56,8 @@ validate.
 \begin{figure}[H]
 \centering
 \includegraphics[height=0.74\textheight,keepaspectratio]{chapters/web_implementation/figures/web_setup}
-\caption{Prediction setup panel. The form is grouped into model and
-material selection, source coordinates, probe coordinates, a read-only
-block of locked scenario settings (point thermal source, free
-mechanical constraint, prototype simplified boundary condition), the
-observation time, and a collapsible reference table that lists the
-resolved physical properties of the selected medium. Three action
-buttons close the panel: \emph{Use demo values}, \emph{Reset}, and
-\emph{Run prediction}}
+\caption{Prediction setup panel: model, material, source, probe,
+locked scenario, observation time}
 \label{fig:web-setup}
 \end{figure}
 
@@ -102,14 +90,8 @@ The planar domain visualisation is shown in Figure~\ref{fig:web-visualization}.
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.92\textwidth]{chapters/web_implementation/figures/web_visualization}
-\caption{Planar domain visualisation. The canvas reserves a header
-band above the unit square for the active model name
-(\emph{MeshGraphNet} in this view) and the domain-size annotation.
-Inside the unit square the warm-toned disc marks the source point and
-the cool-toned disc marks the probe; the propagation arrow connects
-them and carries the distance and azimuth directly on the line. The
-unit-direction key in the bottom-left corner reports the normalised
-propagation vector}
+\caption{Planar domain visualisation: source, probe, propagation
+arrow with distance and azimuth, and unit-direction key}
 \label{fig:web-visualization}
 \end{figure}
 
@@ -133,17 +115,8 @@ layout. The panel is shown in Figure~\ref{fig:web-result}.
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.94\textwidth]{chapters/web_implementation/figures/web_result}
-\caption{Prediction result panel. The cards report, from top to
-bottom, the thermal response at the probe ($T$ and the perturbation
-$\theta = T - T_{0}$ in Kelvin), the in-plane displacement components
-$u_{x}, u_{y}$ with their magnitude and a small vector diagram, the
-directional response (distance, azimuth, unit direction, magnitude
-score), the temporal response (travel time in seconds and
-milliseconds), and the model metadata (model identifier, version,
-inference time, request identifier, fallback status). The diagnostics
-strip at the bottom carries the run state of the response, the schema
-version, the request identifier, and any warnings or notes returned
-by the backend}
+\caption{Prediction result panel: thermal, displacement, directional,
+temporal, and metadata cards with a diagnostics strip}
 \label{fig:web-result}
 \end{figure}
 
