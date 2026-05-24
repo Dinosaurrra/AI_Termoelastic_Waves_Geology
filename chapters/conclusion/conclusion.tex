@@ -1,125 +1,14 @@
 \section*{Conclusion}
 \addcontentsline{toc}{section}{CONCLUSION}
 
-This thesis investigated the problem of AI-assisted directional
-prediction of thermoelastic wave propagation in geological media. The
-work combined a physical and geological foundation, a coupled
-thermoelastic mathematical formulation in two-dimensional plane
-strain, a controlled COMSOL Multiphysics dataset generation pipeline,
-four neural-surrogate routes (PINN, FNO, MeshGraphNet and a
-Transformer-style operator) wired through a single normalised
-prediction contract, and an end-to-end software prototype that
-exposes the comparison through a backend orchestrator and a web
-frontend.
+This thesis investigated AI-assisted directional prediction of thermoelastic wave propagation in geological media. The aim was to design and analyse a prototype framework that connects geological material parameters, thermoelastic theory, controlled simulation data, neural surrogate models, and a unified prediction interface. This aim was achieved: the work developed a physically motivated formulation of the problem, generated a COMSOL-based dataset, implemented a service-oriented prediction prototype, and compared several model routes under one common input--output contract.
 
-The theoretical part (Chapters~1 and~2) established the physical
-and mathematical setting. Rocks were treated as locally homogeneous
-isotropic linear thermoelastic media with effective parameters drawn
-from the canonical material table of the thesis. The coupled
-heat--momentum system, the thermal expansion coefficient $\alpha$, and
-the thermoelastic coupling $\gamma = 3K\alpha$ provided the
-constitutive backbone reused by every later chapter. Directional
-quantities were defined through the source--probe geometry without
-requiring a full three-dimensional field solution.
+The theoretical part established the physical and mathematical basis of the study. Geological media were treated as effective locally homogeneous thermoelastic materials while preserving the important interpretation that real rocks are heterogeneous, porous, fractured, layered, and often anisotropic. The mathematical formulation introduced temperature, displacement, strain, stress, material parameters, thermoelastic coupling, and source--probe directional quantities. These definitions made it possible to move from a purely physical description to a structured prediction task.
 
-The methodological and implementation part (Chapters~3--6) described
-the comparative prediction methodology, the COMSOL setup that
-produced the per-rock 2D datasets, the system implementation, and the
-four surrogate architectures. A v2 API contract was frozen and implemented
-end-to-end: every request now collapses to four user-facing fields
-(model, medium identifier, source/probe geometry, observation time),
-and every model service returns a normalised response with the same
-physical layout (temperature, displacement components, displacement
-magnitude, directional geometry, predicted travel time, plus
-diagnostics). Training-data invariants (reference temperature
-$273.15$~K, source temperature $1500$~K, domain $1\,\text{m}\times
-1\,\text{m}$, no source frequency) are locked server-side so clients
-cannot push the trained models out of distribution.
+The practical part implemented this task as a research prototype. The backend acts as an orchestration layer, enriches requests with material properties, routes them to selected model services, and returns normalized prediction outputs. The frontend provides an interface for configuring scenarios and visualizing responses. The comparison included a physics-informed PINN baseline and three additional predictive components: FNO, MeshGraphNet, and a Transformer-style model. The PINN is the only route that explicitly includes thermoelastic residuals derived from the governing equations; the other routes use physically meaningful inputs and outputs but do not enforce the full thermoelastic PDE system in the same way.
 
-The empirical part (Chapter~7) compared the four routes on a balanced
-sweep of $40$ scenarios per material across four rocks (sandstone,
-limestone, basalt, granite) under one experimental protocol. The
-measurement script used for the accuracy and latency comparison is
-provided in Appendix~\ref{app:accuracy-latency}. The main quantitative
-findings are:
+The experimental results showed that a unified prediction contract is useful for comparing different model families fairly. PINN provided the most physically consistent travel-time behavior relative to the analytical body-wave reference, while the other routes demonstrated different trade-offs in latency, architecture, calibration, and output stability. These results should be interpreted as prototype-level comparative indicators rather than field-validated geophysical measurements.
 
-\begin{itemize}
-\item
-PINN is the only route whose predicted travel time agrees with the
-analytical body-wave reference $t_{\mathrm{gt}} = \lVert x_p - x_s
-\rVert / V_p$ in every scenario (median relative error $2\,\%$,
-$100\,\%$ of scenarios within the $10\,\%$ band).
-\item
-The Transformer-style operator is the fastest route by per-call
-latency ($\sim 1.3$~ms median) and is the most material-sensitive on
-the temperature output, but its absolute travel-time prediction is
-already outside the $10\,\%$ band (median relative error $\sim 29\,\%$).
-\item
-MeshGraphNet runs the trained rollout in the current deployment, but
-its travel-time scale is dominated by the rollout horizon rather than
-by the requested observation time. It is recommended as a graph-based
-surrogate candidate, not as a standalone physical predictor.
-\item
-The Fourier neural operator passes the structural sanity tests (it
-returns a value of the right type for every request) but its
-displacement and temperature magnitudes in the current iteration are
-many orders of magnitude away from the physically meaningful range.
-This is traced to output denormalisation against
-$\sigma_T = 0.017$~K training statistics; the implementation task is
-to retrain with stable normalisation rather than to discard the
-architecture.
-\item
-Only PINN produces a smooth time-dependent trace at the probe.
-FNO, MeshGraphNet and the Transformer operator behave as fixed-horizon
-operators on the trained scenarios: their predictions are
-approximately constant across the requested observation time. This is
-an architectural property surfaced honestly by the comparison
-framework, not a plotting artefact.
-\end{itemize}
+The work also has clear limitations. The simulations use an idealized COMSOL setup rather than real field data. The material catalog contains effective representative values rather than site-specific laboratory measurements. The implemented experiments are mainly two-dimensional, and some model routes require further calibration or retraining before they can be treated as reliable predictors.
 
-Taken together, these findings answer the central question of the
-thesis: \emph{can a unified AI-assisted prediction contract
-meaningfully compare physics-informed and data-driven surrogates for
-directional thermoelastic prediction in geological media?} The
-answer is positive. The v2 contract holds the four routes to the same
-input description and the same output schema, so the differences seen
-in the results are properties of the architectures, not of the
-interface. Within this comparison, the physics-informed route is the
-most accurate for the body-wave reference, the operator-learning
-routes are faster and more flexible, and the gaps between them are
-well defined.
-
-The work has several limitations that should be made explicit at the
-defence. The training corpus is a controlled COMSOL dataset, not a
-field-validated geological dataset, so the absolute numerical values
-should be read as comparative indicators rather than as engineering
-predictions. The COMSOL setup itself is a simplified rod-in-rock
-geometry, not a full subsurface model. The catalog uses midpoint
-literature parameters, not site-measured values. Six of the ten
-materials in the v2 catalog have no thermal expansion coefficient in
-the source CSV and are therefore gated off from thermoelastic
-prediction by design. The FNO calibration problem identified in
-Chapter~7 requires a retraining pass that is out of scope for the
-present iteration. MeshGraphNet was loaded against a 2D dataset
-padded to match a 3D checkpoint; absolute magnitudes there inherit
-the cost of that mismatch.
-
-Directions for future work follow naturally from these limitations.
-Retrain FNO with checkpoint-consistent normalisation. Train
-MeshGraphNet directly on the 2D rod datasets used in this thesis
-rather than reusing the 3D checkpoint. Extend the catalog with
-laboratory-measured thermal expansion coefficients so that more rocks
-become thermoelastic-supported. Add a low-cost analytical Green's
-tensor baseline alongside the analytical $r/V_p$ reference for a
-richer accuracy comparison. Once the four routes converge on the
-same calibrated output range, the comparison can move from
-\emph{which route is physically consistent} to \emph{which route
-generalises across geological materials it has not seen in training}.
-
-The practical software prototype implemented in this thesis is not a
-field-validated thermoelastic simulator and was not designed to
-replace classical numerical solvers. It is a research MVP that
-demonstrates a normalised contract, a working four-route comparison,
-and an honest visualisation of where physics-informed and data-driven
-surrogates currently differ for directional thermoelastic prediction
-in geological media. Given the limitations described above and the future work outlined, the prototype provides a reproducible basis for the ongoing research of AI-assisted prediction in geophysics
+For future work, it is recommended to expand the material catalog with measured thermoelastic parameters, retrain and calibrate the data-driven models on consistent two-dimensional datasets, and validate the framework against additional analytical, numerical, or laboratory references. Overall, the thesis provides a reproducible prototype and a physically grounded basis for further research on AI-assisted thermoelastic prediction in geological media.
