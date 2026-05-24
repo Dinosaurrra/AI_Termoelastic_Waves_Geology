@@ -1,0 +1,28 @@
+% annotation_counts.tex
+% Supplies annotation statistics while the final page count remains blank.
+
+\newcounter{annotationmetric}
+\let\annotationnormalrule\rule
+\newcommand{\annotationmetricrule}[2]{%
+  \stepcounter{annotationmetric}%
+  \ifcase\value{annotationmetric}%
+    \annotationnormalrule{#1}{#2}%
+  \or \annotationnormalrule{#1}{#2}% pages, Kazakh
+  \or 9% tables, Kazakh
+  \or 27% illustrations, Kazakh
+  \or 27% references, Kazakh
+  \or \annotationnormalrule{#1}{#2}% pages, Russian
+  \or 9% tables, Russian
+  \or 27% illustrations, Russian
+  \or 27% references, Russian
+  \or \annotationnormalrule{#1}{#2}% pages, English
+  \or 9% tables, English
+  \or 27% illustrations, English
+  \or 27% references, English
+  \else \annotationnormalrule{#1}{#2}%
+  \fi
+}
+
+\renewcommand{\rule}[2]{\annotationmetricrule{#1}{#2}}
+\input{annotations.tex}
+\let\rule\annotationnormalrule
