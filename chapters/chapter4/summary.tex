@@ -1,0 +1,5 @@
+\subsection{Summary of Chapter 4}
+
+This chapter described the COMSOL Multiphysics simulation used to generate a controlled synthetic dataset for thermoelastic wave propagation in geological media. The simulation represented a two-dimensional rock domain with a heated rod acting as a localized thermal source. The resulting temperature contrast produced heat conduction, thermal expansion, stress formation, displacement, and wave-like mechanical response.
+
+The chapter also explained how the raw COMSOL outputs were converted into a machine-learning-ready dataset. Temperature, displacement, velocity, stress, strain, material parameters, coordinates, and mesh information were exported, cleaned, aligned, normalized, and stored in a common structure suitable for different surrogate models. The limitations of this setup were stated explicitly: the dataset is synthetic, mesh- and time-step-dependent, and represents an idealized two-dimensional scenario rather than a direct field measurement.
