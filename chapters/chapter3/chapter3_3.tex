@@ -1,6 +1,6 @@
 \subsection{Input and Output Variables}
 
-The input variables are selected from the physical fields, material parameters, and directional quantities defined in Chapter 3. They describe the geological material, the thermal-mechanical state, and the source--probe geometry. A compact input vector may be written conceptually as
+The input variables are selected from the physical fields, material parameters, and directional quantities defined in Chapter 2. They describe the geological material, the thermal-mechanical state, and the source--probe geometry. A compact input vector may be written conceptually as
 \begin{equation}
 X
 =
@@ -13,7 +13,7 @@ where \(m\) denotes the material type, \(\rho\) is density, \(E\), \(\nu\), \(\m
 
 The material type identifies the geological medium being considered. In this thesis, representative media such as sandstone, basalt, granite, and limestone are interpreted through effective material parameters. The material label itself is useful for organizing the comparison, while the numerical parameters provide the physical quantities used in the formulation. This distinction is important because two samples with the same lithological name may still differ in density, stiffness, porosity, thermal conductivity, or heat capacity.
 
-The elastic parameters describe the mechanical response of the medium. Density controls inertia, while the elastic moduli determine how strain produces stress and how mechanical disturbances propagate. Young's modulus and Poisson's ratio may be used as primary parameters, while the shear modulus, bulk modulus, and Lamé parameter can be derived for the isotropic approximation. These parameters are directly related to wave propagation because they determine the stiffness-to-density ratio controlling elastic wave speeds.
+The elastic parameters describe the mechanical response of the medium. Density controls inertia, while the elastic moduli determine how strain produces stress and how mechanical disturbances propagate. Young's modulus and Poisson's ratio may be used as primary parameters, while the shear modulus, bulk modulus, and Lame parameter can be derived for the isotropic approximation. These parameters are directly related to wave propagation because they determine the stiffness-to-density ratio controlling elastic wave speeds.
 
 The thermal parameters describe heat transfer, heat storage, and thermal-mechanical coupling. The temperature field \(T\) and perturbation \(\theta\) represent the thermal state of the medium. Thermal conductivity \(k\) controls the rate of heat conduction, while \(C_p\) and \(C=\rho C_p\) describe heat storage. The coefficient of thermal expansion \(\alpha\) determines how temperature change produces thermal strain, and the coupling coefficient \(\gamma=3K\alpha\) connects temperature perturbation with thermal stress in the thermoelastic constitutive relation.
 
