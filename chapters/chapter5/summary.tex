@@ -1,0 +1,7 @@
+\subsection{Summary of Chapter 5}
+
+This chapter described the implementation architecture used to realize the directional thermoelastic prediction methodology. The prototype is organized around a backend orchestrator, a web-facing interface contract, a geological material catalog, and separate predictive routes for PINN, FNO, MeshGraphNet, and the Transformer-style operator. This structure makes it possible to compare different model families under one consistent physical input description.
+
+The chapter also clarified the responsibility of each component. The backend validates and enriches prediction requests, resolves material presets, routes the request to the selected model service, and normalizes the response. The predictive routes are not treated as physically equivalent solvers: PINN is the explicitly physics-informed baseline, while FNO, MeshGraphNet, and the Transformer-style route are data-driven or architecture-driven surrogate components with different assumptions and limitations.
+
+The main conclusion of this chapter is that the implementation provides a reproducible research prototype rather than a field-validated industrial simulator. Its strengths are modularity, common request and response handling, explicit material parameters, and transparent model comparison. Its limitations are the simplified two-dimensional setup, starter material presets, different depths of physical enforcement across models, and the need to interpret fallback-capable or weakly calibrated routes carefully.
