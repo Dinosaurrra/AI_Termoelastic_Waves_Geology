@@ -81,6 +81,28 @@
 \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
 \numberwithin{equation}{section}
 
+% --- Table of contents formatting. ---
+\usepackage{tocloft}
+\renewcommand{\cfttoctitlefont}{\hfill\normalfont\normalsize}
+\renewcommand{\cftaftertoctitle}{\hfill}
+\setlength{\cftbeforetoctitleskip}{0pt}
+\setlength{\cftaftertoctitleskip}{\baselineskip}
+\renewcommand{\cftsecfont}{\normalfont}
+\renewcommand{\cftsecpagefont}{\normalfont}
+\renewcommand{\cftsubsecfont}{\normalfont}
+\renewcommand{\cftsubsecpagefont}{\normalfont}
+\renewcommand{\cftsubsubsecfont}{\normalfont}
+\renewcommand{\cftsubsubsecpagefont}{\normalfont}
+\renewcommand{\cftsecleader}{\hfill}
+\renewcommand{\cftsubsecleader}{\hfill}
+\renewcommand{\cftsubsubsecleader}{\hfill}
+\setlength{\cftbeforesecskip}{0pt}
+\setlength{\cftbeforesubsecskip}{0pt}
+\setlength{\cftbeforesubsubsecskip}{0pt}
+\cftsetindents{section}{0pt}{1.2cm}
+\cftsetindents{subsection}{1.0cm}{1.4cm}
+\cftsetindents{subsubsection}{2.0cm}{1.8cm}
+
 % --- IEEE-style numeric citations. ---
 \usepackage{cite}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
