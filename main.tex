@@ -58,8 +58,13 @@
 \pgfplotsset{compat=1.18}
 
 % --- Captions per MM-04 §7.21 (figures) and §7.24 (tables) ---
+\usepackage{xstring}
 \usepackage{caption}
-\captionsetup[figure]{name=Figure,labelsep=endash,justification=centering,singlelinecheck=false,font=normalsize,skip=0.5\baselineskip}
+\newcommand{\thesisstripcaptionperiod}[1]{%
+  \IfEndWith{#1}{.}{\StrGobbleRight{#1}{1}}{#1}%
+}
+\DeclareCaptionFormat{thesisfigure}{#1#2\thesisstripcaptionperiod{#3}\par}
+\captionsetup[figure]{name=Figure,labelsep=endash,format=thesisfigure,justification=centering,singlelinecheck=false,font=normalsize,skip=0.5\baselineskip}
 \captionsetup[table]{name=Table,labelsep=endash,justification=raggedright,singlelinecheck=false,font=normalsize,position=above,skip=0.5\baselineskip,belowskip=0.5\baselineskip,indention=\parindent}
 \renewcommand{\thefigure}{\arabic{figure}}
 \renewcommand{\thetable}{\arabic{table}}
