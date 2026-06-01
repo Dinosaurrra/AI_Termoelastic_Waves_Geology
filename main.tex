@@ -60,7 +60,6 @@
 % --- Captions per MM-04 §7.21 (figures) and §7.24 (tables) ---
 \usepackage{xstring}
 \usepackage{caption}
-\usepackage{etoolbox}
 \newcommand{\thesisstripcaptionperiod}[1]{%
   \IfEndWith{#1}{.}{\StrGobbleRight{#1}{1}}{#1}%
 }
@@ -68,17 +67,6 @@
 \DeclareCaptionFormat{thesistable}{\hspace*{\parindent}#1#2#3\par}
 \captionsetup[figure]{name=Figure,labelsep=endash,format=thesisfigure,justification=centering,singlelinecheck=false,font=normalsize,skip=0.5\baselineskip}
 \captionsetup[table]{name=Table,labelsep=endash,format=thesistable,justification=raggedright,singlelinecheck=false,font=normalsize,position=above,skip=\baselineskip,belowskip=0.5\baselineskip,margin=0pt}
-\makeatletter
-\AtBeginEnvironment{table}{%
-  \let\thesis@originalcaption\caption
-  \renewcommand{\caption}[2][]{%
-    \refstepcounter{table}%
-    \addcontentsline{lot}{table}{\protect\numberline{\thetable}{##2}}%
-    \par\noindent\hspace*{\parindent}Table~\thetable\ -- ##2\par\vspace{\baselineskip}%
-  }%
-}
-\AtEndEnvironment{table}{\let\caption\thesis@originalcaption}
-\makeatother
 \renewcommand{\thefigure}{\arabic{figure}}
 \renewcommand{\thetable}{\arabic{table}}
 
