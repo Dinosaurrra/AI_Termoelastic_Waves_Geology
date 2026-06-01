@@ -43,6 +43,13 @@
 \makeatother
 
 \renewcommand{\rule}[2]{\annotationmetricrule{#1}{#2}}
+\begingroup
+\sloppy
+\tolerance=3000
+\emergencystretch=8em
+\hyphenpenalty=50
+\exhyphenpenalty=50
 \input{annotations.tex}
+\endgroup
 \let\rule\annotationnormalrule
 \let\textbf\annotationnormaltextbf
