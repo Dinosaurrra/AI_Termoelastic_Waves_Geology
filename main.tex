@@ -102,6 +102,12 @@
 \cftsetindents{section}{0pt}{2.0cm}
 \cftsetindents{subsection}{0pt}{2.0cm}
 \cftsetindents{subsubsection}{0pt}{2.0cm}
+\makeatletter
+\let\thesis@toc@section\l@section
+\renewcommand{\l@section}[2]{%
+  \thesis@toc@section{\MakeUppercase{#1}}{#2}%
+}
+\makeatother
 
 % --- IEEE-style numeric citations. ---
 \usepackage{cite}
