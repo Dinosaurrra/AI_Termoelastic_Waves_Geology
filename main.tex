@@ -64,11 +64,9 @@
   \IfEndWith{#1}{.}{\StrGobbleRight{#1}{1}}{#1}%
 }
 \DeclareCaptionFormat{thesisfigure}{#1#2\thesisstripcaptionperiod{#3}\par}
+\DeclareCaptionFormat{thesistable}{\makebox[\parindent][l]{}#1#2#3\par\vspace{\baselineskip}}
 \captionsetup[figure]{name=Figure,labelsep=endash,format=thesisfigure,justification=centering,singlelinecheck=false,font=normalsize,skip=0.5\baselineskip}
-\captionsetup[table]{name=Table,labelsep=endash,justification=raggedright,singlelinecheck=false,font=normalsize,position=above,skip=\baselineskip,belowskip=\baselineskip,margin=0pt}
-\makeatletter
-\renewcommand{\fnum@table}{\hspace*{\parindent}\tablename~\thetable}
-\makeatother
+\captionsetup[table]{name=Table,labelsep=endash,format=thesistable,justification=raggedright,singlelinecheck=false,font=normalsize,position=above,skip=0pt,belowskip=0pt,margin=0pt}
 \renewcommand{\thefigure}{\arabic{figure}}
 \renewcommand{\thetable}{\arabic{table}}
 
