@@ -49,6 +49,7 @@
 \usepackage{hhline}
 \usepackage{float}
 \usepackage{flafter}
+\usepackage{etoolbox}
 \setlength{\intextsep}{\baselineskip}
 \setlength{\textfloatsep}{\baselineskip}
 \setlength{\floatsep}{\baselineskip}
@@ -69,6 +70,17 @@
 \captionsetup[table]{name=Table,labelsep=endash,format=thesistable,justification=raggedright,singlelinecheck=false,font=normalsize,position=above,skip=0pt,belowskip=0pt,margin=0pt}
 \renewcommand{\thefigure}{\arabic{figure}}
 \renewcommand{\thetable}{\arabic{table}}
+
+% Add left and right borders to tabulars used inside floating tables only.
+\makeatletter
+\let\thesis@tabular\tabular
+\let\endthesis@tabular\endtabular
+\newenvironment{thesisborderedtabular}[1]{\thesis@tabular{|#1|}}{\endthesis@tabular}
+\AtBeginEnvironment{table}{%
+  \let\tabular\thesisborderedtabular
+  \let\endtabular\endthesisborderedtabular
+}
+\makeatother
 
 % --- Section headings: UPPERCASE per MM-04 §7.10; subsection numbers
 %     without trailing dot per §7.16 ---
