@@ -23,6 +23,26 @@
   \fi
 }
 
+\makeatletter
+\let\annotationnormaltextbf\textbf
+\def\annotationkazkeywords{Кілт сөздер:}
+\def\annotationruskeywords{Перечень ключевых слов:}
+\def\annotationengkeywords{Keywords:}
+\def\annotationlowerkeywords#1.{\MakeLowercase{#1}.}
+\renewcommand{\textbf}[1]{%
+  \def\annotationcurrentlabel{#1}%
+  \annotationnormaltextbf{#1}%
+  \ifx\annotationcurrentlabel\annotationkazkeywords
+    \expandafter\annotationlowerkeywords
+  \else\ifx\annotationcurrentlabel\annotationruskeywords
+    \expandafter\annotationlowerkeywords
+  \else\ifx\annotationcurrentlabel\annotationengkeywords
+    \expandafter\annotationlowerkeywords
+  \fi\fi\fi
+}
+\makeatother
+
 \renewcommand{\rule}[2]{\annotationmetricrule{#1}{#2}}
 \input{annotations.tex}
 \let\rule\annotationnormalrule
+\let\textbf\annotationnormaltextbf
