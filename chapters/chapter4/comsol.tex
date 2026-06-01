@@ -6,12 +6,12 @@ The purpose of the COMSOL Multiphysics simulation was to generate a controlled s
 
 The required dataset had to contain not only temperature values, but also displacement, velocity, stress, strain, material parameters, spatial coordinates, and mesh information. These quantities are difficult to obtain experimentally at every spatial point and every time step. In contrast, a numerical multiphysics model allows all required physical fields to be extracted consistently from the same simulation.
 
-In the process of searching for programs, the programs Ansys, Nvidia Omniverse, Comsol Multiphysics were found. Ansys was considered as a powerful finite element analysis platform, but the construction of a repeatable data-generation pipeline required more computational resources and a more complex workflow. Nvidia Omniverse was also considered for visualization purposes; however, the main goal of this work was not only to visualize the process, but also to export numerical fields for further processing. Comsol Multiphysics was selected because it supports coupled thermo-mechanical analysis, finite element discretization, time-dependent studies, material assignment, boundary condition configuration, visualization, and structured export of simulation data. Also, when configuring Comsol, it turned out to be more accessible in the absence of computing capabilities.
+In the process of searching for programs, the programs Ansys, Nvidia Omniverse, Comsol Multiphysics were found. Ansys was considered as a powerful finite element analysis platform, but the construction of a repeatable data-generation pipeline required more computational resources and a more complex workflow. Nvidia Omniverse was also considered for visualization purposes; however, the main goal of this work was not only to visualize the process, but also to export numerical fields for further processing. Comsol Multiphysics was selected because it supports coupled thermo-mechanical analysis, finite element discretization, time-dependent studies, material assignment, boundary condition configuration, visualization, and structured export of simulation data (Figure~\ref{fig:comsol_interface}). Also, when configuring Comsol, it turned out to be more accessible in the absence of computing capabilities.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{chapters/chapter4/comsol_interface.png}
-\caption{COMSOL Multiphysics interface used for creating the thermoelastic simulation.}
+\caption{COMSOL Multiphysics interface used for creating the thermoelastic simulation}
 \label{fig:comsol_interface}
 \end{figure}
 
@@ -70,7 +70,7 @@ The Temperature Coupling feature transferred the computed temperature field from
 Time Dependent Study.
 The Time Dependent Study was used to solve the coupled thermoelastic problem over a sequence of time steps. It generated time-dependent temperature, displacement, stress and strain fields. These r sults were later exported and used for synthetic dataset generation.
 
-This model structure is important because the final dataset is not generated from independent physical fields. Temperature, displacement, stress, and strain are obtained from the same coupled solution, which makes the exported data physically consistent.
+This model structure is important because the final dataset is not generated from independent physical fields. Temperature, displacement, stress, and strain are obtained from the same coupled solution, which makes the exported data physically consistent (Figure~\ref{fig:comsol_model_tree}).
 
 \begin{figure}[H]
 \centering
@@ -118,7 +118,7 @@ The main parameters of the experiment are presented in Table~\ref{tab:heated_rod
 
 \begin{table}[H]
 \centering
-\caption{Main parameters of the heated rod thermoelastic experiment.}
+\caption{Main parameters of the heated rod thermoelastic experiment}
 \label{tab:heated_rod_experiment_parameters}
 \begin{tabular}{p{0.35\textwidth} p{0.25\textwidth} p{0.25\textwidth}}
 \hline
@@ -229,7 +229,7 @@ The material parameters define how heat propagates through the medium and how th
 
 \begin{table}[H]
 \centering
-\caption{Main material parameters used in the thermoelastic simulation.}
+\caption{Main material parameters used in the thermoelastic simulation}
 \label{tab:comsol_material_parameters}
 \begin{tabular}{p{0.26\textwidth} p{0.16\textwidth} p{0.48\textwidth}}
 \hline
@@ -289,7 +289,7 @@ The exported COMSOL groups are summarized in Table~\ref{tab:comsol_export_groups
 
 \begin{table}[H]
 \centering
-\caption{Exported COMSOL data groups used for dataset construction.}
+\caption{Exported COMSOL data groups used for dataset construction}
 \label{tab:comsol_export_groups}
 \begin{tabular}{p{0.24\textwidth} p{0.34\textwidth} p{0.32\textwidth}}
 \hline
@@ -434,7 +434,7 @@ The most important processed artifacts are summarized in Table~\ref{tab:processe
 
 \begin{table}[H]
 \centering
-\caption{Processed dataset artifacts produced from COMSOL exports.}
+\caption{Processed dataset artifacts produced from COMSOL exports}
 \label{tab:processed_dataset_artifacts}
 \begin{tabular}{p{0.32\textwidth} p{0.58\textwidth}}
 \hline
@@ -476,35 +476,35 @@ Thus, the preprocessing stage converts heterogeneous COMSOL outputs into a commo
 
 Visualization was used to check whether the simulation behaved physically correctly before using the exported data. The most important checks were the geometry, mesh quality, temperature propagation, and stress distribution.
 
-The temperature field was inspected to verify that heat propagates from the heated rod into the surrounding rock. This check is important because an incorrect material assignment, wrong thermal contact, or incorrect boundary condition can prevent heat from entering the rock domain.
+The temperature field was inspected to verify that heat propagates from the heated rod into the surrounding rock (Figure~\ref{fig:comsol_temperature}). This check is important because an incorrect material assignment, wrong thermal contact, or incorrect boundary condition can prevent heat from entering the rock domain.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{chapters/chapter4/temperature.png}
-\caption{Temperature distribution in the rock caused by the heated rod.}
+\caption{Temperature distribution in the rock caused by the heated rod}
 \label{fig:comsol_temperature}
 \end{figure}
 
-The stress field was inspected to verify that the non-uniform temperature distribution creates a mechanical response. Regions close to the rod are expected to show stronger stress because they experience the highest thermal gradients and strongest local expansion.
+The stress field was inspected to verify that the non-uniform temperature distribution creates a mechanical response (Figures~\ref{fig:comsol_stress_beginning}--\ref{fig:comsol_stress_end}). Regions close to the rod are expected to show stronger stress because they experience the highest thermal gradients and strongest local expansion.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{chapters/chapter4/stress_1.png}
-\caption{Stress distribution at the beginning of the thermoelastic response.}
+\caption{Stress distribution at the beginning of the thermoelastic response}
 \label{fig:comsol_stress_beginning}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{chapters/chapter4/stress_2.png}
-\caption{Stress distribution during the intermediate stage of the simulation.}
+\caption{Stress distribution during the intermediate stage of the simulation}
 \label{fig:comsol_stress_middle}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{chapters/chapter4/stress_3.png}
-\caption{Stress distribution at the later stage of the simulation.}
+\caption{Stress distribution at the later stage of the simulation}
 \label{fig:comsol_stress_end}
 \end{figure}
 
