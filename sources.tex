@@ -3,16 +3,29 @@
 \renewcommand{\refname}{\normalfont REFERENCES}
 \addcontentsline{toc}{section}{\texorpdfstring{\protect\numberline{}REFERENCES}{REFERENCES}}
 
+\makeatletter
+\renewenvironment{thebibliography}[1]
+  {\section*{\refname}%
+   \list{\@biblabel{\@arabic\c@enumiv}}{%
+     \usecounter{enumiv}%
+     \let\p@enumiv\@empty
+     \renewcommand{\theenumiv}{\@arabic\c@enumiv}%
+     \setlength{\leftmargin}{0pt}%
+     \setlength{\rightmargin}{0pt}%
+     \setlength{\labelwidth}{0pt}%
+     \setlength{\labelsep}{0pt}%
+     \setlength{\itemindent}{1.25cm}%
+     \setlength{\listparindent}{0pt}%
+     \setlength{\itemsep}{0pt}%
+     \setlength{\parsep}{0pt}%
+     \setlength{\topsep}{0pt}%
+     \renewcommand{\makelabel}[1]{##1\hspace{0.5em}}%
+   }%
+   \sloppy\clubpenalty4000\widowpenalty4000\sfcode`\.\@m}
+  {\def\@noitemerr{\@latex@warning{Empty `thebibliography' environment}}\endlist}
+\makeatother
+
 \begin{thebibliography}{99}
-\setlength{\leftmargin}{0pt}
-\setlength{\labelwidth}{0pt}
-\setlength{\labelsep}{0pt}
-\setlength{\itemindent}{1.25cm}
-\setlength{\listparindent}{0pt}
-\setlength{\itemsep}{0pt}
-\setlength{\parsep}{0pt}
-\setlength{\parskip}{0pt}
-\renewcommand{\makelabel}[1]{#1\hspace{0.5em}}
 
 \bibitem{mavko2009}
 G. Mavko, T. Mukerji, and J. Dvorkin,
