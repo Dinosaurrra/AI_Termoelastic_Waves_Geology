@@ -110,18 +110,18 @@
   {}
 
 % После section — 1 пустая строка
-\titlespacing*{\section}
+\titlespacing{\section}
   {\parindent}
   {0pt}
   {1\baselineskip}
 
 % Обычные subsection: до заголовка 2 строки, после заголовка 1 строка
-\titlespacing*{\subsection}
+\titlespacing{\subsection}
   {\parindent}
   {2\baselineskip}
   {1\baselineskip}
 
-\titlespacing*{\subsubsection}
+\titlespacing{\subsubsection}
   {\parindent}
   {2\baselineskip}
   {1\baselineskip}
@@ -131,7 +131,7 @@
 % потому что section уже дал 1 пустую строку.
 \newcommand{\firstsubsection}[1]{%
   {%
-    \titlespacing*{\subsection}
+    \titlespacing{\subsection}
       {\parindent}
       {0pt}
       {1\baselineskip}%
