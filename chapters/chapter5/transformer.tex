@@ -89,20 +89,45 @@ construction discretisation-invariant (Figure~\ref{fig:transformer-tokens}).
 \node[below=2mm of i2] (idots) {\(\vdots\)};
 \node[itok, below=2mm of idots] (iN) {\(a_{N_{\mathrm{in}}} = (x_{N_{\mathrm{in}}},\;\ldots)\)};
 
-\node[draw=black!50, dashed, fit=(i1) (iN), inner sep=4mm, label=above:{Input set (mesh nodes, ground-truth state at \(t=0\))}] (inset) {};
+\node[
+  draw=black!50,
+  dashed,
+  fit=(i1) (iN),
+  inner sep=4mm
+] (inset) {};
+
+\node[
+  anchor=south,
+  align=center,
+  text width=60mm,
+  font=\scriptsize
+] at ([yshift=1mm]inset.north)
+{Input set\\(mesh nodes, ground-truth state at \(t=0\))};
 
 \node[qtok, right=18mm of i1.east] (q1) {\(q_1 = (x_q^{(1)})\)};
 \node[qtok, below=of q1] (q2) {\(q_2 = (x_q^{(2)})\)};
 \node[below=2mm of q2] (qdots) {\(\vdots\)};
 \node[qtok, below=2mm of qdots] (qN) {\(q_{N_q} = (x_q^{(N_q)})\)};
 
-\node[draw=black!50, dashed, fit=(q1) (qN), inner sep=4mm, label=above:{Query set (arbitrary points)}] (qset) {};
+\node[
+  draw=black!50,
+  dashed,
+  fit=(q1) (qN),
+  inner sep=4mm
+] (qset) {};
+
+\node[
+  anchor=south,
+  align=center,
+  text width=38mm,
+  font=\scriptsize
+] at ([yshift=1mm]qset.north)
+{Query set\\(arbitrary points)};
 
 \end{tikzpicture}
 \caption{Tokenisation of the thermoelastic state}
 \label{fig:transformer-tokens}
 \end{figure}
-
 \subsection{Scaled dot-product attention}
 
 The basic operation in a Transformer is attention. Given a query
@@ -417,20 +442,46 @@ work.
 \begin{table}[ht]
 \centering
 \small
-\begin{tabular}{l l l}
-\toprule
-Architecture & Attention cost & Key idea \\
-\midrule
-Vanilla Transformer \cite{vaswani2017} & \(\mathcal{O}(N^2 d_m)\) & Softmax dot-product on sequences \\
-OFormer \cite{liNeuralOperator2023} & \(\mathcal{O}(N_{\mathrm{in}} N_q d_m)\) & Cross-attention from input set to query set \\
-Galerkin Transformer \cite{caoChooseTransformer2021} & \(\mathcal{O}(N d_m^2)\) & Softmax replaced by Galerkin-style linear attention \\
-Transolver \cite{wuTransolver2024} & \(\mathcal{O}(N M d_m)\) & Latent physics-aware slots with \(M\!\ll\!N\) \\
-\midrule
-This work & \(\mathcal{O}(N_{\mathrm{in}} N_q d_m)\) & OFormer baseline, \(N_{\mathrm{in}}\!=\!N_q\!=\!1024\) subsampling \\
-\bottomrule
-\end{tabular}
-\caption{Position of the Transformer-based neural operator among
-set-based operators}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.2}
+
+\begin{tabularx}{\dimexpr\textwidth-1cm\relax}{
+|>{\raggedright\arraybackslash}p{0.23\textwidth}
+|>{\raggedright\arraybackslash}p{0.24\textwidth}
+|>{\raggedright\arraybackslash}X|
+}
+\hline
+\textbf{Architecture} & \textbf{Attention cost} & \textbf{Key idea} \\
+\hline
+
+Vanilla Transformer \cite{vaswani2017}
+& \(\mathcal{O}(N^2 d_m)\)
+& Softmax dot-product on sequences \\
+\hline
+
+OFormer \cite{liNeuralOperator2023}
+& \(\mathcal{O}(N_{\mathrm{in}} N_q d_m)\)
+& Cross-attention from input set to query set \\
+\hline
+
+Galerkin Transformer \cite{caoChooseTransformer2021}
+& \(\mathcal{O}(N d_m^2)\)
+& Softmax replaced by Galerkin-style linear attention \\
+\hline
+
+Transolver \cite{wuTransolver2024}
+& \(\mathcal{O}(N M d_m)\)
+& Latent physics-aware slots with \(M\!\ll\!N\) \\
+\hline
+
+This work
+& \(\mathcal{O}(N_{\mathrm{in}} N_q d_m)\)
+& OFormer baseline, \(N_{\mathrm{in}}\!=\!N_q\!=\!1024\) subsampling \\
+\hline
+
+\end{tabularx}
+
+\caption{Position of the Transformer-based neural operator among set-based operators}
 \label{tab:transformer-variants}
 \end{table}
 

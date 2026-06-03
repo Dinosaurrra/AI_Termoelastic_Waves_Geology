@@ -27,38 +27,39 @@ Representative effective material parameters used in the formulation are summari
 
 \input{chapters/tables/combined_geological_media_parameters_compact.tex}
 
-\begin{table}[h]
+Each parameter in Table~\ref{tab:material_parameters} enters directly into the governing equations of thermoelasticity. Density appears in the equation of motion, elastic moduli determine how strain produces stress, thermal conductivity and heat capacity control the evolution of temperature, and the thermal expansion and coupling coefficients link the thermal field with mechanical stress. Thus, the effective material parameters provide the bridge between the geological character of the rock and the mathematical structure of the thermoelastic wave propagation problem.
+
+\begin{table}[H]
+\vspace*{-5mm}
 \centering
 \small
 \caption{Material parameters used in the thermoelastic formulation}
 \label{tab:material_parameters}
-\begin{tabular}{p{0.13\textwidth} p{0.25\textwidth} p{0.20\textwidth} p{0.32\textwidth}}
+\begin{tabular}{p{0.13\textwidth}|p{0.25\textwidth}|p{0.20\textwidth}|p{0.32\textwidth}}
 \hline
 Symbol & Meaning & Unit & Role in formulation \\
 \hline
 \(\rho\) & Density & \(\mathrm{kg\,m^{-3}}\) & Inertia in the equation of motion; affects wave velocity \\
-
+\hline
 \(E\) & Young's modulus & \(\mathrm{Pa}\) & Axial stiffness under tension or compression \\
-
+\hline
 \(\nu\) & Poisson's ratio & Dimensionless & Lateral deformation response; controls elastic relations \\
-
+\hline
 \(\mu\) or \(G\) & Shear modulus & \(\mathrm{Pa}\) & Shear stiffness; controls S-wave propagation \\
-
+\hline
 \(K\) & Bulk modulus & \(\mathrm{Pa}\) & Resistance to volume change; affects P-wave propagation \\
-
+\hline
 \(\lambda\) & Lamé parameter & \(\mathrm{Pa}\) & Appears in isotropic stress--strain relation \\
-
+\hline
 \(\alpha\) & Linear thermal expansion coefficient & \(\mathrm{K^{-1}}\) & Converts temperature change into thermal strain \\
-
+\hline
 \(k\) & Thermal conductivity & \(\mathrm{W\,m^{-1}\,K^{-1}}\) & Controls conductive heat transfer \\
-
+\hline
 \(C_p\) & Specific heat capacity & \(\mathrm{J\,kg^{-1}\,K^{-1}}\) & Heat storage per unit mass \\
-
+\hline
 \(C=\rho C_p\) & Volumetric heat capacity & \(\mathrm{J\,m^{-3}\,K^{-1}}\) & Heat storage per unit volume; appears in heat equation \\
-
+\hline
 \(\gamma\) & Thermoelastic coupling coefficient & \(\mathrm{Pa\,K^{-1}}\) & Links temperature perturbation with thermal stress and coupled heat equation \\
 \hline
 \end{tabular}
 \end{table}
-
-Each parameter in Table~\ref{tab:material_parameters} enters directly into the governing equations of thermoelasticity. Density appears in the equation of motion, elastic moduli determine how strain produces stress, thermal conductivity and heat capacity control the evolution of temperature, and the thermal expansion and coupling coefficients link the thermal field with mechanical stress. Thus, the effective material parameters provide the bridge between the geological character of the rock and the mathematical structure of the thermoelastic wave propagation problem.

@@ -82,20 +82,64 @@
 }
 \makeatother
 
-% --- Section headings: UPPERCASE per MM-04 §7.10; subsection numbers
-%     without trailing dot per §7.16 ---
+% --- Section headings ---
 \usepackage{titlesec}
-\titleformat{\section}
-  {\normalfont\normalsize\bfseries\MakeUppercase}{\thesection}{1em}{}
-\titleformat{name=\section,numberless}
-  {\normalfont\normalsize\bfseries\filcenter\MakeUppercase}{}{0pt}{}
-\titleformat{\subsection}
-  {\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
-\titleformat{\subsubsection}
-  {\normalfont\normalsize\itshape}{\thesubsubsection}{1em}{}
-\titlespacing{\section}{\parindent}{2\baselineskip}{2\baselineskip}
-\titlespacing{\subsection}{\parindent}{1\baselineskip}{0.5\baselineskip}
-\titlespacing{\subsubsection}{0.5\parindent}{0.5\baselineskip}{0.3\baselineskip}
+
+\titleformat{\section}[hang]
+  {\normalfont\normalsize\bfseries}
+  {\thesection}
+  {1em}
+  {\MakeUppercase}
+
+\titleformat{name=\section,numberless}[block]
+  {\normalfont\normalsize\bfseries\filcenter}
+  {}
+  {0pt}
+  {\MakeUppercase}
+
+\titleformat{\subsection}[hang]
+  {\normalfont\normalsize\bfseries}
+  {\thesubsection}
+  {1em}
+  {}
+
+\titleformat{\subsubsection}[hang]
+  {\normalfont\normalsize\bfseries}
+  {\thesubsubsection}
+  {1em}
+  {}
+
+% После section — 1 пустая строка
+\titlespacing*{\section}
+  {\parindent}
+  {0pt}
+  {1\baselineskip}
+
+% Обычные subsection: до заголовка 2 строки, после заголовка 1 строка
+\titlespacing*{\subsection}
+  {\parindent}
+  {2\baselineskip}
+  {1\baselineskip}
+
+\titlespacing*{\subsubsection}
+  {\parindent}
+  {2\baselineskip}
+  {1\baselineskip}
+
+% Первый subsection после section:
+% убирает дополнительные 2 строки перед subsection,
+% потому что section уже дал 1 пустую строку.
+\newcommand{\firstsubsection}[1]{%
+  {%
+    \titlespacing*{\subsection}
+      {\parindent}
+      {0pt}
+      {1\baselineskip}%
+    \subsection{#1}%
+  }%
+}
+
+  
 \renewcommand{\thesection}{\arabic{section}}
 \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
 \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
@@ -129,6 +173,10 @@
   \thesis@toc@section{\MakeUppercase{#1}}{#2}%
 }
 \makeatother
+
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{array}
 
 % --- IEEE-style numeric citations. ---
 \usepackage{cite}
@@ -178,10 +226,16 @@
 
 \clearpage
 
-\clearpage
+\pagenumbering{gobble}
+\pagestyle{empty}
+
 \renewcommand{\contentsname}{\hfill CONTENTS\hfill\mbox{}}
 \tableofcontents
+
 \clearpage
+\pagenumbering{arabic}
+\setcounter{page}{13}
+\pagestyle{plain}
 
 % Main introduction.
 \selectlanguage{english}

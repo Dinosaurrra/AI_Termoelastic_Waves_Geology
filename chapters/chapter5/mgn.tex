@@ -13,7 +13,6 @@ MeshGraphNet is more suitable for this task because it works directly with mesh-
 \begin{equation}
 \mathcal{G} = (\mathcal{V}, \mathcal{E})
 \end{equation}
-
 where \(\mathcal{G}\) is the graph representation of the computational mesh, \(\mathcal{V}\) is the set of graph nodes, and \(\mathcal{E}\) is the set of graph edges.
 
 In this representation, each node corresponds to a spatial point or finite-element-related location in the simulated geological medium. Edges describe local spatial relationships between neighboring nodes. This is physically meaningful because the temperature, displacement, velocity, stress, and strain at one point of the medium depend on the physical state of nearby regions.
@@ -29,7 +28,6 @@ X^{t},
 \mapsto
 \hat{Y}^{t+\Delta t}
 \end{equation}
-
 where \(f_{\theta}\) is the trainable MeshGraphNet model with parameters \(\theta\), \(X^{t}\) is the matrix of input node features at time \(t\), \(\mathcal{G}\) is the graph representation of the finite-element mesh, and \(\hat{Y}^{t+\Delta t}\) is the predicted matrix of physical fields at the next time step \(t+\Delta t\).
 
 This surrogate modelling approach is useful because inference with a trained neural network is usually much faster than running a full COMSOL simulation. Therefore, MeshGraphNet can be used for rapid prediction, visualization, comparison of scenarios, and further analysis of thermoelastic wave propagation in geological materials.
@@ -41,7 +39,6 @@ The COMSOL finite-element mesh is transformed into a graph structure. The graph 
 \begin{equation}
 \mathcal{G} = (\mathcal{V}, \mathcal{E})
 \end{equation}
-
 where \(\mathcal{G}\) is the mesh graph, \(\mathcal{V}\) is the set of nodes, and \(\mathcal{E}\) is the set of edges connecting neighboring nodes.
 
 The set of graph nodes is written as
@@ -49,7 +46,6 @@ The set of graph nodes is written as
 \begin{equation}
 \mathcal{V} = \{v_i\}_{i=1}^{N}
 \end{equation}
-
 where \(v_i\) is the \(i\)-th node of the graph, \(i\) is the node index, and \(N\) is the total number of nodes in the finite-element mesh.
 
 The set of graph edges is written as
@@ -57,7 +53,6 @@ The set of graph edges is written as
 \begin{equation}
 \mathcal{E} = \{(i,j)\}
 \end{equation}
-
 where \((i,j)\) is an edge between node \(i\) and node \(j\), and \(i\) and \(j\) are indices of neighboring nodes in the mesh.
 
 An edge \((i,j)\) means that there is a local physical connection between two neighboring parts of the medium. In the thermoelastic problem, this local connection is important because heat transfer, deformation, stress redistribution, and wave propagation are all governed by interactions between nearby spatial regions.
@@ -72,7 +67,6 @@ y_i \\
 z_i
 \end{bmatrix}
 \end{equation}
-
 where \(p_i\) is the position vector of node \(i\), and \(x_i\), \(y_i\), and \(z_i\) are the Cartesian coordinates of this node.
 
 The relative geometric vector for every edge \((i,j)\), is defined as
@@ -80,7 +74,6 @@ The relative geometric vector for every edge \((i,j)\), is defined as
 \begin{equation}
 r_{ij} = p_j - p_i
 \end{equation}
-
 where \(r_{ij}\) is the vector directed from node \(i\) to node \(j\), \(p_i\) is the coordinate vector of the source node, and \(p_j\) is the coordinate vector of the neighboring destination node.
 
 The length of the edge is computed as
@@ -88,7 +81,6 @@ The length of the edge is computed as
 \begin{equation}
 d_{ij} = \|r_{ij}\|_2
 \end{equation}
-
 where \(d_{ij}\) is the Euclidean distance between nodes \(i\) and \(j\), \(r_{ij}\) is the relative position vector, and \(\|\cdot\|_2\) denotes the Euclidean norm.
 
 The edge feature vector is then defined as
@@ -101,7 +93,6 @@ r_{ij} \\
 d_{ij}
 \end{bmatrix}
 \end{equation}
-
 where \(a_{ij}\) is the feature vector of edge \((i,j)\), \(r_{ij}\) describes the direction and relative displacement between neighboring nodes, and \(d_{ij}\) describes the distance between these nodes.
 
 This geometric edge representation is essential for the model. In a physical medium, the interaction between two points depends not only on their states, but also on their relative position and distance. For example, heat transfer between close nodes is usually stronger than between distant nodes, and the direction of mechanical disturbance is related to the geometry of the mesh.
@@ -119,7 +110,6 @@ s \\
 q_i^t
 \end{bmatrix}
 \end{equation}
-
 where \(x_i^t\) is the full input feature vector of node \(i\) at time \(t\), \(p_i\) is the coordinate vector of the node, \(m_i\) is the vector of material parameters, \(s\) is the vector of scenario parameters, and \(q_i^t\) is the dynamic physical state of the node at time \(t\).
 
 The vector \(m_i\) describes the local material properties of the geological medium. In the thermoelastic task, these properties may include density, heat capacity, thermal conductivity, Young's modulus, Poisson's ratio, and thermal expansion coefficient. These parameters are important because different rocks react differently to heating and mechanical disturbance.
@@ -143,7 +133,6 @@ v_i^t \\
 \varepsilon_{y,i}^t
 \end{bmatrix}
 \end{equation}
-
 where \(q_i^t\) is the physical state vector of node \(i\) at time \(t\), \(T_i^t\) is the temperature, \(u_i^t\) and \(v_i^t\) are the in-plane displacement components, \(\dot{u}_i^t\) and \(\dot{v}_i^t\) are velocity components, \(\sigma_{x,i}^t\), \(\sigma_{y,i}^t\), and \(\sigma_{xy,i}^t\) are the in-plane stress components, and \(\varepsilon_{x,i}^t\), \(\varepsilon_{y,i}^t\) are diagonal strain components under the plane-strain assumption.
 
 The temperature component \(T_i^t\) describes the thermal state of the medium at node \(i\). The displacement components \(u_i^t\) and \(v_i^t\) describe mechanical motion in the two in-plane directions; the velocity components \(\dot{u}_i^t\) and \(\dot{v}_i^t\) describe its rate. The stress components \(\sigma_{x,i}^t\), \(\sigma_{y,i}^t\), and \(\sigma_{xy,i}^t\) describe internal mechanical forces; the strain components \(\varepsilon_{x,i}^t\) and \(\varepsilon_{y,i}^t\) describe local deformation.
@@ -160,7 +149,6 @@ X^{t}
 (x_N^t)^{\top}
 \end{bmatrix}
 \end{equation}
-
 where \(X^{t}\) is the full node feature matrix at time \(t\), \(x_i^t\) is the input feature vector of node \(i\), and \(N\) is the total number of nodes in the graph.
 
 The target matrix can be written as
@@ -175,7 +163,6 @@ Y^{t+\Delta t}
 (y_N^{t+\Delta t})^{\top}
 \end{bmatrix}
 \end{equation}
-
 where \(Y^{t+\Delta t}\) is the target matrix at the next time step, \(y_i^{t+\Delta t}\) is the target physical field vector for node \(i\), \(N\) is the total number of nodes, and \(\Delta t\) is the time interval between the current and predicted states.
 
 \subsection{Prediction Target}
@@ -193,7 +180,6 @@ x_i^t,
 \mathcal{G}
 \right)
 \end{equation}
-
 where \(\hat{y}_i^{t+\Delta t}\) is the predicted output vector for node \(i\) at time \(t+\Delta t\), \(f_{\theta}\) is the trainable ConditionalMeshGraphNet model, \(\theta\) denotes all trainable parameters of the model, \(x_i^t\) is the input feature vector of node \(i\) at time \(t\), \(\mathcal{G}\) is the graph representation of the COMSOL mesh, and \(\Delta t\) is the time interval between the current and predicted states.
 
 For the whole graph, the model prediction can be written as
@@ -207,7 +193,6 @@ X^{t},
 \mathcal{G}
 \right)
 \end{equation}
-
 where \(\hat{Y}^{t+\Delta t}\) is the predicted matrix of physical fields for all graph nodes at time \(t+\Delta t\), \(X^{t}\) is the input node feature matrix at time \(t\), \(f_{\theta}\) is the neural network surrogate model, and \(\mathcal{G}\) is the graph structure of the finite-element mesh.
 
 The output matrix has the following form:
@@ -222,7 +207,6 @@ The output matrix has the following form:
 (\hat{y}_N^{t+\Delta t})^{\top}
 \end{bmatrix}
 \end{equation}
-
 where \(\hat{Y}^{t+\Delta t}\) is the full predicted output matrix, \(\hat{y}_i^{t+\Delta t}\) is the predicted physical field vector for node \(i\), and \(N\) is the total number of graph nodes.
 
 The model can be trained in two main target modes. In the first mode, the model directly predicts the absolute physical state at the next time step:
@@ -236,7 +220,6 @@ x_i^t,
 \mathcal{G}
 \right)
 \end{equation}
-
 where \(\hat{q}_i^{t+\Delta t}\) is the predicted physical state of node \(i\) at time \(t+\Delta t\), \(f_{\theta}\) is the trainable graph neural network, \(x_i^t\) is the current input feature vector of node \(i\), and \(\mathcal{G}\) is the graph representation of the mesh.
 
 In the second mode, the model predicts the increment of the physical state. This mode is called delta prediction. The predicted increment is written as
@@ -250,7 +233,6 @@ x_i^t,
 \mathcal{G}
 \right)
 \end{equation}
-
 where \(\Delta \hat{q}_i^t\) is the predicted change of the physical state at node \(i\), \(f_{\theta}\) is the trainable ConditionalMeshGraphNet model, \(x_i^t\) is the input feature vector at time \(t\), and \(\mathcal{G}\) is the graph structure of the finite-element mesh.
 
 The next physical state is then reconstructed as
@@ -262,7 +244,6 @@ q_i^t
 +
 \Delta \hat{q}_i^t
 \end{equation}
-
 where \(\hat{q}_i^{t+\Delta t}\) is the reconstructed prediction of the physical state at the next time step, \(q_i^t\) is the current physical state of node \(i\), and \(\Delta \hat{q}_i^t\) is the predicted increment of the state.
 
 Delta prediction can be more stable than direct prediction of absolute values. In thermoelastic simulations, the difference between two neighboring time steps is often smoother and smaller in magnitude than the full physical field. Therefore, learning the increment allows the model to focus on the local temporal evolution of the system. This is especially useful for wave propagation, where the model must capture small changes in displacement, velocity, stress, and strain over time.
@@ -282,7 +263,6 @@ P_{\theta_P}
 \circ
 E_{\theta_E}
 \end{equation}
-
 where \(f_{\theta}\) is the full ConditionalMeshGraphNet model, \(E_{\theta_E}\) is the encoder with parameters \(\theta_E\), \(P_{\theta_P}\) is the processor with parameters \(\theta_P\), \(D_{\theta_D}\) is the decoder with parameters \(\theta_D\), and \(\circ\) denotes function composition.
 
 The full set of trainable parameters is written as
@@ -296,7 +276,6 @@ The full set of trainable parameters is written as
 \theta_D
 \right\}
 \end{equation}
-
 where \(\theta\) is the complete parameter set of the model, \(\theta_E\) is the set of encoder parameters, \(\theta_P\) is the set of processor parameters, and \(\theta_D\) is the set of decoder parameters.
 
 The input of the model consists of node features and edge features. The node feature matrix is written as
@@ -306,7 +285,6 @@ X^{t}
 \in
 \mathbb{R}^{N \times F_v}
 \end{equation}
-
 where \(X^{t}\) is the node feature matrix at time \(t\), \(N\) is the number of graph nodes, and \(F_v\) is the number of input node features.
 
 The edge feature matrix is written as
@@ -316,7 +294,6 @@ A
 \in
 \mathbb{R}^{M \times F_e}
 \end{equation}
-
 where \(A\) is the edge feature matrix, \(M\) is the number of graph edges, and \(F_e\) is the number of edge features.
 
 The output of the model is written as
@@ -326,7 +303,6 @@ The output of the model is written as
 \in
 \mathbb{R}^{N \times C}
 \end{equation}
-
 where \(\hat{Y}^{t+\Delta t}\) is the predicted output matrix at time \(t+\Delta t\), \(N\) is the number of graph nodes, and \(C\) is the number of predicted physical fields.
 
 \subsubsection{Node and Edge Encoders}
@@ -341,7 +317,6 @@ h_i^{0}
 x_i^t
 \right)
 \end{equation}
-
 where \(h_i^{0}\) is the initial latent representation of node \(i\), \(\phi_v^{enc}\) is the node encoder network, and \(x_i^t\) is the input feature vector of node \(i\) at time \(t\).
 
 For all nodes, the node encoding operation can be written as
@@ -354,7 +329,6 @@ H^{0}
 X^{t}
 \right)
 \end{equation}
-
 where \(H^{0}\) is the matrix of initial latent node representations, \(\phi_v^{enc}\) is the node encoder, and \(X^{t}\) is the input node feature matrix.
 
 The matrix of latent node representations has the following form:
@@ -369,7 +343,6 @@ H^{0}
 (h_N^{0})^{\top}
 \end{bmatrix}
 \end{equation}
-
 where \(H^{0}\) is the latent node representation matrix, \(h_i^{0}\) is the initial latent vector of node \(i\), and \(N\) is the total number of nodes.
 
 The edge encoder maps the raw edge feature vector into a latent representation. For edge \((i,j)\), this operation is written as
@@ -382,7 +355,6 @@ e_{ij}^{0}
 a_{ij}
 \right)
 \end{equation}
-
 where \(e_{ij}^{0}\) is the initial latent representation of edge \((i,j)\), \(\phi_e^{enc}\) is the edge encoder network, and \(a_{ij}\) is the raw edge feature vector.
 
 Both \(\phi_v^{enc}\) and \(\phi_e^{enc}\) are multilayer perceptrons. Their purpose is to transform heterogeneous physical inputs into a common latent space. This is important because the raw input variables may have different units, scales, and physical meanings. For example, coordinates, temperature, displacement, velocity, stress, strain, density, and elastic constants cannot be processed effectively as a single unstructured set of raw values without feature transformation.
@@ -413,7 +385,6 @@ b_{L-1}
 +
 b_L
 \end{equation}
-
 where \(\phi(z)\) is the output of the multilayer perceptron, \(z\) is the input vector, \(L\) is the number of linear layers, \(W_{\ell}\) is the weight matrix of layer \(\ell\), \(b_{\ell}\) is the bias vector of layer \(\ell\), and \(\psi(\cdot)\) is the nonlinear activation function.
 
 In this model, the activation function is the SiLU function:
@@ -423,7 +394,6 @@ In this model, the activation function is the SiLU function:
 =
 x\sigma(x)
 \end{equation}
-
 where \(\operatorname{SiLU}(x)\) is the activation value for scalar input \(x\), and \(\sigma(x)\) is the sigmoid function.
 
 The sigmoid function is defined as
@@ -433,7 +403,6 @@ The sigmoid function is defined as
 =
 \frac{1}{1+e^{-x}}
 \end{equation}
-
 where \(\sigma(x)\) is the sigmoid value, \(x\) is the scalar input, and \(e\) is the base of the natural exponential function.
 
 The SiLU activation is useful for regression of continuous physical fields because it is smooth and differentiable. This is important when the model learns continuous quantities such as temperature, displacement, stress, and strain.
@@ -447,7 +416,6 @@ Let the number of message passing steps be \(K\). The message passing index is w
 \begin{equation}
 k = 0,1,\dots,K-1
 \end{equation}
-
 where \(k\) is the index of the current message passing step, and \(K\) is the total number of message passing iterations.
 
 At step \(k\), each edge \((i,j)\) is updated using the latent representation of the source node, the latent representation of the destination node, and the current latent representation of the edge. The temporary edge update is computed as
@@ -464,7 +432,6 @@ e_{ij}^k
 \end{bmatrix}
 \right)
 \end{equation}
-
 where \(\tilde{e}_{ij}^{k+1}\) is the proposed update for edge \((i,j)\), \(\phi_e^{k}\) is the edge update network at message passing step \(k\), \(h_i^k\) is the latent representation of the source node \(i\), \(h_j^k\) is the latent representation of the destination node \(j\), and \(e_{ij}^k\) is the current latent representation of edge \((i,j)\).
 
 Then a residual connection is applied to the edge representation:
@@ -474,7 +441,6 @@ e_{ij}^{k}
 +
 \tilde{e}_{ij}^{k+1}
 \end{equation}
-
 where \(e_{ij}^{k}\) is the previous edge representation and \(\tilde{e}_{ij}^{k+1}\) is the learned edge update.
 
 After the residual connection, layer normalization is applied:
@@ -489,7 +455,6 @@ e_{ij}^{k}
 \tilde{e}_{ij}^{k+1}
 \right)
 \end{equation}
-
 where \(e_{ij}^{k+1}\) is the updated edge representation, \(\operatorname{LayerNorm}\) is the layer normalization operation, \(e_{ij}^{k}\) is the previous edge representation, and \(\tilde{e}_{ij}^{k+1}\) is the computed edge update.
 
 The edge update can be interpreted as a learned local interaction between two neighboring mesh points. In the thermoelastic problem, this interaction may depend on relative position, distance, material parameters, temperature difference, displacement difference, velocity, stress, and strain. Therefore, the edge update is responsible for modelling how physical information is transferred between neighboring parts of the geological medium.
@@ -502,7 +467,6 @@ m_j^{k+1}
 \sum_{i:(i,j)\in\mathcal{E}}
 e_{ij}^{k+1}
 \end{equation}
-
 where \(m_j^{k+1}\) is the aggregated message received by node \(j\), \(e_{ij}^{k+1}\) is the updated edge representation from node \(i\) to node \(j\), and the summation is taken over all incoming edges \((i,j)\) connected to node \(j\).
 
 This operation is equivalent to collecting information from all neighboring nodes. In implementation terms, it corresponds to a scatter-add operation over destination nodes. In physical terms, it means that the future state of a node is influenced by the surrounding local region of the geological medium.
@@ -520,7 +484,6 @@ m_j^{k+1}
 \end{bmatrix}
 \right)
 \end{equation}
-
 where \(\tilde{h}_j^{k+1}\) is the proposed update for node \(j\), \(\phi_v^{k}\) is the node update network at message passing step \(k\), \(h_j^k\) is the previous latent representation of node \(j\), and \(m_j^{k+1}\) is the aggregated message received from neighboring nodes.
 
 A residual connection is then applied to the node representation:
@@ -530,7 +493,6 @@ h_j^k
 +
 \tilde{h}_j^{k+1}
 \end{equation}
-
 where \(h_j^k\) is the previous node representation and \(\tilde{h}_j^{k+1}\) is the learned node update.
 
 The final updated node representation is obtained after layer normalization:
@@ -545,7 +507,6 @@ h_j^k
 \tilde{h}_j^{k+1}
 \right)
 \end{equation}
-
 where \(h_j^{k+1}\) is the updated latent representation of node \(j\), \(\operatorname{LayerNorm}\) is the normalization operation, \(h_j^k\) is the previous node representation, and \(\tilde{h}_j^{k+1}\) is the learned node update.
 
 The residual connections help to preserve the information from previous representations and improve the gradient flow during training. Layer normalization stabilizes the distribution of latent features and makes training more robust. This is important because the model performs several message passing steps, and without stabilization, the latent representations may become difficult to optimize.
@@ -561,7 +522,6 @@ After \(K\) message passing steps, each graph node contains a final latent repre
 h_i^K
 \right)
 \end{equation}
-
 where \(\hat{y}_i\) is the predicted output vector for node \(i\), \(\phi^{dec}\) is the decoder network, and \(h_i^K\) is the latent representation of node \(i\) after \(K\) message passing steps.
 
 For the whole graph, the output matrix is written as
@@ -576,7 +536,6 @@ For the whole graph, the output matrix is written as
 \hat{y}_N^{\top}
 \end{bmatrix}
 \end{equation}
-
 where \(\hat{Y}\) is the predicted output matrix for all graph nodes, \(\hat{y}_i\) is the predicted physical field vector for node \(i\), and \(N\) is the total number of graph nodes.
 
 The decoder is responsible for converting abstract latent features into physically interpretable quantities. Depending on the selected target fields, the output may contain temperature, displacement components, velocity components, stress components, strain components, or increments of these quantities. In the context of thermoelastic wave prediction, this means that the decoder learns how the latent representation of each node should be translated into the next physical state of the geological medium.
@@ -598,7 +557,6 @@ k \nabla T
 +
 Q
 \end{equation}
-
 where \(\rho\) is the material density, \(c_p\) is the specific heat capacity, \(T\) is the temperature field, \(t\) is time, \(k\) is the thermal conductivity, \(\nabla T\) is the temperature gradient, and \(Q\) is the heat source term.
 
 Mechanical wave propagation in an elastic medium is related to displacement, stress, and force balance. A general dynamic balance equation can be written as
@@ -611,7 +569,6 @@ Mechanical wave propagation in an elastic medium is related to displacement, str
 +
 b
 \end{equation}
-
 where \(\rho\) is the material density, \(u\) is the displacement vector, \(t\) is time, \(\sigma\) is the stress tensor, and \(b\) is the body force vector.
 
 The displacement vector is written as
@@ -624,7 +581,6 @@ u \\
 v
 \end{bmatrix}
 \end{equation}
-
 where \(u\) is the displacement vector, and \(u\) and \(v\) are the in-plane displacement components.
 
 Under the plane-strain assumption used in this thesis, the stress tensor reduces to its in-plane components and can be written as
@@ -637,7 +593,6 @@ Under the plane-strain assumption used in this thesis, the stress tensor reduces
 \sigma_{xy} & \sigma_y
 \end{bmatrix}
 \end{equation}
-
 where \(\sigma\) is the stress tensor, \(\sigma_x\) and \(\sigma_y\) are the in-plane normal stress components, and \(\sigma_{xy}\) is the in-plane shear stress component.
 
 The strain tensor is related to displacement gradients. In the small-strain approximation, it is defined as
@@ -652,7 +607,6 @@ The strain tensor is related to displacement gradients. In the small-strain appr
 (\nabla u)^{\top}
 \right)
 \end{equation}
-
 where \(\varepsilon\) is the strain tensor, \(u\) is the displacement vector, \(\nabla u\) is the displacement gradient tensor, and \((\nabla u)^{\top}\) is its transpose.
 
 Thermal expansion couples the thermal and mechanical parts of the problem. A simplified thermoelastic strain relation can be written as
@@ -664,7 +618,6 @@ Thermal expansion couples the thermal and mechanical parts of the problem. A sim
 +
 \varepsilon^{th}
 \end{equation}
-
 where \(\varepsilon\) is the total strain tensor, \(\varepsilon^{mech}\) is the mechanical strain tensor, and \(\varepsilon^{th}\) is the thermal strain tensor.
 
 The thermal strain may be written as
@@ -678,7 +631,6 @@ T - T_0
 \right)
 I
 \end{equation}
-
 where \(\varepsilon^{th}\) is the thermal strain tensor, \(\alpha\) is the coefficient of thermal expansion, \(T\) is the current temperature, \(T_0\) is the reference temperature, and \(I\) is the identity tensor.
 
 After finite-element discretization, these continuous equations are represented through local interactions between neighboring mesh nodes and elements. MeshGraphNet learns a data-driven approximation of these interactions. The edge update models pairwise interactions between neighboring nodes, the aggregation step collects information from the local neighborhood, and the node update changes the hidden state of each node according to the received information.
@@ -694,7 +646,6 @@ j \in \mathcal{V}
 \operatorname{dist}_{\mathcal{G}}(i,j) \leq K
 \right\}
 \end{equation}
-
 where \(\mathcal{N}_K(i)\) is the \(K\)-step neighborhood of node \(i\), \(j\) is another node in the graph, \(\mathcal{V}\) is the set of graph nodes, \(\operatorname{dist}_{\mathcal{G}}(i,j)\) is the shortest graph distance between nodes \(i\) and \(j\), and \(K\) is the number of message passing steps.
 
 This means that after \(K\) message passing iterations, node \(i\) can receive information from all nodes located within \(K\) graph edges. Therefore, increasing the number of message passing blocks increases the spatial region that can influence the prediction at each node. This is important because thermal and elastic disturbances propagate through the medium over time and affect increasingly distant regions.
@@ -720,7 +671,6 @@ w_c
 y_{i,c}
 \right)^2
 \end{equation}
-
 where \(\mathcal{L}\) is the weighted loss value, \(C\) is the number of predicted fields, \(w_c\) is the weight assigned to field \(c\), \(N\) is the number of nodes, \(\hat{y}_{i,c}\) is the predicted value of field \(c\) at node \(i\), and \(y_{i,c}\) is the target value.
 
 The need for weighting comes from the fact that different physical variables may have different numerical scales and different physical importance. Temperature, displacement, velocity, stress, and strain are measured in different units. If all fields are treated equally without normalization or weighting, fields with larger numerical magnitude may dominate the loss function.
@@ -742,7 +692,6 @@ The set of output fields can be divided into physical groups:
 \cup
 \mathcal{C}_{other}
 \end{equation}
-
 where \(\mathcal{C}\) is the full set of predicted fields, \(\mathcal{C}_{T}\) is the temperature group, \(\mathcal{C}_{u}\) is the displacement group, \(\mathcal{C}_{\dot{u}}\) is the velocity group, \(\mathcal{C}_{\sigma}\) is the stress group, \(\mathcal{C}_{\varepsilon}\) is the strain group, and \(\mathcal{C}_{other}\) is the group of other physical fields.
 
 A group-based weighting scheme can be written as
@@ -752,7 +701,6 @@ w_c = w_g,
 \qquad
 c \in \mathcal{C}_g
 \end{equation}
-
 where \(w_c\) is the weight of field \(c\), \(w_g\) is the weight assigned to physical group \(g\), and \(\mathcal{C}_g\) is the set of fields that belong to group \(g\).
 
 For example, if stress fields are considered especially important for evaluating wave intensity, the stress group can receive a larger weight. If temperature propagation is the main target, the temperature group can be emphasized. This makes the training objective flexible and better aligned with the physical goals of the project.
@@ -779,7 +727,6 @@ y_{i,c}
 \right)^2
 }
 \end{equation}
-
 where \(\mathrm{RMSE}\) is the root mean squared error, \(N\) is the number of nodes, \(C\) is the number of predicted fields, \(\hat{y}_{i,c}\) is the predicted value, and \(y_{i,c}\) is the target value.
 
 The mean absolute error is written as
@@ -796,7 +743,6 @@ The mean absolute error is written as
 y_{i,c}
 \right|
 \end{equation}
-
 where \(\mathrm{MAE}\) is the mean absolute error, \(N\) is the number of nodes, \(C\) is the number of predicted fields, \(\hat{y}_{i,c}\) is the predicted value, and \(y_{i,c}\) is the target value.
 
 The per-field root mean squared error is defined as
@@ -814,7 +760,6 @@ y_{i,c}
 \right)^2
 }
 \end{equation}
-
 where \(\mathrm{RMSE}_c\) is the root mean squared error for field \(c\), \(N\) is the number of nodes, \(\hat{y}_{i,c}\) is the predicted value of field \(c\) at node \(i\), and \(y_{i,c}\) is the corresponding target value.
 
 The per-field mean absolute error is defined as
@@ -830,7 +775,6 @@ The per-field mean absolute error is defined as
 y_{i,c}
 \right|
 \end{equation}
-
 where \(\mathrm{MAE}_c\) is the mean absolute error for field \(c\), \(N\) is the number of nodes, \(\hat{y}_{i,c}\) is the predicted value of field \(c\) at node \(i\), and \(y_{i,c}\) is the target value.
 
 Global metrics are useful for comparing different training runs, model configurations, and checkpoints. However, they may hide errors in individual physical fields. For example, a model may achieve a low total error because temperature is predicted accurately, while stress or strain prediction remains less accurate. Therefore, per-field metrics are necessary for detailed physical evaluation of the model.
@@ -847,7 +791,6 @@ Y,
 \texttt{edge\_attr}
 \right)
 \end{equation}
-
 where \(X\) is the node feature matrix, \(Y\) is the target matrix of physical fields, \(\texttt{edge\_index}\) is the graph connectivity matrix, and \(\texttt{edge\_attr}\) is the matrix of edge features.
 
 The node feature matrix has the following dimensionality:
@@ -857,7 +800,6 @@ X
 \in
 \mathbb{R}^{N \times F_v}
 \end{equation}
-
 where \(X\) is the node feature matrix, \(N\) is the number of nodes, and \(F_v\) is the number of node features.
 
 The target matrix has the following dimensionality:
@@ -867,7 +809,6 @@ Y
 \in
 \mathbb{R}^{N \times C}
 \end{equation}
-
 where \(Y\) is the target matrix, \(N\) is the number of nodes, and \(C\) is the number of predicted physical fields.
 
 The graph connectivity matrix is written as
@@ -877,7 +818,6 @@ The graph connectivity matrix is written as
 \in
 \mathbb{N}^{2 \times M}
 \end{equation}
-
 where \(\texttt{edge\_index}\) stores the source and destination node indices for each edge, and \(M\) is the total number of graph edges.
 
 The edge feature matrix is written as
@@ -887,7 +827,6 @@ The edge feature matrix is written as
 \in
 \mathbb{R}^{M \times F_e}
 \end{equation}
-
 where \(\texttt{edge\_attr}\) stores edge features, \(M\) is the number of edges, and \(F_e\) is the number of edge features.
 
 The dataset is divided into training, validation, and test subsets. The training subset is used to update the model parameters. The validation subset is used to monitor generalization during training and select the best checkpoint. The test subset is used only for final evaluation after the training process is complete.
@@ -901,7 +840,6 @@ The Adam optimizer is used to optimize the model parameters. The parameter updat
 \eta
 \frac{\hat{m}_t}{\sqrt{\hat{v}_t}+\epsilon}
 \end{equation}
-
 where \(\theta_t\) is the parameter vector at is the parameter vector at optimization step \(t\), \(\theta_{t+1}\) is the updated parameter vector, \(\eta\) is the learning rate, \(\hat{m}_t\) is the bias-corrected first moment estimate of the gradient, \(\hat{v}_t\) is the bias-corrected first moment estimate of the gradient and \(\epsilon\) is a small constant used for numerical stability.
 
 Gradient clipping is applied to prevent unstable updates. The clipped gradient is computed as
@@ -917,7 +855,6 @@ g
 \frac{\tau}{\|g\|_2}
 \right)
 \end{equation}
-
 where \(g\) is the gradient vector, \(\tau\) is the maximum allowed gradient norm, and \(\|g\|_2\) is the Euclidean norm of the gradient.
 
 The average training loss for epoch \(e\) is given by
@@ -929,7 +866,6 @@ The average training loss for epoch \(e\) is given by
 \sum_{b \in \mathcal{D}_{train}}
 \mathcal{L}^{(b)}
 \end{equation}
-
 where \(\mathcal{L}_{train}^{(e)}\) is the training loss at epoch \(e\), \(\mathcal{D}_{train}\) is the training dataset, \(b\) is a training batch or sample, and \(\mathcal{L}^{(b)}\) is the loss computed for batch \(b\).
 
 The average validation loss for epoch \(e\) is written as
@@ -941,7 +877,6 @@ The average validation loss for epoch \(e\) is written as
 \sum_{b \in \mathcal{D}_{val}}
 \mathcal{L}^{(b)}
 \end{equation}
-
 where \(\mathcal{L}_{val}^{(e)}\) is the validation loss at epoch \(e\), \(\mathcal{D}_{val}\) is the validation dataset, \(b\) is a validation batch or sample, and \(\mathcal{L}^{(b)}\) is the loss computed for batch \(b\).
 
 The final test loss is computed as
@@ -953,7 +888,6 @@ The final test loss is computed as
 \sum_{b \in \mathcal{D}_{test}}
 \mathcal{L}^{(b)}
 \end{equation}
-
 where \(\mathcal{L}_{test}\) is the test loss, \(\mathcal{D}_{test}\) is the test dataset, \(b\) is a test batch or sample, and \(\mathcal{L}^{(b)}\) is the loss computed for batch \(b\).
 
 Early stopping is used to stop training when the validation loss no longer improves.The condition of no improvement at epoch \(e\) can be written as
@@ -964,7 +898,6 @@ Early stopping is used to stop training when the validation loss no longer impro
 \min_{r < e}
 \mathcal{L}_{val}^{(r)}
 \end{equation}
-
 where \(\mathcal{L}_{val}^{(e)}\) is the validation loss at epoch \(e\), \(\mathcal{L}_{val}^{(r)}\)  is the validation loss at an earlier epoch \(r\), and the minimum is taken over all previous epochs.
 
 In practice, training is stopped when this condition holds for a pre-defined number of epochs, called patience. This minimizes the chances of overtraining and unnecessary training. Two checkpoints are saved during training. The last checkpoint stores the final model state, while the best checkpoint stores the model state with the lowest validation loss.
@@ -986,7 +919,6 @@ The full set of model parameters can be written as
 \theta_{dec}
 \right\}
 \end{equation}
-
 where \(\theta\) is the complete set of trainable model parameters, \(\theta_{enc}\) is the set of encoder parameters, \(\theta_{proc}\) is the set of processor parameters, and \(\theta_{dec}\) is the set of decoder parameters.
 
 The encoder is responsible for transforming raw node and edge features into latent representations. The processor learns the message passing dynamics between neighboring mesh nodes. The decoder maps the final latent node states into predicted physical fields. Because these components have different roles, different fine-tuning strategies can be applied depending on the similarity between the original training data and the new dataset.
@@ -1000,7 +932,6 @@ In full fine-tuning, all model parameters are updated during training. This mode
 =
 \text{trainable}
 \end{equation}
-
 where \(\theta_{enc}\) is the set of encoder parameters, and \(\text{trainable}\) means that these parameters are updated during optimization.
 
 \begin{equation}
@@ -1008,7 +939,6 @@ where \(\theta_{enc}\) is the set of encoder parameters, and \(\text{trainable}\
 =
 \text{trainable}
 \end{equation}
-
 where \(\theta_{proc}\) is the set of processor parameters, and \(\text{trainable}\) means that these parameters are updated during optimization.
 
 \begin{equation}
@@ -1016,7 +946,6 @@ where \(\theta_{proc}\) is the set of processor parameters, and \(\text{trainabl
 =
 \text{trainable}
 \end{equation}
-
 where \(\theta_{dec}\) is the set of decoder parameters, and \(\text{trainable}\) means that these parameters are updated during optimization.
 
 Equivalently, the trainable parameter set is
@@ -1030,8 +959,8 @@ Equivalently, the trainable parameter set is
 \theta_{dec}
 \right\}
 \end{equation}
-
-where \(\theta_{full}\) is the trainable parameter set in full fine-tuning mode, \(\theta_{enc}\) represents encoder parameters, \(\theta_{proc}\) represents processor parameters, and \(\theta_{dec}\) represents decoder parameters.
+where \(\theta
+_{full}\) is the trainable parameter set in full fine-tuning mode, \(\theta_{enc}\) represents encoder parameters, \(\theta_{proc}\) represents processor parameters, and \(\theta_{dec}\) represents decoder parameters.
 
 Full fine-tuning is useful when the new dataset differs significantly from the original dataset. For example, this may happen when the model is adapted to a different geological material, a different mesh topology, a different range of temperatures, or a different distribution of physical fields. In this case, both low-level feature representations and message passing dynamics may need to be updated.
 
@@ -1044,7 +973,6 @@ In decoder-only fine-tuning, the encoder and processor are frozen, while only th
 =
 \text{frozen}
 \end{equation}
-
 where \(\theta_{enc}\) is the set of encoder parameters, and \(\text{frozen}\) means that these parameters are not updated during optimization.
 
 \begin{equation}
@@ -1052,7 +980,6 @@ where \(\theta_{enc}\) is the set of encoder parameters, and \(\text{frozen}\) m
 =
 \text{frozen}
 \end{equation}
-
 where \(\theta_{proc}\) is the set of processor parameters, and \(\text{frozen}\) means that these parameters are not updated during optimization.
 
 \begin{equation}
@@ -1060,7 +987,6 @@ where \(\theta_{proc}\) is the set of processor parameters, and \(\text{frozen}\
 =
 \text{trainable}
 \end{equation}
-
 where \(\theta_{dec}\) is the set of decoder parameters, and \(\text{trainable}\) means that these parameters are updated during optimization.
 
 The trainable parameter set in this mode is
@@ -1072,7 +998,6 @@ The trainable parameter set in this mode is
 \theta_{dec}
 \right\}
 \end{equation}
-
 where \(\theta_{decoder}\) is the trainable parameter set in decoder-only fine-tuning mode, and \(\theta_{dec}\) is the set of decoder parameters.
 
 Decoder-only fine-tuning is useful when the learned spatial interaction mechanism remains valid, but the final mapping from latent features to output fields must be adjusted. For example, if the mesh structure and physical process are similar but the output fields have different scaling, normalization, or target selection, updating only the decoder may be sufficient. This mode is computationally cheaper than full fine-tuning because only a small part of the model is trained.
@@ -1086,7 +1011,6 @@ In processor-decoder fine-tuning, the encoder is frozen, while the processor and
 =
 \text{frozen}
 \end{equation}
-
 where \(\theta_{enc}\) is the set of encoder parameters, and \(\text{frozen}\) means that these parameters are not updated during optimization.
 
 \begin{equation}
@@ -1094,7 +1018,6 @@ where \(\theta_{enc}\) is the set of encoder parameters, and \(\text{frozen}\) m
 =
 \text{trainable}
 \end{equation}
-
 where \(\theta_{proc}\) is the set of processor parameters, and \(\text{trainable}\) means that these parameters are updated during optimization.
 
 \begin{equation}
@@ -1102,7 +1025,6 @@ where \(\theta_{proc}\) is the set of processor parameters, and \(\text{trainabl
 =
 \text{trainable}
 \end{equation}
-
 where \(\theta_{dec}\) is the set of decoder parameters, and \(\text{trainable}\) means that these parameters are updated during optimization.
 
 The trainable parameter set in this mode is
@@ -1115,7 +1037,6 @@ The trainable parameter set in this mode is
 \theta_{dec}
 \right\}
 \end{equation}
-
 where \(\theta_{proc-dec}\) is the trainable parameter set in processor-decoder fine-tuning mode, \(\theta_{proc}\) is the set of processor parameters, and \(\theta_{dec}\) is the set of decoder parameters.
 
 Processor-decoder fine-tuning is useful when the low-level encoding of features remains meaningful, but the physical interaction dynamics must be adapted. For example, if the input feature schema is the same but the material properties or thermal response change, the processor may need to learn a new message passing pattern. Since the processor is responsible for modelling local interactions, updating it allows the model to adapt to new propagation behavior without retraining the encoder from scratch.
@@ -1149,7 +1070,6 @@ X^{t},
 \mathcal{G}
 \right)
 \end{equation}
-
 where \(\mathcal{S}_{COMSOL}\) denotes the numerical simulation operator represented by COMSOL, \(f_{\theta}\) denotes the trained MeshGraphNet surrogate model, \(X^{t}\) is the input node feature matrix at time \(t\), and \(\mathcal{G}\) is the graph representation of the finite-element mesh.
 
 This expression means that the neural network is trained to approximate the behavior of the numerical solver. The goal is not to replace the physical formulation itself, but to learn a fast approximation of the simulated state transition for the considered range of scenarios.
@@ -1171,7 +1091,6 @@ Y_n,
 \right)
 \right\}_{n=1}^{N_s}
 \end{equation}
-
 where \(\mathcal{D}_{train}\) is the training dataset, \(X_n\) is the input feature matrix of sample \(n\), \(Y_n\) is the target matrix of sample \(n\), \(\mathcal{G}_n\) is the graph structure of sample \(n\), and \(N_s\) is the number of training samples.
 
 The model is expected to perform best when new samples are drawn from a similar distribution:
@@ -1184,7 +1103,6 @@ X_{new},
 \sim
 \mathcal{D}_{train}
 \end{equation}
-
 where \(X_{new}\) is the input feature matrix for a new sample, \(\mathcal{G}_{new}\) is the graph structure for the new sample, and \(\mathcal{D}_{train}\) represents the distribution of training data.
 
 If the new scenario lies far outside the training distribution, the model may extrapolate poorly. This may occur when the temperature range, material parameters, boundary conditions, mesh density, or excitation type differ strongly from the simulations used during training.
@@ -1200,7 +1118,6 @@ f_{\theta}
 \mathcal{G}
 \right)
 \end{equation}
-
 where \(\hat{q}^{t+(n+1)\Delta t}\) is the predicted physical state at rollout step \(n+1\), \(f_{\theta}\) is the trained surrogate model, \(\hat{q}^{t+n\Delta t}\) is the predicted physical state from the previous rollout step, and \(\mathcal{G}\) is the graph structure.
 
 In this setting, prediction errors can accumulate over time. Even a small error at one step may influence the next input and gradually lead to drift in the predicted trajectory. Therefore, long-horizon prediction requires careful validation.
@@ -1222,7 +1139,6 @@ Y
 \right)
 \right]
 \end{equation}
-
 where \(\theta^{*}\) is the optimized parameter set, \(\theta\) is the model parameter set, \(\mathcal{D}_{train}\) is the training data distribution, \(X\) is the input feature matrix, \(Y\) is the target matrix, \(\mathcal{G}\) is the graph representation of the mesh, \(f_{\theta}\) is the model prediction, and \(\mathcal{L}\) is the training loss function.
 
 This objective shows that the model is optimized to minimize prediction error on the training distribution. It does not automatically guarantee exact satisfaction of the original physical equations. For this reason, model predictions should be evaluated not only using statistical metrics, but also through physical visualization and comparison with reference simulations.
@@ -1242,7 +1158,6 @@ M H
 +
 K M H
 \end{equation}
-
 where \(\mathcal{M}\) denotes approximate memory usage, \(N\) is the number of nodes, \(M\) is the number of edges, \(H\) is the latent hidden dimension, and \(K\) is the number of message passing steps.
 
 This expression is not an exact memory formula, but it shows the main factors that influence memory consumption. Larger graphs, more edges, higher latent dimensions, and more message passing blocks increase the computational requirements of the model.
@@ -1258,7 +1173,6 @@ The graph representation is written as
 =
 (\mathcal{V},\mathcal{E})
 \end{equation}
-
 where \(\mathcal{G}\) is the mesh graph, \(\mathcal{V}\) is the set of mesh nodes, and \(\mathcal{E}\) is the set of graph edges.
 
 Each node contains a feature vector that includes geometry, material parameters, scenario parameters, and the current physical state:
@@ -1273,7 +1187,6 @@ s \\
 q_i^t
 \end{bmatrix}
 \end{equation}
-
 where \(x_i^t\) is the input feature vector of node \(i\) at time \(t\), \(p_i\) is the coordinate vector, \(m_i\) is the material parameter vector, \(s\) is the scenario parameter vector, and \(q_i^t\) is the current physical state vector.
 
 The model learns the transition from the current physical state to the future physical state:
@@ -1287,7 +1200,6 @@ X^{t},
 \mathcal{G}
 \right)
 \end{equation}
-
 where \(\hat{Y}^{t+\Delta t}\) is the predicted matrix of physical fields, \(f_{\theta}\) is the trained ConditionalMeshGraphNet model, \(X^{t}\) is the current node feature matrix, and \(\mathcal{G}\) is the graph structure.
 
 The architecture follows the Encoder--Processor--Decoder principle:
@@ -1301,7 +1213,6 @@ P_{\theta_P}
 \circ
 E_{\theta_E}
 \end{equation}
-
 where \(E_{\theta_E}\) is the encoder, \(P_{\theta_P}\) is the message passing processor, \(D_{\theta_D}\) is the decoder, and \(\theta_E\), \(\theta_P\), and \(\theta_D\) are their corresponding parameter sets.
 
 The encoder maps raw physical features into latent vectors. The processor performs message passing and learns local interactions between neighboring mesh nodes. The decoder converts the final latent representations into predicted physical fields. This structure is suitable for thermoelastic wave prediction because heat transfer and elastic wave propagation are local physical processes that spread through the mesh over time.
@@ -1323,7 +1234,6 @@ w_c
 y_{i,c}
 \right)^2
 \end{equation}
-
 where \(\mathcal{L}\) is the weighted loss, \(w_c\) is the weight of field \(c\), \(C\) is the number of predicted fields, \(N\) is the number of nodes, \(\hat{y}_{i,c}\) is the predicted value, and \(y_{i,c}\) is the target value.
 
 The model is evaluated using global metrics and per-field metrics, including mean squared error, root mean squared error, mean absolute error, per-field root mean squared error, and per-field mean absolute error. These metrics are necessary because different physical quantities may have different scales and different importance for the final interpretation of thermoelastic wave propagation.
